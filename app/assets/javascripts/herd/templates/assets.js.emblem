@@ -1,0 +1,7 @@
+h1 Asset
+
+p Your content here.
+
+ul
+  each ass in model
+    li = ass.fileName
