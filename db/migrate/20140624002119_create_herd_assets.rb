@@ -6,6 +6,7 @@ class CreateHerdAssets < ActiveRecord::Migration
       t.string :content_type
       t.string :type
       t.text :meta
+      t.integer :parent_asset_id, index: true
 
       t.timestamps
     end
