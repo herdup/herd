@@ -7,10 +7,10 @@ require "herd/version"
 Gem::Specification.new do |s|
   s.name        = "herd"
   s.version     = Herd::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of Herd."
+  s.authors     = ["Sebastian Bean"]
+  s.email       = ["sebastian@ginlanemedia.com"]
+  s.homepage    = "nah.com"
+  s.summary     = "Asset mgmt for 2020"
   s.description = "TODO: Description of Herd."
   s.license     = "MIT"
 
