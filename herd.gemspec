@@ -16,19 +16,22 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency "rails", "~> 4.1.1"
-  s.add_dependency "rspec-rails", "~> 2.14.1"
+  s.add_dependency "rails", "> 4"
+  s.add_dependency "rspec-rails"#, "~> 2.14.1"
   s.add_dependency "haml-rails"
   s.add_dependency "coffee-rails"
   s.add_dependency 'ember-rails'
   s.add_dependency 'ember-source'
   s.add_dependency 'emblem-rails'
+  s.add_dependency 'ember_script-rails'
   s.add_dependency 'jquery-rails'
   s.add_dependency 'active_model_serializers'
+  s.add_dependency 'ruby-filemagic'
+  s.add_dependency 'mini_magick'
+  s.add_dependency 'exifr'
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency 'awesome_print'
   s.add_development_dependency 'pry'
-  s.add_development_dependency 'quiet_assets'
 
 end
