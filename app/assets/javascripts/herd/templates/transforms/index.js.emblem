@@ -1,0 +1,9 @@
+h1 Transforms
+
+ul
+  each transform in model
+    li
+      button{action 'destroy' transform} X
+      =link-to 'transforms.show' transform | {{transform.cleanOptions}}
+
+=link-to 'transforms.new' | New

@@ -1,0 +1,15 @@
+h1 Asset
+
+p Your content here.
+
+ul
+  each asset in filteredAssets
+    li
+      button{action 'destroy' asset} X
+
+      = link-to 'assets.show' asset
+        = asset.fileName
+        asset-container asset=asset options="crop: '34%x100%+52+0'|resize: x800"
+
+
+file-upload url="/herd/assets" uploaded="uploadFinished" progress="uploadProgressed"
