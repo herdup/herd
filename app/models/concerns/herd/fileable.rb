@@ -83,6 +83,16 @@ module Herd::Fileable
 				send(sym)
 			end
 		end
+		def fileable_directory_fields(block=nil)
+			define_method :fileable_directory_fields do
+				pattern = ""
+				if block.present?
+					pattern << block.call(self)
+				else
+					pattern << self.id.to_s
+				end
+			end
+		end
 	end
 
 end
