@@ -14,11 +14,27 @@
 #= require handlebars
 #= require ember
 #= require ember-data
-#= require i18n
+#= require ember-uploader
+#= require js-yaml
 #= require_self
+#= require ./herd
 
-window.Herd = Em.Application.create
+# for more details see: http://emberjs.com/guides/application/
+window.Herd = Ember.Application.create
   LOG_TRANSITIONS: true
   LOG_TRANSITIONS_INTERNAL: true
   LOG_VIEW_LOOKUPS: true
-  LOG_ACTIVE_GENERATION: true  
+  LOG_ACTIVE_GENERATION: true
+  Resolver: Ember.DefaultResolver.extend
+    resolveTemplate: (parsedName) ->
+      parsedName.fullNameWithoutType = "herd/" + parsedName.fullNameWithoutType
+      @_super parsedName
+
+DS.YamlTransform = DS.Transform.extend
+  deserialize: (serialized) ->
+    jsyaml.load(serialized)
+
+  serialize: (deserialized) ->
+    jsyaml.safeDump(deserialized)
+
+Herd.register "transform:yaml", DS.YamlTransform
