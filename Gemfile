@@ -13,4 +13,5 @@ gemspec
 # To use debugger
 # gem 'debugger'
 gem 'awesome_print', :require => 'ap'
-gem 'spring', group: :development
+gem 'spring'
+#gem 'mini_magick', path: '/Users/seb/Projects/_Rails/minimagick'
