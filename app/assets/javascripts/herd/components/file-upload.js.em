@@ -9,7 +9,7 @@ Herd.FileUploadComponent = Ember.FileField.extend
       paramNamespace: 'asset'
 
     for file in @files
-      uploader.upload file
+      uploader.upload file, window.assetable
 
     uploader.on 'progress', (e) =>
       @uploadProgressed(e)

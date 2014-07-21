@@ -25,10 +25,13 @@ Gem::Specification.new do |s|
   s.add_dependency 'emblem-rails'
   s.add_dependency 'ember_script-rails'
   s.add_dependency 'jquery-rails'
-  s.add_dependency 'active_model_serializers'
+  s.add_dependency 'jquery-ui-rails'
+  s.add_dependency 'active_model_serializers', "~> 0.9.0.alpha1"
   s.add_dependency 'ruby-filemagic'
   s.add_dependency 'mini_magick'
   s.add_dependency 'exifr'
+  s.add_dependency 'sidekiq'
+  s.add_dependency 'emcee'
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency 'awesome_print'

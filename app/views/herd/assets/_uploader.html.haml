@@ -1,0 +1,11 @@
+
+- content_for :head do
+  :javascript
+    window.assetable = {
+      assetable_id: "#{object.id}",
+      assetable_type: "#{object.class.to_s}"
+    }
+
+  = javascript_include_tag "herd/application"
+  = stylesheet_link_tag "herd/assets"
+#herd-uploader

@@ -1,3 +1,6 @@
+
+require_dependency "herd/transform"
+
 module Herd
   class Asset < ActiveRecord::Base
     include Fileable
@@ -9,15 +12,18 @@ module Herd
     scope :child, -> {where.not(parent_asset_id: nil)}
 
     belongs_to :assetable, polymorphic: true
-    # acts_as_list scope: [:assetable_id, :assetable_type]
 
     belongs_to :transform
+    has_many :child_transforms, through: :child_assets, source: :transform
 
     belongs_to :parent_asset, class_name: 'Asset'
     has_many :child_assets, class_name: 'Asset',
                             dependent: :destroy,
                             foreign_key: :parent_asset_id
 
+    default_scope -> {
+      order(:position)
+    }
 
     fileable_directory_fields -> (a) {
       if a.master?
@@ -28,7 +34,10 @@ module Herd
     }
 
     before_create -> {
-      self.file = transform.perform(parent_asset) if transform_id.present?
+      if parent_asset.present?
+        self.file ||= transform.perform(parent_asset) if transform_id.present?
+        self.assetable ||= parent_asset.assetable
+      end
       prepare_file if file.present?
     }
 
@@ -45,12 +54,15 @@ module Herd
       @meta_struct ||= OpenStruct.new meta
     end
 
-    def t(transform_string)
+    def t(transform_string,params=nil)
+      # klass ||= Herd::MiniMagick
       transform = Transform.find_or_create_with_options_string(transform_string)
+
       # first_or_create will generate a child_asset who's parent_asset is inaccessible
       # because it's tainted with the transform_id: transform.id scope for some reason
-      hash = {parent_asset:self, transform:transform, assetable: assetable}
+      hash = {parent_asset:self, transform:transform}
       child = Asset.where(hash).first || Asset.create(hash)
+      child.update params if params.present?
       child.class.to_s == child.type ? child : child.becomes(type.constantize)
     end
 
