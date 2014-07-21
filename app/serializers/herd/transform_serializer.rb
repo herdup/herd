@@ -1,11 +1,12 @@
 module Herd
   class TransformSerializer < ActiveModel::Serializer
-    attributes :id, :created_at, :updated_at, :type
-    attribute :_options, key: :options
+    attributes :id, :created_at, :type
+    attributes :options
 
+    # has_many :assets
 
-    def _options
-      YAML::dump(object.options)
+    def options
+      YAML::dump(object.options).split("\n").drop(1).join('|')
     end
     def _format
       object.format
@@ -14,8 +15,6 @@ module Herd
     def resize
       object.options.try :resize
     end
-
-
 
   end
 end

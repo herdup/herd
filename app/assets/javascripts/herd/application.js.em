@@ -11,6 +11,7 @@
 # about supported directives.
 #
 #= require jquery
+#= require jquery.ui.sortable
 #= require handlebars
 #= require ember
 #= require ember-data
@@ -25,6 +26,7 @@ window.Herd = Ember.Application.create
   LOG_TRANSITIONS_INTERNAL: true
   LOG_VIEW_LOOKUPS: true
   LOG_ACTIVE_GENERATION: true
+  rootElement: '#herd-uploader'
   Resolver: Ember.DefaultResolver.extend
     resolveTemplate: (parsedName) ->
       parsedName.fullNameWithoutType = "herd/" + parsedName.fullNameWithoutType

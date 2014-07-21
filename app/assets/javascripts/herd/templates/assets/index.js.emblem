@@ -2,14 +2,12 @@ h1 Asset
 
 p Your content here.
 
-ul
-  each asset in filteredAssets
-    li
+ul.sortable
+  each asset in filteredContent
+    li.item data-id=asset.id!
       button{action 'destroy' asset} X
-
-      = link-to 'assets.show' asset
-        = asset.fileName
-        asset-container asset=asset options="crop: '34%x100%+52+0'|resize: x800"
+      = asset.fileName
+      asset-container asset=asset t="resize: 680x"
 
 
 file-upload url="/herd/assets" uploaded="uploadFinished" progress="uploadProgressed"

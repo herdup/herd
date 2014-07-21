@@ -1,1 +1,5 @@
-img src=assetUrl
+div.herd-wrap
+  img src=assetUrl
+  ul.transform-list
+    each asset in asset.childAssets
+      li #{asset.transform.options} #{asset.id}

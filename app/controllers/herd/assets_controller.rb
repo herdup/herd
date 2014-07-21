@@ -10,20 +10,17 @@ module Herd
       transforms = params[:options].split(';')
       child = @asset
       transforms.each { |t| child = child.t t }
-       
+
       respond_to do |format|
-        format.json { render json: [child], each_serializer: AssetSerializer  }
+        format.json { render json: child, serializer: AssetSerializer  }
         format.any { redirect_to child.file_url }
       end
     end
 
     # GET /assets
     def index
-      if params[:ids]
-        @assets = Asset.where(id:params[:ids])
-      else
-        @assets = Asset.all
-      end
+      @assets = scoped_assets
+
       respond_to do |format|
         format.json { render json: @assets,  each_serializer: AssetSerializer  }
         format.html
@@ -32,11 +29,20 @@ module Herd
 
     # GET /assets/1
     def show
-      respond_with(@asset, serializer: AssetSerializer)
+      respond_to do |format|
+        format.json {render json: @asset, serializer: AssetSerializer}
+        format.html
+      end
+
     end
 
     # POST /assets
     def create
+
+      if transform_params.present?
+        @transform = Transform.where_t(transform_params).first_or_create
+        params[:asset][:transform_id] = @transform.id
+      end
       # if asset_params[:file]
         @asset = Asset.new(asset_params)
       # elsif asset_params.keys.sort == %s{transform_id parent_id}.sort
@@ -44,7 +50,7 @@ module Herd
       # end
 
       if @asset.save
-        render json: [@asset], each_serializer: AssetSerializer
+        render json: @asset, serializer: AssetSerializer
       else
         render json: @asset.errors, status: :unprocessable_entity
       end
@@ -65,7 +71,21 @@ module Herd
       render nothing: true, status: 204
     end
 
+    def scoped_assets
+      assets = Asset.order(:position)
+      if params[:assetable_type].present?
+        assets = assets.where(params.slice(:assetable_type,:assetable_id))
+      elsif params[:parent_id].present?
+        assets = assets.where(parent_asset_id:params[:parent_id])
+      elsif params[:ids].present?
+        assets = assets.where(id:params[:id])
+      end
+      assets
+    end
+
     private
+
+
       # Use callbacks to share common setup or constraints between actions.
       def set_asset
         @asset = Asset.find(params[:id])
@@ -73,7 +93,10 @@ module Herd
 
       # Only allow a trusted parameter "white list" through.
       def asset_params
-        params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id)
+        params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position)
+      end
+      def transform_params
+        params.require(:asset).require(:transform).permit(:type, :options, :format)
       end
   end
 end
