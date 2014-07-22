@@ -6,7 +6,7 @@ module Herd
         if options[:bg]
           content_tag(:div,raw('&nbsp;'),options.merge(style:"background-image: url('#{asset.file_url}');"))
         else
-          image_tag(asset.file_url, options)
+          tag(:img,options.merge(src:asset.file_url))
         end
       end
     end
