@@ -26,9 +26,14 @@ module Herd
 
     initializer 'activeservice.autoload', :before => :set_autoload_paths do |app|
       app.config.eager_load_paths << "#{config.root}/app/workers"
-      app.config.eager_load_paths << "#{config.root}/app/models/transforms"
     end
-    # config.eager_load_paths << "#{config.root}/app/workers"
+    initializer :append_migrations do |app|
+      unless app.root.to_s.match root.to_s
+        config.paths["db/migrate"].expanded.each do |expanded_path|
+          app.config.paths["db/migrate"] << expanded_path
+        end
+      end
+    end
   end
 end
 
