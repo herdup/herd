@@ -1,6 +1,4 @@
-h1 Asset
-
-p Your content here.
+h1 Assets
 
 ul.sortable
   each asset in filteredContent
