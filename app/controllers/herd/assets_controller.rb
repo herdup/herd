@@ -59,6 +59,10 @@ module Herd
     # PATCH/PUT /assets/1
     def update
       if @asset.update(asset_params)
+        if metadata_params.present?
+          @asset.meta = metadata_params
+          @asset.save if @asset.meta_changed?
+        end
         respond_with(@asset, serializer: AssetSerializer)
       else
         render :edit
@@ -94,6 +98,9 @@ module Herd
       # Only allow a trusted parameter "white list" through.
       def asset_params
         params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position)
+      end
+      def metadata_params
+        params.require(:asset).require(:metadata).permit!.symbolize_keys
       end
       def transform_params
         params.require(:asset).require(:transform).permit(:type, :options, :format) if params[:asset][:transform].present?

@@ -40,3 +40,12 @@ DS.YamlTransform = DS.Transform.extend
     jsyaml.safeDump(deserialized)
 
 Herd.register "transform:yaml", DS.YamlTransform
+
+DS.RawTransform = DS.Transform.extend
+  deserialize: (serialized) ->
+    serialized
+
+  serialize: (deserialized) ->
+    deserialized
+
+Herd.register "transform:raw", DS.RawTransform

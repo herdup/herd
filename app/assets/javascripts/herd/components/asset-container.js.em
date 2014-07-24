@@ -49,3 +49,6 @@ Herd.AssetContainerComponent = Ember.Component.extend
         return "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
     else
       return @asset.url
+  actions:
+    metaUpdate: ->
+      @asset.save()

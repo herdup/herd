@@ -5,6 +5,11 @@ module Herd
     attributes :width, :height
     attributes :url
     attributes :position
+    attributes :metadata
+
+    def metadata
+      object.meta
+    end
 
 
     has_many :child_assets, embed_in_root: false

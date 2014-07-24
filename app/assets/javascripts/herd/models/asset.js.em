@@ -8,6 +8,7 @@ class Herd.Asset extends DS.Model
   type: DS.attr 'string'
   url: DS.attr 'string'
   position: DS.attr 'number'
+  metadata: DS.attr 'raw'
 
   width: DS.attr 'number'
   height: DS.attr 'number'
@@ -17,6 +18,13 @@ class Herd.Asset extends DS.Model
 
   transform: DS.belongsTo 'transform'
   childTransforms: DS.hasMany 'transform'
+
+  +computed metadata
+  permalink: (key, permalinkString)->
+    if arguments.length == 1
+      @metadata.permalink
+    else
+      @metadata.permalink = permalinkString
 
   t: (trans) ->
     @childAssets.find (item, ix) ->
