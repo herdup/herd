@@ -7,11 +7,11 @@ module Herd
     attributes :position
 
 
-    has_many :child_assets
-    has_one :parent_asset
+    has_many :child_assets, embed_in_root: false
+    has_one :parent_asset, embed_in_root: false
 
     has_one :transform, embed_in_root: true, serializer: TransformSerializer
-    has_many :child_transforms
+    has_many :child_transforms, embed_in_root: false
 
     def url
       object.file_url

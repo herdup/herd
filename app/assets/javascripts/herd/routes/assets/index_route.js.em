@@ -1,3 +1,6 @@
 Herd.AssetsIndexRoute = Ember.Route.extend
   model: (params) ->
-    @store.find('asset', window.assetable)
+    if window.assetable
+      @store.find('asset', window.assetable)
+    else
+      @store.find('asset')
