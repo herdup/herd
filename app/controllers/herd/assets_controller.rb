@@ -96,7 +96,7 @@ module Herd
         params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position)
       end
       def transform_params
-        params.require(:asset).require(:transform).permit(:type, :options, :format)
+        params.require(:asset).require(:transform).permit(:type, :options, :format) if params[:asset][:transform].present?
       end
   end
 end

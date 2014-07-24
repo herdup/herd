@@ -16,7 +16,7 @@ class Herd.AssetsIndexController extends Ember.ArrayController
 
     uploadFinished: (resp) ->
       @store.pushPayload resp
-      @model.pushObject @store.getById('asset', resp.assets[0]?.id)
+      @model.pushObject @store.getById('asset', resp.asset?.id)
 
     uploadProgressed: (e) ->
       console.log('prog ', e)

@@ -24,6 +24,12 @@ module Herd
       config.embed = :ids
     end
 
+    initializer "add herd to precompile", :group => :all do |app|
+      app.config.assets.precompile += %w(
+        application.css
+        application.js
+      )
+    end
     initializer 'activeservice.autoload', :before => :set_autoload_paths do |app|
       app.config.eager_load_paths << "#{config.root}/app/workers"
     end
