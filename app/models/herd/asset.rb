@@ -1,4 +1,3 @@
-
 require_dependency "herd/transform"
 
 module Herd
@@ -123,7 +122,9 @@ module Herd
     def sanitized_classname
       # use the second path chunk for now (i.e. what's after "Rcms::")
       # not ideal but cant figure out an easy way around it
-      self.class.to_s.split("::").second.pluralize.downcase
+      type_s = self.type
+      type_s ||= self.class.to_s
+      type_s.split("::").second.pluralize.downcase
     end
 
     def master?
