@@ -21,6 +21,7 @@
 #= require ./herd
 
 # for more details see: http://emberjs.com/guides/application/
+
 window.Herd = Ember.Application.create
   LOG_TRANSITIONS: true
   LOG_TRANSITIONS_INTERNAL: true

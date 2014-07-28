@@ -5,7 +5,7 @@ ul.sortable
     li.item data-id=asset.id!
       button{action 'destroy' asset} X
       = asset.fileName
-      asset-container asset=asset t="resize: 680x"
+      asset-info asset=asset t="resize: 680x"
 
 
 file-upload url="/herd/assets" uploaded="uploadFinished" progress="uploadProgressed"

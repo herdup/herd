@@ -27,13 +27,8 @@ Herd.AssetContainerComponent = Ember.Component.extend
       return @child.url
 
     else if @t
-      #@transform = @asset.store.all('transform').find (item, ix) =>
-      #  item.options.match @t
 
       @child = @asset.t @t
-      #childAssets.find (item, ix) =>
-      #  item.transform?.options.match @t
-
       return @assetUrl if @child?.url
 
       if !@child?.url
