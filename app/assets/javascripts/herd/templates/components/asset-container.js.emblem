@@ -1,2 +1,4 @@
-div.herd-wrap
-  img src=assetUrl
+if bg
+  = background-image src=assetUrl
+else
+  = img src=assetUrl
