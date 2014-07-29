@@ -13,6 +13,7 @@ class Herd.AssetsIndexController extends Ember.ArrayController
   actions:
     destroy: (asset) ->
       asset.destroyRecord()
+      @model.removeObject(asset)
 
     uploadFinished: (resp) ->
       @store.pushPayload resp
