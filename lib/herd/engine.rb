@@ -20,9 +20,9 @@ module Herd
       g.template_engine :haml
     end
 
-    ActiveModel::Serializer.setup do |config|
-      config.embed = :ids
-    end
+    # ActiveModel::Serializer.setup do |config|
+    #   config.embed = :ids
+    # end
 
     initializer "add herd to precompile", :group => :all do |app|
       app.config.assets.precompile += %w(
@@ -42,30 +42,30 @@ module Herd
     end
   end
 end
-
-# Wrap empty serializer has_one association in
-# an empty array BOOYA fix yo bugs AMS
-# https://github.com/rails-api/active_model_serializers/commit/8ca4d4fcd60aee96c4000ce98a50c37c07bc8a40
-module ActiveModel
-  DefaultSerializer.class_eval do
-    def initialize(object, options={})
-      @object = object
-      @wrap_in_array = options[:_wrap_in_array]
-    end
-
-    def as_json(options={})
-      return [] if @object.nil? && @wrap_in_array
-      hash = @object.as_json
-      @wrap_in_array ? [hash] : hash
-    end
-  end
-
-  Serializer.class_eval do
-    def serializable_object(options={})
-      return @wrap_in_array ? [] : nil if @object.nil?
-      hash = attributes
-      hash.merge! associations
-      @wrap_in_array ? [hash] : hash
-    end
-  end
-end
+#
+# # Wrap empty serializer has_one association in
+# # an empty array BOOYA fix yo bugs AMS
+# # https://github.com/rails-api/active_model_serializers/commit/8ca4d4fcd60aee96c4000ce98a50c37c07bc8a40
+# module ActiveModel
+#   DefaultSerializer.class_eval do
+#     def initialize(object, options={})
+#       @object = object
+#       @wrap_in_array = options[:_wrap_in_array]
+#     end
+#
+#     def as_json(options={})
+#       return [] if @object.nil? && @wrap_in_array
+#       hash = @object.as_json
+#       @wrap_in_array ? [hash] : hash
+#     end
+#   end
+#
+#   Serializer.class_eval do
+#     def serializable_object(options={})
+#       return @wrap_in_array ? [] : nil if @object.nil?
+#       hash = attributes
+#       hash.merge! associations
+#       @wrap_in_array ? [hash] : hash
+#     end
+#   end
+# end
