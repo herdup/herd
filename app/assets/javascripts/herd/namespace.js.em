@@ -1,13 +1,6 @@
-#= require jquery
-#= require jquery.ui.sortable
-#= require handlebars
-#= require ember
-#= require ember-data
-#= require ember-uploader
-#= require js-yaml
-
+#
+#= require ./core
 #= require_self
-
 #= require_tree ./models
 #= require_tree ./mixins
 #= require_tree ./views

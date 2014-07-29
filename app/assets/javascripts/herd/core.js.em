@@ -1,0 +1,10 @@
+#= require jquery
+#= require jquery.ui.sortable
+#= require handlebars
+#= require ember
+#= require ember-data
+#= require ember-uploader
+#= require ember-image-loader
+#= require ember-img-view
+#= require ember-background-image-view
+#= require js-yaml
