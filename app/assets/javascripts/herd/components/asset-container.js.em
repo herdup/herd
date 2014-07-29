@@ -40,13 +40,14 @@ Herd.AssetContainerComponent = Ember.Component.extend
             options: @t
             type: 'Herd::MiniMagick'
 
-
         @child.save()
-        return "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
+      
+      "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
     else if @asset
-      return @asset.url
+      @asset.url
     else
-      return "http://www.york.ac.uk/media/environment/images/staff/NoImageAvailableFemale.jpg"
+      "http://www.york.ac.uk/media/environment/images/staff/NoImageAvailableFemale.jpg"
+
   actions:
     metaUpdate: ->
       @asset.save()
