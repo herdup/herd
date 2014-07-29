@@ -26,7 +26,7 @@ Herd.AssetContainerComponent = Ember.Component.extend
     if @child and @child.url
       return @child.url
 
-    else if @t
+    else if @asset and @t
 
       @child = @asset.t @t
       return @assetUrl if @child?.url
@@ -42,8 +42,10 @@ Herd.AssetContainerComponent = Ember.Component.extend
 
         @child.save()
         return "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
-    else
+    else if @asset
       return @asset.url
+    else
+      return "http://www.york.ac.uk/media/environment/images/staff/NoImageAvailableFemale.jpg"
   actions:
     metaUpdate: ->
       @asset.save()
