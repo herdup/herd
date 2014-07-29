@@ -3,6 +3,7 @@ Herd.AssetContainerComponent = Ember.Component.extend
   t: null
   transform: null
   child: null
+  bg: true
 
   +computed options
   optionsHash: ->
