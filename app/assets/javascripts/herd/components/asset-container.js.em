@@ -1,4 +1,5 @@
 Herd.AssetContainerComponent = Ember.Component.extend
+  classNames: ['asset-container']
   asset: null
   t: null
   transform: null
@@ -41,7 +42,7 @@ Herd.AssetContainerComponent = Ember.Component.extend
             type: 'Herd::MiniMagick'
 
         @child.save()
-      
+
       "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
     else if @asset
       @asset.url
