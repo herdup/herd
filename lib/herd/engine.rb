@@ -28,6 +28,8 @@ module Herd
       app.config.assets.precompile += %w(
         application.css
         application.js
+        core.js
+        namespace.js
       )
     end
     initializer 'activeservice.autoload', :before => :set_autoload_paths do |app|
