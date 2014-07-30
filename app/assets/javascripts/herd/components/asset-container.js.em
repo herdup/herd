@@ -6,8 +6,6 @@ Herd.AssetContainerComponent = Ember.Component.extend
   transform: null
   t: null
 
-
-
   +computed options
   optionsHash: ->
     return unless @t
