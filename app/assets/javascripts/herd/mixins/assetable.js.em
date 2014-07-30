@@ -4,3 +4,7 @@ mixin Herd.Assetable
   +computed assets.@each
   masterAssets: ->
     @assets.filterBy('parentAsset', null) || []
+
+  +computed masterAssets.@each
+  asset: ->
+    @masterAssets.firstObject

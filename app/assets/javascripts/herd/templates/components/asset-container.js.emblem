@@ -1,4 +1,4 @@
-if bg
+if bgImage
   = background-image src=assetUrl
 else
   = img src=assetUrl

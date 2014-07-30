@@ -1,10 +1,12 @@
 Herd.AssetContainerComponent = Ember.Component.extend
   classNames: ['asset-container']
+  bgImage: true
   asset: null
-  t: null
-  transform: null
   child: null
-  bg: true
+  transform: null
+  t: null
+
+
 
   +computed options
   optionsHash: ->
