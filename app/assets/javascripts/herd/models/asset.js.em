@@ -1,5 +1,3 @@
-# for more details see: http://emberjs.com/guides/models/defining-models/
-
 class Herd.Asset extends DS.Model
   createdAt: DS.attr 'date'
   fileName: DS.attr 'string'
@@ -17,7 +15,6 @@ class Herd.Asset extends DS.Model
   childAssets: DS.hasMany 'asset', { inverse: 'parentAsset' }
 
   transform: DS.belongsTo 'transform'
-  childTransforms: DS.hasMany 'transform'
 
   +computed metadata
   permalink: (key, permalinkString)->
