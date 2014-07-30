@@ -161,6 +161,7 @@ module Herd
         meta[:model] = exif.model
         meta[:gps] = exif.gps.try(:to_h)
       end
+      auto_orient
     end
 
     def auto_orient

@@ -1,8 +1,12 @@
 Herd.AssetContainerComponent = Ember.Component.extend
+  classNames: ['asset-container']
+  bgImage: true
   asset: null
-  t: null
-  transform: null
   child: null
+  transform: null
+  t: null
+
+
 
   +computed options
   optionsHash: ->
@@ -26,14 +30,9 @@ Herd.AssetContainerComponent = Ember.Component.extend
     if @child and @child.url
       return @child.url
 
-    else if @t
-      #@transform = @asset.store.all('transform').find (item, ix) =>
-      #  item.options.match @t
+    else if @asset and @t
 
       @child = @asset.t @t
-      #childAssets.find (item, ix) =>
-      #  item.transform?.options.match @t
-
       return @assetUrl if @child?.url
 
       if !@child?.url
@@ -44,11 +43,14 @@ Herd.AssetContainerComponent = Ember.Component.extend
             options: @t
             type: 'Herd::MiniMagick'
 
-
         @child.save()
-        return "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
+
+      "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
+    else if @asset
+      @asset.url
     else
-      return @asset.url
+      "http://www.york.ac.uk/media/environment/images/staff/NoImageAvailableFemale.jpg"
+
   actions:
     metaUpdate: ->
       @asset.save()

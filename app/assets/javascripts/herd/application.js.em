@@ -10,17 +10,12 @@
 # Read Sprockets README (https:#github.com/sstephenson/sprockets#sprockets-directives) for details
 # about supported directives.
 #
-#= require jquery
-#= require jquery.ui.sortable
-#= require handlebars
-#= require ember
-#= require ember-data
-#= require ember-uploader
-#= require js-yaml
+#= require ./core
 #= require_self
 #= require ./herd
 
 # for more details see: http://emberjs.com/guides/application/
+
 window.Herd = Ember.Application.create
   LOG_TRANSITIONS: true
   LOG_TRANSITIONS_INTERNAL: true

@@ -1,7 +1,4 @@
-div.herd-wrap
-  img src=assetUrl
-  br
-  = input action='metaUpdate' value=asset.permalink placeholder='permalink'
-  ul.transform-list
-    each asset in asset.childAssets
-      li #{asset.transform.options} #{asset.id}
+if bgImage
+  = background-image src=assetUrl
+else
+  = img src=assetUrl
