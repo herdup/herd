@@ -3,8 +3,6 @@ module Herd
     attributes :id, :created_at, :type
     attributes :options
 
-    # has_many :assets
-
     def options
       YAML::dump(object.options).split("\n").drop(1).join('|')
     end
