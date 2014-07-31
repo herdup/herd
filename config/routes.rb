@@ -7,6 +7,7 @@ Herd::Engine.routes.draw do
       get :empty_zip, on: :collection
     end
     resources :transforms, defaults: {format: :json}
+    resources :pages
 
     root to: 'home#main'
   end

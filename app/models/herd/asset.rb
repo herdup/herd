@@ -141,17 +141,20 @@ module Herd
   end
 
   class Video < Asset
-
     def self.default_transform
       FfmpegTransform
     end
 
     def ffmpeg
       FFMPEG.logger.level = Logger::ERROR
-      FFMPEG::Movie.new(file_path)
+      FFMPEG::Movie.new file_path
     end
 
     def did_identify_type
+      load_meta
+    end
+
+    def load_meta
       movie = ffmpeg
       self.meta = {
         resolution: movie.resolution,
@@ -186,6 +189,11 @@ module Herd
       @rmagick ||= Magick::Image.read(file_path).first
     end
 
+    def did_identify_type
+      load_meta
+      auto_orient # for camera pictures that were taken at weird angles
+    end
+
     def load_meta
       image = mini_magick
       meta[:height] = image[:height]
@@ -196,7 +204,6 @@ module Herd
         meta[:model] = exif.model
         meta[:gps] = exif.gps.try(:to_h)
       end
-      auto_orient
     end
 
     def auto_orient
@@ -205,8 +212,6 @@ module Herd
       image.write file_path
     end
 
-    def did_identify_type
-      load_meta
-    end
+
   end
 end
