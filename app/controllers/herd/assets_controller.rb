@@ -40,7 +40,8 @@ module Herd
     def create
 
       if transform_params.present?
-        @transform = Transform.where_t(transform_params).first_or_create
+        parent = Asset.find params[:asset][:parent_asset_id]
+        @transform = parent.class.default_transform.where_t(transform_params).first_or_create
         params[:asset][:transform_id] = @transform.id
       end
       # if asset_params[:file]
