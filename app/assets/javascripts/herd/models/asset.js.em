@@ -25,7 +25,7 @@ class Herd.Asset extends DS.Model
 
   t: (trans) ->
     @childAssets.find (item, ix) ->
-      item.transform == trans || item.transform?.options.match trans
+      item.transform == trans || item.transform?.options == trans
 
 
 class Herd.AssetSerializer extends DS.ActiveModelSerializer with DS.EmbeddedRecordsMixin

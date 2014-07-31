@@ -1,8 +1,11 @@
 %ul
-  - @assets.each do |a|
+  - @assets.master.each do |a|
     %li
       = herd_tag a
-      = a.transform.options
+      %ul
+        - a.child_assets.each do |aa|
+          %li
+            = herd_tag aa
       -# = ass_tag a.t("set: 'option:distort:viewport 300x300-50-50'|virtual_pixel: tile|distort: Arc '90 0 50'")
       -# = ass_tag a.t("crop: '34%x100%+52+0'").t("scale: 50%|swirl: 90|define: 'distort:viewport=1000x1000'|virtual_pixel: Mirror|distort: SRT 0")
       -# = herd_tag a.t("crop: '25%x100%+56+0'").t("function: sinusoid  1,80").t("scale: 50%|swirl: 90|define: 'distort:viewport=1000x1000'|virtual_pixel: Mirror|distort: SRT 0")
