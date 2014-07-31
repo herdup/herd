@@ -11,12 +11,10 @@ module Herd
       object.meta
     end
 
+    has_many :child_assets,  embed: :ids, serializer: AssetSerializer
+    has_one :parent_asset,  embed: :ids, serializer: AssetSerializer
 
-    has_many :child_assets#, embed_in_root: false
-    has_one :parent_asset#, embed_in_root: false
-
-    has_one :transform, serializer: TransformSerializer
-    has_many :child_transforms#, embed_in_root: false
+    has_one :transform,  embed: :ids, include: true, serializer: TransformSerializer
 
     def url
       object.file_url
