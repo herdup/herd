@@ -8,17 +8,12 @@ module Herd
     validates_uniqueness_of :options, scope: :type
 
     before_validation -> {
-      # if attributes['options'].kind_of?(String)
-      #   attributes['options'] = YAML::load(attributes['options']).with_indifferent_access
-      # end
-      #self.options = YAML::load(self.options).with_indifferent_access unless self.options
       self.options = YAML::load(options).with_indifferent_access if options.kind_of? String
     }
 
     def self.options_from_string(string)
       yaml = string.split('|').map(&:strip).join("\n")
       hash = YAML::load(yaml).with_indifferent_access
-      # hash.keys.sort.inject({}) { |h,k| h[k] = hash[k]; h }.with_indifferent_access
     end
 
     def self.where_t(params)
