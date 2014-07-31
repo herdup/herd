@@ -1,9 +1,38 @@
 require_dependency "herd/application_controller"
+require 'zip'
 
 module Herd
   class AssetsController < ApplicationController
     respond_to :json
     before_action :set_asset, only: [:show, :edit, :update, :destroy]
+
+    def empty_zip
+      folders = ASSETABLE_MODELS.inject({}) do |h,t|
+        h[t.to_s.demodulize] = t.group(:slug).map(&:slug); h
+      end
+
+      seed_struct = Rails.root.join('tmp','seed')
+      FileUtils.rm_rf seed_struct
+      folders.each do |f,a|
+        a.each do |s|
+          FileUtils.mkdir_p Rails.root.join('tmp','seed',f,s)
+        end
+      end
+      zip_file = Rails.root.join('public','seed.zip')
+      FileUtils.rm_rf zip_file
+      Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
+        Dir["#{seed_struct}/**/**"].each do |file|
+          zipfile.add file.gsub("#{seed_struct}/", ''), file
+        end
+      end
+      redirect_to '/seed.zip'
+    end
+
+    def upload_zip
+      if params[:file]
+
+      end
+    end
 
     def transform
       set_asset
@@ -40,16 +69,18 @@ module Herd
     def create
 
       if transform_params.present?
-        @transform = Transform.where_t(transform_params).first_or_create
+        parent = Asset.find(params[:asset][:parent_asset_id])
+        params[:asset][:transform].delete(:type) unless params[:asset][:transform][:type].present?
+        @transform = parent.class.default_transform.where_t(transform_params).first_or_create
         params[:asset][:transform_id] = @transform.id
       end
       # if asset_params[:file]
-        @asset = Asset.new(asset_params)
+
       # elsif asset_params.keys.sort == %s{transform_id parent_id}.sort
         # binding.pry
       # end
 
-      if @asset.save
+      if @asset = Asset.create(asset_params)
         render json: @asset, serializer: AssetSerializer
       else
         render json: @asset.errors, status: :unprocessable_entity
