@@ -8,6 +8,8 @@ module Herd
         else
           tag(:img,options.merge(src:asset.file_url))
         end
+      when Video
+        video_tag(asset.file_url, size:"#{asset.width}x#{asset.height}", autoplay: true, loop:true)
       end
     end
   end

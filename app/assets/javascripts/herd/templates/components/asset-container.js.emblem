@@ -1,4 +1,1 @@
-if bgImage
-  = background-image src=assetUrl
-else
-  = img src=assetUrl
+= partial 'assets/asset'
