@@ -1,5 +1,5 @@
 div.herd-wrap
-  img src=assetUrl
+  = partial 'assets/asset'
   br
   = input action='metaUpdate' value=asset.permalink placeholder='permalink'
   ul.transform-list
