@@ -23,9 +23,12 @@ module Herd
       end
     end
 
+    protected
+
     def pages_params
       params.require(:page).permit(:path)
     end
+    
     def set_page
       @page = Page.find params[:id]
     end
