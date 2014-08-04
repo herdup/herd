@@ -9,6 +9,7 @@ require 'filemagic'
 require 'mini_magick'
 require 'exifr'
 require 'sidekiq'
+require 'streamio-ffmpeg'
 
 module Herd
   class Engine < ::Rails::Engine

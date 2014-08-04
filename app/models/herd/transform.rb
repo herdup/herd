@@ -8,34 +8,23 @@ module Herd
     validates_uniqueness_of :options, scope: :type
 
     before_validation -> {
-      # if attributes['options'].kind_of?(String)
-      #   attributes['options'] = YAML::load(attributes['options']).with_indifferent_access
-      # end
-      #self.options = YAML::load(self.options).with_indifferent_access unless self.options
       self.options = YAML::load(options).with_indifferent_access if options.kind_of? String
     }
 
     def self.options_from_string(string)
       yaml = string.split('|').map(&:strip).join("\n")
-      hash = YAML::load(yaml)
-      # hash.keys.sort.inject({}) { |h,k| h[k] = hash[k]; h }.with_indifferent_access
+      hash = YAML::load(yaml).with_indifferent_access
     end
 
     def self.where_t(params)
-      params[:options] = YAML::load(params[:options]).with_indifferent_access.to_yaml
+      params[:options] = options_from_string(params[:options]).to_yaml
+      params.delete :type if params[:type].nil?
       where(params)
     end
 
-    def self.find_by_options(hash)
-      match = YAML::dump(hash.with_indifferent_access)
-      where(options:match).take
-    end
-
     def self.find_or_create_with_options_string(string)
-      hash = options_from_string(string)
-      klass = hash.delete('type').constantize if hash['type']
-      klass ||= MiniMagick
-      klass.find_by_options(hash) || klass.create(options: hash.to_yaml)
+      params = {options:string}
+      where_t(params).first_or_create
     end
 
 
@@ -45,9 +34,20 @@ module Herd
 
   end
 
-  class Zip < Transform
-    def perform(assets)
+  class FfmpegTransform < Transform
+    def self.resize_string_from(o_width,o_height,string)
+      t_width, t_height = string.match(/(\d*)x(\d*)/).captures
+      t_width = o_width.to_f * (t_height.to_f/o_height.to_f) unless t_width.present?
+      t_height = o_height.to_f * (t_width.to_f/o_width.to_f) unless t_height.present?
 
+      "#{t_width.to_i}x#{t_height.to_i}"
+    end
+    def perform(asset)
+      options = self.options.symbolize_keys
+      options[:resolution] = self.class.resize_string_from(asset.width,asset.height,options.delete(:resize)) if options[:resize]
+      out = asset.unique_tmppath(options.delete(:format))
+      asset.ffmpeg.transcode(out, options) { |progress| puts progress }
+      out
     end
   end
 

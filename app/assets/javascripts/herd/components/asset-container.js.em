@@ -6,6 +6,16 @@ Herd.AssetContainerComponent = Ember.Component.extend
   transform: null
   t: null
 
+  +computed asset, child
+  isImage: ->
+    return @asset?.type == 'Herd::Image' unless @child
+    @child.type == 'Herd::Image' and !@bgImage
+
+  +computed child
+  isVideo: ->
+    return @asset?.type == 'Herd::Video' unless @child
+    @child.type == 'Herd::Video'
+
   +computed options
   optionsHash: ->
     return unless @t
@@ -24,12 +34,12 @@ Herd.AssetContainerComponent = Ember.Component.extend
 
   +computed asset, transform, child.url
   assetUrl: ->
+    #@t = "#{@t}|format: webm" if @isVideo and bowser.gecko
 
     if @child and @child.url
       return @child.url
 
     else if @asset and @t
-
       @child = @asset.t @t
       return @assetUrl if @child?.url
 
@@ -39,7 +49,6 @@ Herd.AssetContainerComponent = Ember.Component.extend
           parentAsset: @asset
           transform: @transform || @asset.store.createRecord 'transform',
             options: @t
-            type: 'Herd::MiniMagick'
 
         @child.save()
 
