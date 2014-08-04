@@ -8,4 +8,3 @@
 #= require ember-img-view
 #= require ember-background-image-view
 #= require js-yaml
-#= require bowser

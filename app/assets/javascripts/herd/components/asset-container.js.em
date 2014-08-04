@@ -34,7 +34,7 @@ Herd.AssetContainerComponent = Ember.Component.extend
 
   +computed asset, transform, child.url
   assetUrl: ->
-    @t = "#{@t}|format: webm" if @isVideo and bowser.gecko
+    #@t = "#{@t}|format: webm" if @isVideo and bowser.gecko
 
     if @child and @child.url
       return @child.url
