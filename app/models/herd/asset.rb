@@ -1,11 +1,12 @@
 require_dependency "herd/transform"
-
 module Herd
   class Asset < ActiveRecord::Base
     include Fileable
 
     attr_accessor :file
     file_field :file_name
+
+    # validates :file_name, presence: true
 
     scope :master, -> {where(parent_asset_id: nil)}
     scope :child, -> {where.not(parent_asset_id: nil)}
@@ -55,7 +56,7 @@ module Herd
 
     def t(transform_string,params=nil)
       # klass ||= Herd::MiniMagick
-      transform = Transform.find_or_create_with_options_string(transform_string)
+      transform = self.class.default_transform.find_or_create_with_options_string(transform_string)
 
       # first_or_create will generate a child_asset who's parent_asset is inaccessible
       # because it's tainted with the transform_id: transform.id scope for some reason
@@ -84,10 +85,19 @@ module Herd
       self.content_type ||= FileMagic.new(::FileMagic::MAGIC_MIME).file(@file.path).split(';').first.to_s
       set_asset_type
 
-      self.file_name = file_name_wo_ext.parameterize + "." + file_ext
+      if master?
+        o_file_name_wo_ext = file_name_wo_ext
+        self.file_name = "#{o_file_name_wo_ext}.#{file_ext}"
+        ix = 0
+        while self.class.master.exists? file_name: self.file_name do
+          ix += 1
+          self.file_name = "#{o_file_name_wo_ext}-#{ix}.#{file_ext}"
+        end
+      end
     end
 
     def save_file
+
       File.open(file_path, "wb") { |f| f.write(file.read) }
       sub = becomes(type.constantize)
 
@@ -130,11 +140,44 @@ module Herd
     def master?
       parent_asset_id.nil?
     end
+    def child?
+      !master?
+    end
   end
 
   class Video < Asset
+    def self.default_transform
+      FfmpegTransform
+    end
+
+    def ffmpeg
+      FFMPEG.logger.level = Logger::ERROR
+      FFMPEG::Movie.new file_path
+    end
+
+    def did_identify_type
+      load_meta
+    end
+
+    def load_meta
+      movie = ffmpeg
+      self.meta = {
+        resolution: movie.resolution,
+        height: movie.height,
+        width: movie.width,
+        frame_rate: movie.frame_rate,
+        video_codec: movie.video_codec,
+        bitrate: movie.bitrate,
+        duration: movie.duration
+      }
+    end
   end
+
   class Image < Asset
+
+    def self.default_transform
+      MiniMagick
+    end
 
     def exif
       case file_ext
@@ -151,6 +194,11 @@ module Herd
       @rmagick ||= Magick::Image.read(file_path).first
     end
 
+    def did_identify_type
+      load_meta
+      auto_orient # for camera pictures that were taken at weird angles
+    end
+
     def load_meta
       image = mini_magick
       meta[:height] = image[:height]
@@ -161,7 +209,6 @@ module Herd
         meta[:model] = exif.model
         meta[:gps] = exif.gps.try(:to_h)
       end
-      auto_orient
     end
 
     def auto_orient
@@ -170,8 +217,6 @@ module Herd
       image.write file_path
     end
 
-    def did_identify_type
-      load_meta
-    end
+
   end
 end
