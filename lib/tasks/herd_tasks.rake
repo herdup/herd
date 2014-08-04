@@ -11,9 +11,9 @@ namespace :herd do
 
     seed_struct = Rails.root.join('tmp','seed')
     FileUtils.rm_rf seed_struct
-    folders.each do |f,a|
-      a.each do |s|
-        FileUtils.mkdir_p Rails.root.join('tmp','seed',f,s)
+    folders.each do |f,as|
+      as.each do |a|
+        FileUtils.mkdir_p Rails.root.join('tmp','seed',f,a)
       end
     end
     zip_file = Rails.root.join('public','seed.zip')
@@ -35,19 +35,27 @@ namespace :herd do
         puts entry.name
 
         parts = entry.name.split '/'
-        parts.shift if parts.first == 'seed'
+        parts.shift if parts.first.match Regexp.new('seed', 'g')
         item, asset = *parts.slice!(-2,2)
         modules = parts.join('::')
         klass = modules.constantize
         raise "no class Herd::#{model}" unless klass
-        object = klass.friendly.find item
-        raise "no item found #{item}" unless object
+        begin
+          object = klass.friendly.find item
+        rescue Exception => e
+          puts "no item found #{item}"
+          next
+        end
         asset_path = Rails.root.join('tmp','seed',*parts,item,asset)
 
         # do something if exists?
         FileUtils.rm asset_path if File.exist? asset_path
         entry.extract(asset_path)
-        object.assets.create file: asset_path.to_s
+        if found = object.assets.master.find_by(file_name:File.basename(asset_path))
+          puts "linked this file is #{asset_path} \n exist: #{found}"
+        else
+          object.assets.create file: asset_path.to_s
+        end
       end
     end
   end
