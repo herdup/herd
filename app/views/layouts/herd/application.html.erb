@@ -3,8 +3,8 @@
 <head>
   <title>Herd</title>
   <%= stylesheet_link_tag    "herd/application", media: "all" %>
-  <%= javascript_include_tag "herd/application" %>
   <%= csrf_meta_tags %>
+  <%= content_for?(:head) ? yield(:head) : '' %>
 </head>
 <body>
   <div id="herd-uploader">

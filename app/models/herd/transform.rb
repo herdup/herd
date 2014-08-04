@@ -18,6 +18,7 @@ module Herd
 
     def self.where_t(params)
       params[:options] = options_from_string(params[:options]).to_yaml
+      params.delete :type if params[:type].nil?
       where(params)
     end
 

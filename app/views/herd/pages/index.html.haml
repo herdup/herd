@@ -1,0 +1,4 @@
+%ul
+  - @pages.each do |p|
+    %li
+      = link_to p.path, page_url(p)
