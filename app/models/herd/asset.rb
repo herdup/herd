@@ -85,12 +85,14 @@ module Herd
       self.content_type ||= FileMagic.new(::FileMagic::MAGIC_MIME).file(@file.path).split(';').first.to_s
       set_asset_type
 
-      o_file_name_wo_ext = file_name_wo_ext
-      self.file_name = "#{o_file_name_wo_ext}.#{file_ext}"
-      ix = 0
-      while self.class.master.exists? file_name: self.file_name do
-        ix += 1
-        self.file_name = "#{o_file_name_wo_ext}-#{ix}.#{file_ext}"
+      if master?
+        o_file_name_wo_ext = file_name_wo_ext
+        self.file_name = "#{o_file_name_wo_ext}.#{file_ext}"
+        ix = 0
+        while self.class.master.exists? file_name: self.file_name do
+          ix += 1
+          self.file_name = "#{o_file_name_wo_ext}-#{ix}.#{file_ext}"
+        end
       end
     end
 
@@ -137,6 +139,9 @@ module Herd
 
     def master?
       parent_asset_id.nil?
+    end
+    def child?
+      !master?
     end
   end
 
