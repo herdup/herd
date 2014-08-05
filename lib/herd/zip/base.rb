@@ -5,7 +5,7 @@ module Herd
         path.split('/').join('::').constantize
       end
       def path_from_class(klass)
-        klass.to_s.split('::').join('/')
+        klass.to_s.split('::').join '/'
       end
     end
   end
