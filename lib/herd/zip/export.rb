@@ -26,7 +26,7 @@ module Herd
         # build folder structure into seed_path
         folder_map.each do |class_path,assetables|
           assetables.each do |slug|
-            assetable_path = File.join(@seed_path, class_path, slug)
+            assetable_path = File.join @seed_path, class_path, slug
             # make a directory for each assetable item's slug
             FileUtils.mkdir_p assetable_path
 
