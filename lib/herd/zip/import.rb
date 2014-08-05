@@ -2,13 +2,18 @@ module Herd
   module Zip
     class Import < Base
       attr_accessor :zip_path
+      attr_accessor :accept_extensions
 
+      def accept_extensions
+        @accept_extensions ||= %w(.jpg .gif .png .mp4 .mov .webm)
+      end
       def self.import(zip_path)
         new(zip_path).import
       end
 
       def initialize(zip_path)
         @zip_path = zip_path
+        @accept_extensions
       end
 
       def import(path=nil)
@@ -20,8 +25,7 @@ module Herd
         ::Zip::File.open(zip_data) do |zip|
           zip.each do |entry|
             next if entry.name =~ /\.DS_Store|__MACOSX|(^|\/)\._/
-            # FIXME: mus b better way
-            next unless %w(.jpg .gif .png).include? File.extname(entry.name).downcase
+            next unless accept_extensions.include? File.extname(entry.name).downcase
 
             parts = entry.name.split '/'
             parts.shift if parts.first.match Regexp.new('seed', 'g')
