@@ -18,7 +18,7 @@ module Herd
 
       def import(path=nil)
         @zip_path = path if path
-        zip_data = open(zip_path)
+        zip_data = open zip_path
 
         assets=[]
 
@@ -29,24 +29,24 @@ module Herd
 
             parts = entry.name.split '/'
             begin
-               parts.first.classify.constantize
+              parts.first.classify.constantize
             rescue NameError
               parts.shift
             end
 
             asset_file = parts.pop
             assetable_slug = parts.pop
-            klass = class_from_path parts.join('/')
-            raise "no class Herd::#{model}" unless klass
+
             begin
+              klass = class_from_path parts.join '/'
               object = klass.friendly.find assetable_slug
             rescue Exception => e
-              puts "no item found #{assetable_slug}"
+              puts "no item found #{assetable_slug} #{e} #{parts}"
               next
             end
 
-            assetable_path = Rails.root.join('tmp','import',*parts,assetable_slug)
-            asset_path = File.join(assetable_path,asset_file)
+            assetable_path = Rails.root.join 'tmp','import',*parts,assetable_slug
+            asset_path = File.join assetable_path,asset_file
 
             FileUtils.mkdir_p assetable_path
             FileUtils.rm asset_path if File.exist? asset_path
