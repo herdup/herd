@@ -28,7 +28,11 @@ module Herd
             next unless accept_extensions.include? File.extname(entry.name).downcase
 
             parts = entry.name.split '/'
-            parts.shift if parts.first.match Regexp.new('seed', 'g')
+            begin
+               parts.first.classify.constantize
+            rescue NameError
+              parts.shift
+            end
 
             asset_file = parts.pop
             assetable_slug = parts.pop
