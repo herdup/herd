@@ -1,6 +1,7 @@
 #= require ./core
 #= require_self
 #= require_tree ./mixins
+#= require_tree ./initializers
 #= require_tree ./models
 #= require_tree ./views
 #= require_tree ./components

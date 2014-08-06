@@ -8,3 +8,17 @@
 #= require ember-img-view
 #= require ember-background-image-view
 #= require js-yaml
+
+class DS.RawTransform extends DS.Transform
+  deserialize: (serialized) ->
+    serialized
+
+  serialize: (deserialized) ->
+    deserialized
+
+class DS.YamlTransform extends DS.Transform
+  deserialize: (serialized) ->
+    jsyaml.load(serialized)
+
+  serialize: (deserialized) ->
+    jsyaml.safeDump(deserialized)

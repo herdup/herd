@@ -26,21 +26,3 @@ window.Herd = Ember.Application.create
     resolveTemplate: (parsedName) ->
       parsedName.fullNameWithoutType = "herd/" + parsedName.fullNameWithoutType
       @_super parsedName
-
-DS.YamlTransform = DS.Transform.extend
-  deserialize: (serialized) ->
-    jsyaml.load(serialized)
-
-  serialize: (deserialized) ->
-    jsyaml.safeDump(deserialized)
-
-Herd.register "transform:yaml", DS.YamlTransform
-
-DS.RawTransform = DS.Transform.extend
-  deserialize: (serialized) ->
-    serialized
-
-  serialize: (deserialized) ->
-    deserialized
-
-Herd.register "transform:raw", DS.RawTransform
