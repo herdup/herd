@@ -44,13 +44,13 @@ Herd.AssetContainerComponent = Ember.Component.extend
       return @assetUrl if @child?.url
 
       if !@child?.url
-        debugger if @transform
-        @child = @asset.store.createRecord 'asset',
-          parentAsset: @asset
-          transform: @transform || @asset.store.createRecord 'transform',
-            options: @t
+        Ember.run ->
+          @child = @asset.store.createRecord 'asset',
+            parentAsset: @asset
+            transform: @transform || @asset.store.createRecord 'transform',
+              options: @t
 
-        @child.save()
+          @child.save()
 
       "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
     else if @asset
