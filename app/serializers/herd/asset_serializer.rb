@@ -11,8 +11,8 @@ module Herd
       object.meta
     end
 
-    has_many :child_assets,  embed: :ids, serializer: AssetSerializer
-    has_one :parent_asset,  embed: :ids, serializer: AssetSerializer
+    has_many :child_assets,  embed: :ids
+    has_one :parent_asset,  embed: :ids
 
     has_one :transform,  embed: :ids, include: true, serializer: TransformSerializer
 
