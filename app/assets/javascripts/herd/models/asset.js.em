@@ -12,7 +12,7 @@ class Herd.Asset extends DS.Model
   height: DS.attr 'number'
 
   parentAsset: DS.belongsTo 'asset', { inverse: 'childAssets' }
-  childAssets: DS.hasMany 'asset', { inverse: 'parentAsset' }
+  childAssets: DS.hasMany 'asset'
 
   transform: DS.belongsTo 'transform'
 
