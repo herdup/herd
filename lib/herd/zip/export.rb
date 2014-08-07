@@ -5,9 +5,9 @@ module Herd
       attr_accessor :zip_path
       attr_accessor :output_assets
 
-      def initialize(zip_path=nil, output_assets=false)
+      def initialize(zip_path=nil, output_assets=true)
         @seed_path = Rails.root.join 'tmp/seeds'
-        @zip_path = zip_path || Rails.root.join 'public/seeds.zip'
+        @zip_path = zip_path || Rails.root.join('public/seeds.zip')
         @output_assets = output_assets
       end
 
