@@ -6,5 +6,5 @@ ul.sortable
   each asset in filteredContent
     li.item data-id=asset.id!
       = asset.fileName
-      a.delete{action 'destroy' asset} X
+      a.delete{action 'destroy' asset} Delete
       = asset-info asset=asset t="resize: 680x" bgImage=false
