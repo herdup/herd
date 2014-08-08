@@ -1,11 +1,10 @@
-h1 Assets
+h3 Assets
+
+file-upload url="/herd/assets" uploaded="uploadFinished" progress="uploadProgressed"
 
 ul.sortable
   each asset in filteredContent
     li.item data-id=asset.id!
-      button{action 'destroy' asset} X
       = asset.fileName
+      a.delete{action 'destroy' asset} X
       = asset-info asset=asset t="resize: 680x" bgImage=false
-
-
-file-upload url="/herd/assets" uploaded="uploadFinished" progress="uploadProgressed"

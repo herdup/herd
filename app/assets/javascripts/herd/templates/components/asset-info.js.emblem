@@ -1,7 +1,7 @@
 div.herd-wrap
   = partial 'assets/asset'
-  br
-  = input action='metaUpdate' value=asset.permalink placeholder='permalink'
-  ul.transform-list
-    each asset in asset.childAssets
-      li #{asset.transform.options} #{asset.id}
+  / br
+  / = input action='metaUpdate' value=asset.permalink placeholder='permalink'
+  / ul.transform-list
+  /   each asset in asset.childAssets
+  /     li #{asset.transform.options} #{asset.id}
