@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'jquery-ui-rails', '4.1.2'
   s.add_dependency 'active_model_serializers','0.8.1' #"~> 0.9.0.alpha1"
 
+  s.add_dependency 'progressbar'
   s.add_dependency 'ruby-filemagic'
   s.add_dependency 'mini_magick'
   s.add_dependency 'streamio-ffmpeg'

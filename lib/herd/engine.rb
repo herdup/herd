@@ -10,6 +10,7 @@ require 'mini_magick'
 require 'exifr'
 require 'sidekiq'
 require 'streamio-ffmpeg'
+require 'progressbar'
 
 module Herd
   class Engine < ::Rails::Engine

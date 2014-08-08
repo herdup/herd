@@ -18,7 +18,16 @@ module Herd
 
       def import(path=nil)
         @zip_path = path if path
-        zip_data = open zip_path
+        zip_data = open zip_path,
+          :content_length_proc => lambda {|t|
+            if t && 0 < t
+              @pbar = ProgressBar.new(File.basename(zip_path), t)
+              @pbar.file_transfer_mode
+            end
+          },
+          :progress_proc => lambda {|s|
+            @pbar.set s if @pbar
+          }
 
         assets=[]
 
