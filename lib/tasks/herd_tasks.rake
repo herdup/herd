@@ -4,6 +4,10 @@ namespace :herd do
   task :cleanup do
     FileUtils.rm_rf File.join(Rails.root, 'public', 'uploads')
   end
+
+  task watch: :environment do
+    Herd::Config.new.watch
+  end
 end
 
 Rake::Task["db:reset"].enhance ['herd:cleanup']
