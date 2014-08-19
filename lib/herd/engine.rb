@@ -4,6 +4,7 @@ require 'ember_script-rails'
 require 'emblem/rails'
 require 'jquery-rails'
 require 'jquery-ui-rails'
+
 require 'active_model_serializers'
 require 'filemagic'
 require 'mini_magick'
@@ -11,6 +12,11 @@ require 'exifr'
 require 'sidekiq'
 require 'streamio-ffmpeg'
 require 'progressbar'
+require 'open-uri'
+require 'zip'
+require 'sidekiq'
+require 'sidekiq-status'
+require 'rb-fsevent'
 
 module Herd
   class Engine < ::Rails::Engine
@@ -39,6 +45,23 @@ module Herd
       unless app.root.to_s.match root.to_s
         config.paths["db/migrate"].expanded.each do |expanded_path|
           app.config.paths["db/migrate"] << expanded_path
+        end
+      end
+    end
+
+    initializer :setup_sidekiq_middlewares do |app|
+      Sidekiq.configure_client do |config|
+        config.client_middleware do |chain|
+          chain.add Sidekiq::Status::ClientMiddleware
+        end
+      end
+
+      Sidekiq.configure_server do |config|
+        config.server_middleware do |chain|
+          chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.minutes # default
+        end
+        config.client_middleware do |chain|
+          chain.add Sidekiq::Status::ClientMiddleware
         end
       end
     end

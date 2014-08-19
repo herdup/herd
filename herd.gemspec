@@ -35,11 +35,14 @@ Gem::Specification.new do |s|
   s.add_dependency 'exifr'
   s.add_dependency 'rubyzip'
   s.add_dependency 'sidekiq'
+  s.add_dependency 'sidekiq-status'
+  s.add_dependency 'sinatra'
+  s.add_dependency 'rb-fsevent'
 
   #s.add_dependency 'emcee'
 
   s.add_development_dependency "sqlite3"
-  s.add_development_dependency 'awesome_print'
-  s.add_development_dependency 'pry'
+  # s.add_development_dependency 'awesome_print'
+  # s.add_development_dependency 'pry'
 
 end
