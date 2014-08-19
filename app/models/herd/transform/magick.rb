@@ -11,11 +11,15 @@ module Herd
         opts.each do |k,v|
           case k
           when 'crop'
-            x_regex = /\+(.*?)\+/
-            y_regex = /\+([0-9]*?)$/
-            x_crop_offset = v[x_regex, 1].to_i / 100.0 * asset.width
-            y_crop_offset = v[y_regex, 1].to_i / 100.0 * asset.height
-            image.send k, v.sub(x_regex, "+#{x_crop_offset.to_i}+").sub(y_regex, "+#{y_crop_offset.to_i}")
+            if v.match '%'
+              x_regex = /\+(.*?)\+/
+              y_regex = /\+([0-9]*?)$/
+              x_crop_offset = v[x_regex, 1].to_i / 100.0 * asset.width
+              y_crop_offset = v[y_regex, 1].to_i / 100.0 * asset.height
+              image.send k, v.sub(x_regex, "+#{x_crop_offset.to_i}+").sub(y_regex, "+#{y_crop_offset.to_i}")
+            else
+              image.send k, v
+            end
           else
             c.send k,v
           end
