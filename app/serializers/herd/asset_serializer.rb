@@ -7,10 +7,6 @@ module Herd
     attributes :position
     attributes :metadata
 
-    def metadata
-      object.meta
-    end
-
     has_many :child_assets,  embed: :ids
     has_one :parent_asset,  embed: :ids
 
@@ -19,5 +15,10 @@ module Herd
     def url
       object.file_url
     end
+
+    def metadata
+      object.meta
+    end
+
   end
 end
