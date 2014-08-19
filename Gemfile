@@ -1,5 +1,5 @@
 source "https://rubygems.org"
-
+ruby '2.1.2'
 # Declare your gem's dependencies in herd.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
@@ -15,3 +15,7 @@ gemspec
 gem 'awesome_print', :require => 'ap'
 gem 'spring'
 #gem 'mini_magick', path: '/Users/seb/Projects/_Rails/minimagick'
+
+gem 'pry'
+gem 'puma'
+gem 'quiet_assets'
