@@ -15,7 +15,5 @@ Herd::Engine.routes.draw do
     end
     resources :transforms, defaults: {format: :json}
     resources :pages
-
-    # root to: 'home#main'
   end
 end
