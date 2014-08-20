@@ -12,7 +12,7 @@ before_install:
 - sudo add-apt-repository ppa:jon-severinsson/ffmpeg -y
 - sudo apt-get update -y
 - sudo apt-get install ffmpeg
-- sudo apt-get install libavcodec-extra-52
+- sudo apt-get install ffmpeg-extra
 install:
 - bundle install --path .bundle
 script:
