@@ -49,23 +49,22 @@ module Herd
       end
     end
 
-    initializer :setup_sidekiq_middlewares do |app|
-      return
-      Sidekiq.configure_client do |config|
-        config.client_middleware do |chain|
-          chain.add Sidekiq::Status::ClientMiddleware
-        end
-      end
-
-      Sidekiq.configure_server do |config|
-        config.server_middleware do |chain|
-          chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.minutes # default
-        end
-        config.client_middleware do |chain|
-          chain.add Sidekiq::Status::ClientMiddleware
-        end
-      end
-    end
+    # initializer :setup_sidekiq_middlewares do |app|
+    #   Sidekiq.configure_client do |config|
+    #     config.client_middleware do |chain|
+    #       chain.add Sidekiq::Status::ClientMiddleware
+    #     end
+    #   end
+    #
+    #   Sidekiq.configure_server do |config|
+    #     config.server_middleware do |chain|
+    #       chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.minutes # default
+    #     end
+    #     config.client_middleware do |chain|
+    #       chain.add Sidekiq::Status::ClientMiddleware
+    #     end
+    #   end
+    # end
 
   end
 end
