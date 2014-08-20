@@ -15,7 +15,7 @@ before_install:
 - sudo apt-get update -y
 # - sudo apt-get install ffmpeg
 # - sudo apt-get install libavcodec-extra
-- sudo apt-get install mpeg2dec vorbis-tools id3v2 mpg321 mpg123 libflac++6 ffmpeg tagtool easytag id3tool lame libjpeg-progs flac faac faad sox ffmpeg2theora libmpeg2-4 flac libmpeg3-1 mpeg3-utils mpegdemux liba52-0.7.4-dev libquicktime2
+- sudo apt-get install mpeg2dec vorbis-tools id3v2 mpg321 mpg123 libflac++6 ffmpeg tagtool easytag id3tool lame libjpeg-progs flac faac faad sox ffmpeg2theora libmpeg2-4 flac libmpeg3-1 mpeg3-utils mpegdemux liba52-0.7.4-dev libquicktime2 --fix-missing
 install:
 - bundle install --path .bundle
 script:
