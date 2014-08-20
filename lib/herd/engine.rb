@@ -50,6 +50,7 @@ module Herd
     end
 
     initializer :setup_sidekiq_middlewares do |app|
+      return
       Sidekiq.configure_client do |config|
         config.client_middleware do |chain|
           chain.add Sidekiq::Status::ClientMiddleware
@@ -65,5 +66,6 @@ module Herd
         end
       end
     end
+
   end
 end
