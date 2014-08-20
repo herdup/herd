@@ -5,7 +5,7 @@ Herd::Engine.routes.draw do
   mount Sidekiq::Web => '/herd/sidekiq'
 
   scope :herd do
-    resources :assets do
+    resources :assets, as: :media do
       collection do
         get :live
       end
