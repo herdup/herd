@@ -1,9 +1,9 @@
-# require 'sidekiq/web'
-# require 'sidekiq-status/web'
+require 'sidekiq/web'
+require 'sidekiq-status/web'
 
 Herd::Engine.routes.draw do
   scope :herd, as: :herd do
-    # mount Sidekiq::Web => '/sidekiq'
+    mount Sidekiq::Web => '/sidekiq'
 
     resources :assets do
       collection do
@@ -16,6 +16,6 @@ Herd::Engine.routes.draw do
     resources :transforms, defaults: {format: :json}
     resources :pages
 
-    root to: 'home#main'
+    # root to: 'home#main'
   end
 end
