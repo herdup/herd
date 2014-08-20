@@ -1,0 +1,11 @@
+language: ruby
+rvm: 2.1.0
+gemfile: Gemfile
+cache: apt
+env:
+  global:
+  - RAILS_ENV=test
+install:
+- bundle install --path .bundle
+script:
+- bundle exec rspec
