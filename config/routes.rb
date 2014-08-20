@@ -2,10 +2,10 @@ require 'sidekiq/web'
 require 'sidekiq-status/web'
 
 Herd::Engine.routes.draw do
-  mount Sidekiq::Web => '/herd/sidekiq'
-
   scope :herd do
-    resources :assets, as: :media do
+    # mount Sidekiq::Web => '/sidekiq'
+
+    resources :assets do
       collection do
         get :live
       end
