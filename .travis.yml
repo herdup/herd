@@ -8,6 +8,7 @@ env:
 services:
   - redis-server
 before_install:
+- sudo sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
 - sudo apt-get install libmagic-dev
 - sudo apt-get install ubuntu-restricted-extras
 # - sudo add-apt-repository ppa:jon-severinsson/ffmpeg -y
