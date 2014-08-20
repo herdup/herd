@@ -6,12 +6,13 @@ env:
   global:
   - RAILS_ENV=test
 services:
-  - redis-server  
+  - redis-server
 before_install:
 - sudo apt-get install libmagic-dev
 - sudo add-apt-repository ppa:jon-severinsson/ffmpeg -y
 - sudo apt-get update -y
 - sudo apt-get install ffmpeg
+- sudo apt-get install libavcodec-extra-54
 install:
 - bundle install --path .bundle
 script:
