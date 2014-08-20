@@ -7,7 +7,8 @@ env:
   - RAILS_ENV=test
 before_install:
 - sudo apt-get install libmagic-dev
-- sudo add-apt-repository ppa:jon-severinsson/ffmpeg
+- sudo add-apt-repository ppa:jon-severinsson/ffmpeg -y
+- sudo apt-get install ffmpeg
 install:
 - bundle install --path .bundle
 script:
