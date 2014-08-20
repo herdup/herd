@@ -3,7 +3,7 @@ require 'sidekiq-status/web'
 
 Herd::Engine.routes.draw do
   scope :herd do
-    # mount Sidekiq::Web => '/sidekiq'
+    mount Sidekiq::Web => '/sidekiq'
 
     resources :assets do
       collection do
