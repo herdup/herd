@@ -12,7 +12,7 @@ before_install:
 - sudo apt-get install libmagic-dev
 - sudo apt-get install ubuntu-restricted-extras
 # - sudo add-apt-repository ppa:jon-severinsson/ffmpeg -y
-# - sudo apt-get update -y
+- sudo apt-get update -y
 # - sudo apt-get install ffmpeg
 # - sudo apt-get install libavcodec-extra
 - sudo apt-get install libxine1-ffmpeg gxine mencoder mpeg2dec vorbis-tools id3v2 mpg321 mpg123 libflac++6 ffmpeg totem-mozilla icedax tagtool easytag id3tool lame nautilus-script-audio-convert libmad0 libjpeg-progs flac faac faad sox ffmpeg2theora libmpeg2-4 uudeview flac libmpeg3-1 mpeg3-utils mpegdemux liba52-0.7.4-dev libquicktime2
