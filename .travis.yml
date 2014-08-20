@@ -5,6 +5,8 @@ cache: apt
 env:
   global:
   - RAILS_ENV=test
+services:
+  - redis-server  
 before_install:
 - sudo apt-get install libmagic-dev
 - sudo add-apt-repository ppa:jon-severinsson/ffmpeg -y
