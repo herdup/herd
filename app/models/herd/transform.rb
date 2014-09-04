@@ -1,7 +1,7 @@
 module Herd
   class Transform < ActiveRecord::Base
 
-    attr_accessor :generate_sync
+    attr_accessor :async
     has_many :assets, dependent: :destroy
 
     serialize :options, HashWithIndifferentAccess
@@ -14,8 +14,7 @@ module Herd
 
     after_save -> {
       assets.map do |a|
-        a.generate_sync = generate_sync
-        a.generate
+        a.generate async
       end if options_changed?
     }
 
