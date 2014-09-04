@@ -44,15 +44,20 @@ module Herd
         hash.delete 'created_at'
         hash.delete 'updated_at'
         hash.delete 'id'
-        hash['options'] = hash['options'].to_h
+        unless hash['options'].empty?
+          hash['options'] = hash['options'].to_h
+        else
+          hash['options'] = nil
+        end
+
         hash
       end
-      
+
       def deserialize(h)
         options = h.delete 'options'
         transform = Transform.where(h).first_or_create
 
-        if transform.options.to_h != options
+        if transform.options.to_h != options and !options.nil?
           transform.options = options
           transform.save!
         end
