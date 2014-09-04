@@ -21,12 +21,3 @@
 %br
 
 = link_to 'New Post', new_post_path
-
-:javascript
-  $(function() {
-    var source = new EventSource('/herd/assets/live');
-    source.addEventListener('assets', function(e) {
-      console.log(e)
-      window.location.reload()
-    });
-  })

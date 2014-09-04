@@ -90,7 +90,9 @@ module Herd
 
     def n(name, transform_string=nil, async=nil)
       return unless id
-      return t transform_string, name, async
+      trans = computed_class.default_transform.find_by(name:name) unless name.nil?
+      child = child_with_transform(trans) if trans
+      return child || t(transform_string, name, async)
     end
 
     def prepare_file
@@ -174,8 +176,6 @@ module Herd
         FileUtils.rm_rf base_path
       end
     end
-
-
 
     def computed_class
       self.type.constantize
