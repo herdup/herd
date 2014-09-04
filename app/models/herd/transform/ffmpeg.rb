@@ -14,7 +14,6 @@ module Herd
       options = self.options.symbolize_keys
       options[:resolution] = self.class.resize_string_from(asset.width,asset.height,options.delete(:resize)) if options[:resize]
       out = asset.unique_tmppath(options.delete(:format))
-      ap options
       asset.ffmpeg.transcode(out, options) { |progress| yield progress if block_given? }
       out
     end
