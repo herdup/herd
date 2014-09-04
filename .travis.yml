@@ -21,4 +21,7 @@ install:
 script:
 - bundle exec rspec
 notifications:
-  hipchat: gwTrCRFewy9uLATIF6i7gBMRFhBocdA2881A4OxP@SweetDev
+  hipchat:
+    rooms: gwTrCRFewy9uLATIF6i7gBMRFhBocdA2881A4OxP@SweetDev
+    template: "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message} (<a href=\"%{build_url}\">Details</a>/<a href=\"%{compare_url}\">Change view</a>)"
+    format: html
