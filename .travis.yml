@@ -20,3 +20,5 @@ install:
 - bundle install --path .bundle
 script:
 - bundle exec rspec
+notifications:
+  hipchat: gwTrCRFewy9uLATIF6i7gBMRFhBocdA2881A4OxP@SweetDev
