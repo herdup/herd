@@ -56,11 +56,13 @@ module Herd
       OpenStruct.new meta
     end
 
-    def generate
-      if generate_sync
-        generate!
-      else
+    def generate(async=nil)
+      async ||= transform.async
+
+      if async
         self.jid = TransformWorker.perform_async(id, transform.options)
+      else
+        generate!
       end
     end
 
@@ -69,20 +71,21 @@ module Herd
       reload
     end
 
-    def child_with_transform(transform,async=nil)
+    def child_with_transform(transform)
       # first_or_create will generate a child_asset who's parent_asset is inaccessible
       # because it's tainted with the transform_id: transform.id scope for some reason
       hash = {parent_asset:self, transform:transform}
-      child = Asset.where(hash).take || Asset.new(hash)
-      child.generate_sync = !async #unless async.nil?
-      child.save if child.new_record?
+      child = Asset.where(hash).take || Asset.create(hash)
+
       child.class.to_s == child.type ? child : child.becomes(type.constantize)
     end
+
 
     def t(transform_string, name=nil, async=nil)
       return unless id
       transform = computed_class.default_transform.find_or_create_with_options_string transform_string, name, assetable_type
-      child_with_transform transform, async
+      transform.async = async
+      child_with_transform transform
     end
 
     def n(name, transform_string=nil, async=nil)
