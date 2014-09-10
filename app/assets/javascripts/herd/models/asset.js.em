@@ -1,5 +1,6 @@
 class Herd.Asset extends DS.Model
   createdAt: DS.attr 'date'
+  updatedAt: DS.attr 'date'
   fileName: DS.attr 'string'
   fileSize: DS.attr 'number'
   contentType: DS.attr 'string'
@@ -10,6 +11,9 @@ class Herd.Asset extends DS.Model
 
   width: DS.attr 'number'
   height: DS.attr 'number'
+
+  assetableId: DS.attr 'number'
+  assetableType: DS.attr 'string'
 
   parentAsset: DS.belongsTo 'asset', { inverse: 'childAssets' }
   childAssets: DS.hasMany 'asset', { inverse: null }
@@ -27,6 +31,9 @@ class Herd.Asset extends DS.Model
     @childAssets.find (item, ix) ->
       item.transform == trans || item.transform?.options == trans
 
+  n: (name) ->
+    @childAssets.find (item, ix) ->
+      item.transform.name == name
 
 class Herd.AssetSerializer extends DS.ActiveModelSerializer with DS.EmbeddedRecordsMixin
   attrs:
