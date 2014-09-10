@@ -5,7 +5,7 @@ module Herd
       attr_accessor :accept_extensions
 
       def accept_extensions
-        @accept_extensions ||= %w(.jpg .gif .png .mp4 .mov .webm .m4v)
+        @accept_extensions ||= %w(.jpg .gif .png .mp4 .mov .webm .m4v .tif)
       end
       def self.import(zip_path)
         new(zip_path).import
@@ -32,7 +32,10 @@ module Herd
         assets=[]
 
         ::Zip::File.open(zip_data) do |zip|
+          @pbar = ProgressBar.new(File.basename(zip_path), zip.count)
           zip.each do |entry|
+            @pbar.inc if @pbar
+
             next if entry.name =~ /\.DS_Store|__MACOSX|(^|\/)\._/
             next unless accept_extensions.include? File.extname(entry.name).downcase
 
