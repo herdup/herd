@@ -170,7 +170,7 @@ describe Herd::Config do
     Herd::Page.missing_asset = Herd::Asset.create file: path
 
     child = Herd::Page.missing.n 'spot'
-    expect(child.transform.options).to eq Herd::Transform::Magick.defaults.options
+    expect(child.transform.options).to eq Herd::Transform::Magick.defaults
     expect(child.transform.options[:quality]).to eq 50
 
     path =  Rails.root.join('../../spec/fixtures/test.mov')
