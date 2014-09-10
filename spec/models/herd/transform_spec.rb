@@ -44,6 +44,19 @@ module Herd
       expect(child.reload.width).to eq 50
     end
 
-    # it "should create transform"
+    it "should re-trigger if defaults change" do
+      # Transform::Magick.defaults = { quality: 50 }
+
+      path =  Rails.root.join('../../spec/fixtures/shutter.jpg')
+      asset = Herd::Asset.create file: path
+      asset = Herd::Asset.find asset.id # hack cuz need type
+      child = asset.n 'test',"resize: 230x"
+
+      large_size = child.file_size
+      Transform::Magick.defaults = { quality: 50 }
+      small_size = child.reload.file_size
+      
+      expect(large_size).to be > small_size
+    end
   end
 end

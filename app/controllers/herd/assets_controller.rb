@@ -23,13 +23,12 @@ module Herd
       response.headers['Content-Type'] = 'text/event-stream'
       sse = SSE.new(response.stream, event:'assets')
       # NB: this is a blocking, infinite loop.
-      Sidekiq.redis do |conn|
-        conn.subscribe('assets') do |on|
-          on.message do |event, data|
-            sse.write(data)
-          end
+      Redis.new.subscribe('assets') do |on|
+        on.message do |event, data|
+          sse.write(data)
         end
       end
+
     rescue IOError
       puts "user closed the bitch"
     ensure
@@ -57,7 +56,6 @@ module Herd
 
     # POST /assets
     def create
-
       if transform_params.present?
         parent = Asset.find(params[:asset][:parent_asset_id])
         params[:asset][:transform].delete(:type) unless params[:asset][:transform][:type].present?
@@ -124,7 +122,7 @@ module Herd
         params.require(:asset).require(:metadata).permit!.symbolize_keys
       end
       def transform_params
-        params.require(:asset).require(:transform).permit(:type, :options, :format, :name) if params[:asset][:transform].present?
+        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type) if params[:asset][:transform].present?
       end
   end
 end

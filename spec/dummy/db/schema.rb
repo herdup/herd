@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140812174015) do
+ActiveRecord::Schema.define(version: 20140820225744) do
 
   create_table "herd_assets", force: true do |t|
     t.string   "file_name"

@@ -3,7 +3,7 @@ module Herd
     include Sidekiq::Worker
 
     def perform(path)
-      Herd::Config.load_transforms path
+      Herd::Config.load_transforms path, true
     end
   end
 end

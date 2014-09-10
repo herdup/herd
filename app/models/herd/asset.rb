@@ -5,6 +5,7 @@ module Herd
 
     attr_accessor :file
     file_field :file_name
+    # validates_presence_of :file_name
 
     attr_accessor :jid
     attr_accessor :generate_sync
@@ -31,7 +32,8 @@ module Herd
     }
 
     before_save -> {
-      self.assetable ||= parent_asset.try :assetable
+      self.assetable_type ||= parent_asset.try :assetable_type
+      self.assetable_id ||= parent_asset.try :assetable_id
 
       if file.present? # reupload
         cleanup_file if file_name.present?

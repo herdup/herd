@@ -18,20 +18,20 @@ module Herd
       asset = Asset.find asset.id
 
       # resize first then rotate
-      expect(helper.herd_tag asset.t("resize: 300x").t("rotate: 90>")).to match /img/
+      expect(helper.herd_tag asset.t("resize: 300x", 'small').t("rotate: 90>", 'clock')).to match /img/
 
       expect(Asset.count).to be 3
       expect(Transform.count).to be 2
 
       # rotate firs then resize
-      expect(helper.herd_tag asset.t("rotate: 90>").t("resize: 300x")).to match /img/
+      expect(helper.herd_tag asset.t("rotate: 90>",'clock').t("resize: 300x",'small')).to match /img/
 
       # no new transforms just assets
       expect(Transform.count).to be 2
       # got some new assets bae
       expect(Asset.count).to be 5
 
-      child = asset.t("rotate: 90>").t("resize: 300x")
+      child = asset.t("rotate: 90>",'clock').t("resize: 300x",'small')
 
       expect(child.width).to eq 300
     end
