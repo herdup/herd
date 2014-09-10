@@ -10,6 +10,8 @@ module Herd
       image.combine_options do |c|
         opts.each do |k,v|
           case k
+          when 'format'
+            image.send k, v
           when 'crop'
             if v.match '%'
               x_regex = /\+(.*?)\+/
