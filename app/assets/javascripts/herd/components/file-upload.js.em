@@ -1,6 +1,8 @@
 Herd.FileUploadComponent = Ember.FileField.extend
   multiple: true,
-  url: ''
+  url: '/herd/assets'
+  uploaded: 'uploadFinished'
+  progress: 'uploadProgressed'
 
   +observer files
   filesDidChange: ->
