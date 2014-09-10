@@ -1,5 +1,3 @@
-require_dependency "herd/application_controller"
-
 module Herd
   class AssetsController < ApplicationController
     include ActionController::Live
@@ -116,13 +114,13 @@ module Herd
 
       # Only allow a trusted parameter "white list" through.
       def asset_params
-        params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position)
+        params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position, :created_at, :updated_at)
       end
       def metadata_params
         params.require(:asset).require(:metadata).permit!.symbolize_keys
       end
       def transform_params
-        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type) if params[:asset][:transform].present?
+        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at) if params[:asset][:transform].present?
       end
   end
 end

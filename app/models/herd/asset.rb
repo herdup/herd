@@ -1,4 +1,3 @@
-require_dependency "herd/transform"
 module Herd
   class Asset < ActiveRecord::Base
     include Fileable
@@ -59,9 +58,7 @@ module Herd
     end
 
     def generate(async=nil)
-      async ||= transform.async
-
-      if async
+      if async || transform.try(:async)
         self.jid = TransformWorker.perform_async(id, transform.options)
       else
         generate!
