@@ -170,42 +170,13 @@ describe Herd::Config do
     Herd::Page.missing_asset = Herd::Asset.create file: path
 
     child = Herd::Page.missing.n 'spot'
-    expect(child.transform.options).to eq Herd::Transform::Magick.defaults
-    expect(child.transform.options[:quality]).to eq 50
+    expect(child.transform.options_with_defaults).to eq Herd::Transform::Magick.defaults
+    expect(child.transform.options_with_defaults[:quality]).to eq 50
 
     path =  Rails.root.join('../../spec/fixtures/test.mov')
     Post.missing_asset = Herd::Asset.create file: path
 
     child = Post.missing.n 'spot'
-    expect(child.transform.options).to eq Herd::Transform::Ffmpeg.defaults
+    expect(child.transform.options_with_defaults).to eq Herd::Transform::Ffmpeg.defaults
   end
-
-
-  # it "should watch file for changes and sync db!" do
-  #   path =  Rails.root.join('../../spec/fixtures/guac.png')
-  #   Post.missing_asset = Herd::Asset.create file: path
-  #   child = Post.missing.n 'test.hole','resize: 350x'
-  #
-  #   yml_path = Rails.root.join 'tmp/herd-test.yml'
-  #   config = Herd::Config.new yml_path
-  #
-  #   watch_thread = Thread.new do
-  #     config.watch true
-  #   end
-  #
-  #   yml = YAML::load_file Rails.root.join yml_path
-  #
-  #   tran_h = yml['transforms'].first
-  #   tran_h['options']['quality'] = 80
-  #
-  #   # save it
-  #   yml_path.write yml.to_yaml
-  #
-  #   watch_thread.join
-  #
-  #
-  #   expect(Post.missing.transform.options[:quality]).to eq 80
-  #
-  #   # watch_thread.raise IOError.new
-  # end
 end
