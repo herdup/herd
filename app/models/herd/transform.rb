@@ -5,6 +5,7 @@ module Herd
     has_many :assets, dependent: :destroy
 
     serialize :options, HashWithIndifferentAccess
+    # validates_presence_of :name
     validates_uniqueness_of :name, scope: [:type, :assetable_type, :options]
 
     before_validation -> {
@@ -12,13 +13,27 @@ module Herd
       self.options = options.with_indifferent_access unless options.kind_of? HashWithIndifferentAccess
     }
 
+    before_save -> {
+      self.options ||= self.class.defaults
+    }
+
     after_save -> {
       assets.map do |a|
         a.generate async
       end if options_changed?
+
+      self.class.all.map do |t|
+        next if t == self
+        t.assets.map do |a|
+          a.generate async
+        end
+      end if default? #and options_changed?
     }
 
     after_create -> {
+      TransformExportWorker.perform_async
+    }
+    after_destroy -> {
       TransformExportWorker.perform_async
     }
 
@@ -42,12 +57,42 @@ module Herd
       where_t(params).first_or_create
     end
 
-    def perform
+    def perform(parent_asset, options)
       raise 'subclass this'
     end
 
     def computed_asset(asset_or_id)
       asset_or_id.is_a?(Numeric) ? Asset.find(asset_or_id) : asset_or_id
+    end
+
+    def options_with_defaults
+      options.reverse_merge! self.class.defaults || {}
+    end
+
+    def default?
+      assetable_type.nil? and name == 'default'
+    end
+
+    class << self
+
+      def default_transform
+        where(assetable_type:nil, name: 'default').first_or_initialize
+      end
+
+      def defaults
+        default_transform.try :options
+      end
+
+      def defaults=(options)
+        trans = default_transform
+        trans.async = true
+
+        if options != trans.options
+          trans.options = options
+          trans.save!
+        end
+      end
+
     end
   end
 end

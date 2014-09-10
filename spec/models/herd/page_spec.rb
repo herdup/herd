@@ -13,7 +13,7 @@ module Herd
       expect(asset.class).to be Herd::Image
 
       # make a resize
-      child = asset.t("resize: 300x", nil, false)
+      child = asset.t("resize: 300x", 'small', false)
 
       # should resize right
       expect(child.width).to eq 300
@@ -22,7 +22,7 @@ module Herd
       expect(Herd::Page.transforms.count).to be 1
 
       # assets relation should be scoped to masters
-      expect(page.assets.count).to be 1
+      expect(page.master_assets.count).to be 1
       # all assets should give resize as well
       expect(page.all_assets.count).to be 2 # with resize
     end
@@ -35,12 +35,12 @@ module Herd
       expect(Herd::Page.missing.id).to be asset.id
 
 
-      child = Herd::Page.missing.t("resize: 320x")
+      child = Herd::Page.missing.t("resize: 320x", 'smallish')
 
       expect(Herd::Asset.count).to be 2
 
-      expect(Herd::Page.missing_assets.count).to be 1
-      expect(Herd::Page.missing_assets.unscoped.count).to be 2
+      expect(Herd::Page.missing_assets.count).to be 2
+      expect(Herd::Page.missing_assets.master.count).to be 1
     end
 
 

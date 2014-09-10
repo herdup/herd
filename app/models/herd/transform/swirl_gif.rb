@@ -1,6 +1,6 @@
 module Herd
   class Transform::SwirlGif < Transform
-    def perform(asset)
+    def perform(asset, options)
       iterate = self.options.extract!(:step,:start,:end)
       transforms = (iterate[:start]..iterate[:end]).to_a.map do |ix|
         "swirl: -#{ix*iterate[:step]}"

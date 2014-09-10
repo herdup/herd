@@ -1,6 +1,6 @@
 module Herd
   class Transform::Magick < Transform
-    def perform(asset_or_id)
+    def perform(asset_or_id, options)
       asset = computed_asset asset_or_id
       image = asset.mini_magick
 

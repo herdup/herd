@@ -6,13 +6,10 @@ module Herd
     included do
       ASSETABLE_MODELS.push(self)
 
-      has_many :assets, -> {master.order(:position)}, as: :assetable, class_name: 'Herd::Asset', dependent: :destroy
+      has_many :assets, -> {order(:position)}, as: :assetable, class_name: 'Herd::Asset', dependent: :destroy
+      has_many :master_assets, -> {master.order(:position)}, as: :assetable, class_name: 'Herd::Asset', dependent: :destroy
 
       assetable_slug
-    end
-
-    def all_assets
-      assets.unscoped
     end
 
     def asset
@@ -23,12 +20,16 @@ module Herd
       self.class.transforms
     end
 
+    def assets_missing
+      assets.empty? ? self.class.missing_assets : assets
+    end
+
     module ClassMethods
       def transforms
         Transform.where assetable_type: to_s
       end
       def missing_assets
-        Asset.where(assetable_type: to_s, assetable_id: 0).master
+        Asset.where(assetable_type: to_s, assetable_id: 0)
       end
       def missing_asset=(asset)
         asset.update_column :assetable_type, to_s

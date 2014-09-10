@@ -77,7 +77,7 @@ module Herd
       asset = Herd::Asset.find asset.id # hack cuz need type
       child = asset.t("resize: 30x", 'test')
       expect(child.width).to eq 30
-      child2 = child.t("rotate: 90>")
+      child2 = child.t("rotate: 90>", 'rotate-clockwise')
       expect(child2.height).to eq 30
     end
 

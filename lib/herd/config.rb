@@ -9,60 +9,116 @@ module Herd
 
     class << self
 
-      def load_transforms(path)
-        path = Pathname.new(path) if path.is_a? String
-        return unless path.exist?
-
-        config = YAML::load path.read
-        return unless config
-
-        hash = config['transforms']
-        return unless ActiveRecord::Base.connection.tables.include? Herd::Transform.table_name
-
-        transforms = hash.map do |h|
-          deserialize h
-        end
-      end
-
-      def save_transforms(path)
+      def save_transforms(path, nested=true)
         path = Pathname.new(path) if path.is_a? String
 
-        transforms = Herd::Transform.all
+        transforms  = serialize_array Herd::Transform.where.not(assetable_type: nil), nested
+        defaults    = serialize_array Herd::Transform.where(assetable_type: nil), nested
 
-        hash = transforms.map do |t|
-          serialize t
-        end
+        container = {
+          'transforms'  => transforms,
+          'defaults'    => defaults
+        }
 
-        container = {'transforms'=> hash}
         path.write container.to_yaml
 
         container
       end
 
-      def serialize(transform)
+      def serialize_array(transforms, nested=true)
+        list = transforms.map do |t|
+          serialize t
+        end
+
+        list = list.inject({}) do |h, hh|
+          h.deep_merge nest hh
+        end if nested
+
+        list
+      end
+
+      def serialize(transform, nested=nil)
         hash = transform.attributes
         hash.delete 'created_at'
         hash.delete 'updated_at'
         hash.delete 'id'
+
         unless hash['options'].empty?
-          hash['options'] = hash['options'].to_h
+          opts = hash.delete 'options'
+          hash['options'] = opts.to_h
         else
           hash['options'] = nil
         end
 
+        hash = nest hash if nested
         hash
       end
 
+      def nest(h)
+        out = { "#{h.delete('type').gsub('Herd::Transform::','')}" => h }
+
+        key = h.delete('name')
+        out = { "#{key}" => out } if key and key != 'default'
+
+        key = h.delete('assetable_type')
+        out = { "#{key}" => out } if key
+
+        out
+      end
+
+      def load_transforms(path, async=nil)
+        path = Pathname.new(path) if path.is_a? String
+        return unless path.exist?
+
+        config = YAML::load path.read
+        return unless config
+        return unless ActiveRecord::Base.connection.tables.include? Herd::Transform.table_name
+
+        config['defaults'].map do |k,h|
+          klass = k.constantize rescue "Herd::Transform::#{k}".constantize
+          klass.defaults = h['options']
+          klass.defaults
+        end if config['defaults']
+
+        deserialize_array(config['transforms']).map do |t|
+          t.async = async
+          t.save! if t.options_changed?
+        end
+      end
+
+      def deserialize_array(hash_or_array)
+        hash_or_array.map do |k,h|
+          if h # nested hash not flat
+            h.map do |name,a|
+              a.map do |t,hh|
+                n = { "#{k}" => { "#{name}" => { "#{t}" => hh } } }
+                deserialize n
+              end
+            end
+          else
+            deserialize k
+          end
+        end.flatten
+      end
+
       def deserialize(h)
+        h = flatten h if h.values.count == 1
+
         options = h.delete 'options'
         transform = Transform.where(h).first_or_create
 
-        if transform.options.to_h != options and !options.nil?
-          transform.options = options
-          transform.save!
-        end
+        transform.options = options if transform.options.to_h != options and !options.nil?
 
         transform
+      end
+
+      def flatten(h)
+        hash = h.values.first.values.first.values.first
+        hash['assetable_type'] = h.keys.first
+        hash['name'] = h.values.first.keys.first
+        hash['type'] = h.values.first.values.first.keys.first
+        hash['type'] = hash['type'].constantize.to_s rescue "Herd::Transform::#{hash['type']}"
+        hash
       end
 
     end

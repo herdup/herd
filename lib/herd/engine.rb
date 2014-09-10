@@ -38,6 +38,7 @@ module Herd
 
     initializer 'activeservice.autoload', :before => :set_autoload_paths do |app|
       app.config.eager_load_paths << "#{config.root}/app/workers"
+      app.config.eager_load_paths << "#{config.root}/app/serializers/concerns"
       app.config.eager_load_paths << "#{config.root}/lib"
     end
 
@@ -51,12 +52,14 @@ module Herd
 
     initializer :setup_sidekiq_middlewares do |app|
       Sidekiq.configure_client do |config|
+        config.redis = { url: ENV['REDIS_DATABASE_URL'], namespace: Rails.application.class.parent_name }
         config.client_middleware do |chain|
           chain.add Sidekiq::Status::ClientMiddleware
         end
       end
 
       Sidekiq.configure_server do |config|
+        config.redis = { url: ENV['REDIS_DATABASE_URL'], namespace: Rails.application.class.parent_name }
         config.server_middleware do |chain|
           chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.minutes # default
         end
