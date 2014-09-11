@@ -12,8 +12,8 @@ module Herd
       def save_transforms(path, nested=true)
         path = Pathname.new(path) if path.is_a? String
 
-        transforms  = serialize_array Transform.where.not(assetable_type: nil), nested
-        defaults    = serialize_array Transform.where(assetable_type: nil), nested
+        transforms  = serialize_array Herd::Transform.where.not(assetable_type: nil), nested
+        defaults    = serialize_array Herd::Transform.where(assetable_type: nil), nested
 
         container = {
           'transforms'  => transforms,
@@ -72,7 +72,7 @@ module Herd
 
         config = YAML::load path.read
         return unless config
-        return unless ActiveRecord::Base.connection.tables.include? Transform.table_name
+        return unless ActiveRecord::Base.connection.tables.include? Herd::Transform.table_name
 
         defaults = config['defaults'].map do |k,h|
           klass = k.constantize rescue "Herd::Transform::#{k}".constantize
@@ -107,7 +107,7 @@ module Herd
         h = flatten h if h.values.count == 1
 
         options = h.delete 'options'
-        transform = Transform.where(h).first_or_create
+        transform = Herd::Transform.where(h).first_or_create
 
         transform.options = options if transform.options.to_h != options and !options.nil?
 
