@@ -6,7 +6,7 @@ module Herd
 
     serialize :options, HashWithIndifferentAccess
     # validates_presence_of :name
-    validates_uniqueness_of :name, scope: [:type, :assetable_type, :options]
+    validates_uniqueness_of :name, scope: [:type, :assetable_type]
 
     before_validation -> {
       self.options = YAML::load(options) if options.kind_of? String
@@ -18,22 +18,21 @@ module Herd
     }
 
     after_save -> {
+      # trigger asset regen if changed
       assets.map do |a|
         a.generate async
       end if options_changed?
 
+      # trigger all assets of all similarly typed (sti) transforms assets
       self.class.all.map do |t|
         next if t == self
         t.assets.map do |a|
           a.generate async
         end
-      end if default? #and options_changed?
+      end if default? and options_changed?
     }
 
     after_create -> {
-      TransformExportWorker.perform_async
-    }
-    after_destroy -> {
       TransformExportWorker.perform_async
     }
 
