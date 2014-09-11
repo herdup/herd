@@ -2,9 +2,11 @@ require 'spec_helper'
 
 module Herd
   describe AssetsHelper do
-    it "should output image tag for image asst" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
-      asset = Asset.create file:path.to_s
+    let :path do
+      Rails.root.join('../../spec/fixtures/guac.png')
+    end
+    it "should output image tag for image asset" do
+      asset = Asset.create file: path
       asset = Asset.find asset.id
       expect(helper.herd_tag asset).to match /img/
       expect(helper.herd_tag asset).to match /#{asset.file_url}/
@@ -13,8 +15,7 @@ module Herd
     end
 
     it "should output image tag for image resize" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
-      asset = Asset.create file:path
+      asset = Asset.create file: path
       asset = Asset.find asset.id
 
       # resize first then rotate
@@ -37,7 +38,6 @@ module Herd
     end
 
     it "should output model's missing image for non-asseted items" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
       # make missing asset
       Page.missing_asset = Asset.create file: path
 

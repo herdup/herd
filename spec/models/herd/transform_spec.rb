@@ -2,9 +2,14 @@ require 'spec_helper'
 
 module Herd
   describe Transform do
+    let :png_path do
+      Rails.root.join('../../spec/fixtures/guac.png')
+    end
+    let :jpg_path do
+      Rails.root.join('../../spec/fixtures/shutter.jpg')
+    end
     it "should recreate child assets with tranform has changed sync" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
-      asset = Herd::Asset.create file: path
+      asset = Herd::Asset.create file: png_path
       asset = Herd::Asset.find asset.id # hack cuz need type
       child = asset.t "resize: 30x", 'test'
 
@@ -22,8 +27,7 @@ module Herd
     end
 
     it "should recreat using queue if async" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
-      asset = Herd::Asset.create file: path
+      asset = Herd::Asset.create file: png_path
       asset = Herd::Asset.find asset.id # hack cuz need type
       child = asset.t "resize: 30x", 'test'
 
@@ -45,10 +49,7 @@ module Herd
     end
 
     it "should re-trigger if defaults change" do
-      # Transform::Magick.defaults = { quality: 50 }
-
-      path =  Rails.root.join('../../spec/fixtures/shutter.jpg')
-      asset = Herd::Asset.create file: path
+      asset = Herd::Asset.create file: jpg_path
       asset = Herd::Asset.find asset.id # hack cuz need type
       child = asset.n 'test',"resize: 230x"
 

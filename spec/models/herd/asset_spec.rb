@@ -2,9 +2,12 @@ require 'spec_helper'
 
 module Herd
   describe Asset do
+    let :img_path do
+      Rails.root.join('../../spec/fixtures/guac.png')
+    end
+
     it "should create image asset from Pathname" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
-      asset = Herd::Asset.create file: path
+      asset = Herd::Asset.create file: img_path
 
       expect(File).to exist(asset.file_path)
       expect(asset.type).to eq('Herd::Image')
@@ -13,8 +16,7 @@ module Herd
     end
 
     it "should create image asset from filename" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
-      asset = Herd::Asset.create file:path.to_s
+      asset = Herd::Asset.create file:img_path.to_s
 
       expect(File).to exist(asset.file_path)
       expect(asset.type).to eq('Herd::Image')
@@ -22,14 +24,13 @@ module Herd
       expect(asset.class).to eq Herd::Image
       expect(asset.content_type).to eq('image/png')
 
-      asset = Herd::Asset.create file: path.to_s
-      expect(asset.file_name).not_to be path.basename.to_s
+      asset = Herd::Asset.create file: img_path.to_s
+      expect(asset.file_name).not_to be img_path.basename.to_s
     end
 
     it "should not dupe if same file_name uploaded twice" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
-      asset1 = Herd::Asset.create file:path.to_s
-      asset2 = Herd::Asset.create file: path.to_s
+      asset1 = Herd::Asset.create file: img_path.to_s
+      asset2 = Herd::Asset.create file: img_path.to_s
       expect(asset1.file_name).not_to be asset2.file_name
     end
 
@@ -58,22 +59,20 @@ module Herd
       asset = Herd::Asset.create file: 'http://files.ginlane.com/photo.JPG'
       file_path1 = asset.file_path
       expect(File).to exist file_path1
-      asset.update file: Rails.root.join('../../spec/fixtures/guac.png')
+      asset.update file: img_path
       expect(File).not_to exist file_path1
       expect(File).to exist asset.file_path
     end
 
     it "should create child asset with transform string" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
-      asset = Herd::Asset.create file: path
+      asset = Herd::Asset.create file: img_path
       asset = Herd::Asset.find asset.id # hack cuz need type
       child = asset.t("resize: 30x", 'test')
       expect(child.width).to eq 30
     end
 
     it "should be able to chain transform strings" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
-      asset = Herd::Asset.create file: path
+      asset = Herd::Asset.create file: img_path
       asset = Herd::Asset.find asset.id # hack cuz need type
       child = asset.t("resize: 30x", 'test')
       expect(child.width).to eq 30
@@ -82,15 +81,11 @@ module Herd
     end
 
     it "should created empty child if async flag true" do
-      path =  Rails.root.join('../../spec/fixtures/guac.png')
-      asset = Herd::Asset.create file: path
+      asset = Herd::Asset.create file: img_path
       asset = Herd::Asset.find asset.id
 
       child = asset.t 'resize: 300x', 'small', true
       expect(child.file_name).to be_nil
-
-
     end
-
   end
 end

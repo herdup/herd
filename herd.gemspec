@@ -39,10 +39,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'sinatra'
   s.add_dependency 'rb-fsevent'
 
-  #s.add_dependency 'emcee'
-
   s.add_development_dependency "sqlite3"
-  # s.add_development_dependency 'awesome_print'
-  # s.add_development_dependency 'pry'
 
 end
