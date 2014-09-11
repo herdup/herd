@@ -7,3 +7,8 @@ mixin Herd.LiveAssets
       source.addEventListener 'assets', (e) =>
         Ember.run =>
           @store.pushPayload JSON.parse(e.data)
+
+  actions:
+    generateChild: (child, t) ->
+      console.log child, t
+      debugger
