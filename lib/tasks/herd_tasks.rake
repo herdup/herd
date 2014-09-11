@@ -16,11 +16,13 @@ namespace :herd do
     end
   end
 
-  task generate: :environment do
+  task :generate, [:async] => [:environment] do |t,args|
+    args.with_defaults(:async => false)
+
     Herd::Transform.all.map do |t|
       Herd::Asset.master.where(assetable_type:t.assetable_type).map do |a|
-        t.async = true
-        ap a.child_with_transform t
+        t.async = args.async
+        child = a.child_with_transform t
       end
     end
   end
