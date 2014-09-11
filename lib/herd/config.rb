@@ -74,16 +74,18 @@ module Herd
         return unless config
         return unless ActiveRecord::Base.connection.tables.include? Herd::Transform.table_name
 
-        config['defaults'].map do |k,h|
+        defaults = config['defaults'].map do |k,h|
           klass = k.constantize rescue "Herd::Transform::#{k}".constantize
           klass.defaults = h['options']
           klass.defaults
         end if config['defaults']
 
-        deserialize_array(config['transforms']).map do |t|
+        transforms = deserialize_array(config['transforms']).map do |t|
           t.async = async
           t.save! if t.options_changed?
+          t
         end
+        transforms
       end
 
       def deserialize_array(hash_or_array)
@@ -140,7 +142,7 @@ module Herd
 
         # Watch the above directories
         @fsevent.watch(config_path, file_events: true) do |dirs|
-          TransformImportWorker.perform_async(config_path)
+          TransformImportWorker.perform_async config_path
         end
 
         @fsevent.run
