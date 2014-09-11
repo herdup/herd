@@ -26,7 +26,7 @@ describe Herd::Config do
     expect(Herd::Transform.count).to be 1
 
     Herd::Config.save_transforms yml_path, false
-    yml = YAML::load_file Rails.root.join 'tmp/herd-test.yml'
+    yml = YAML::load_file yml_path
     expect(yml['transforms'].count).to be 1
 
     child2 = child.n 'test.rotated','rotate: 90>'

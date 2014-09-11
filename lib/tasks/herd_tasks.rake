@@ -14,6 +14,9 @@ namespace :herd do
     task import: :environment do |t,args|
       Herd::TransformImportWorker.perform_async Rails.root.join 'config/herd.yml'
     end
+    task export: :environment do |t,args|
+      Herd::TransformExportWorker.perform_async Rails.root.join 'config/herd.yml'
+    end
   end
 
   task :generate, [:async] => [:environment] do |t,args|
