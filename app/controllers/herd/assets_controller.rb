@@ -28,7 +28,7 @@ module Herd
       end
 
     rescue IOError
-      puts "user closed the bitch"
+      puts "user closed connection"
     ensure
       sse.close
     end
