@@ -1,4 +1,5 @@
 Herd.AssetContainerComponent = Ember.Component.extend
+  action: 'generateChild'
   classNames: ['asset-container']
   bgImage: true
   asset: null
@@ -17,35 +18,19 @@ Herd.AssetContainerComponent = Ember.Component.extend
     return @asset?.type == 'Herd::Video' unless @child
     @child.type == 'Herd::Video'
 
-  +computed options
-  optionsHash: ->
-    return unless @t
-    yaml = @t.split('|').join("\n")
-    hash = jsyaml.load yaml
-    sorted = {}
-    for k in Object.keys(hash).sort()
-      sorted[k] = hash[k]
-
-    sorted
-
-  +computed options
-  sortedOptionsSegment: ->
-    yaml = jsyaml.dump @optionsHash
-    encodeURIComponent yaml.split("\n").join('|')
-
   +computed asset, transform, child.url, child.updatedAt
   assetUrl: ->
     @child = @asset if @asset.assetableId == 0
 
     if @child and @child.url
-      "#{@child?.url}?#{@child.updatedAt.getTime()}"
+      return "#{@child?.url}?#{@child.updatedAt.getTime()}"
 
     else if @asset and (@t or @n)
       @child = @asset.n @n if @n
       @child = @asset.t @t unless @child
 
       if @child?.url
-        "#{@child?.url}?#{@child.updatedAt.getTime()}"
+        return "#{@child?.url}?#{@child.updatedAt.getTime()}"
       else
         # this needs to be refactored into a controller, maybe using @sendAction
         @child = @asset.store.createRecord 'asset',
