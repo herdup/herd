@@ -38,15 +38,16 @@ Herd.AssetContainerComponent = Ember.Component.extend
     @child = @asset if @asset.assetableId == 0
 
     if @child and @child.url
-      return "#{@child?.url}?#{@child.updatedAt.getTime()}"
+      "#{@child?.url}?#{@child.updatedAt.getTime()}"
 
     else if @asset and (@t or @n)
       @child = @asset.n @n if @n
       @child = @asset.t @t unless @child
 
       if @child?.url
-        return "#{@child?.url}?#{@child.updatedAt.getTime()}"
+        "#{@child?.url}?#{@child.updatedAt.getTime()}"
       else
+        # this needs to be refactored into a controller, maybe using @sendAction
         @child = @asset.store.createRecord 'asset',
           parentAsset: @asset
           transform: @transform || @asset.store.createRecord 'transform',
