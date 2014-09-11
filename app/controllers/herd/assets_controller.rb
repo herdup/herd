@@ -1,38 +1,9 @@
-require_dependency "herd/application_controller"
-require 'zip'
-
 module Herd
   class AssetsController < ApplicationController
+    include ActionController::Live
+
     respond_to :json
     before_action :set_asset, only: [:show, :edit, :update, :destroy]
-
-    def empty_zip
-      folders = ASSETABLE_MODELS.inject({}) do |h,t|
-        h[t.to_s.demodulize] = t.group(:slug).map(&:slug); h
-      end
-
-      seed_struct = Rails.root.join('tmp','seed')
-      FileUtils.rm_rf seed_struct
-      folders.each do |f,a|
-        a.each do |s|
-          FileUtils.mkdir_p Rails.root.join('tmp','seed',f,s)
-        end
-      end
-      zip_file = Rails.root.join('public','seed.zip')
-      FileUtils.rm_rf zip_file
-      Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
-        Dir["#{seed_struct}/**/**"].each do |file|
-          zipfile.add file.gsub("#{seed_struct}/", ''), file
-        end
-      end
-      redirect_to '/seed.zip'
-    end
-
-    def upload_zip
-      if params[:file]
-
-      end
-    end
 
     def transform
       set_asset
@@ -44,6 +15,22 @@ module Herd
         format.json { render json: child, serializer: AssetSerializer  }
         format.any { redirect_to child.file_url }
       end
+    end
+
+    def live
+      response.headers['Content-Type'] = 'text/event-stream'
+      sse = SSE.new(response.stream, event:'assets')
+      # NB: this is a blocking, infinite loop.
+      Redis.new.subscribe('assets') do |on|
+        on.message do |event, data|
+          sse.write(data)
+        end
+      end
+
+    rescue IOError
+      puts "user closed connection"
+    ensure
+      sse.close
     end
 
     # GET /assets
@@ -67,20 +54,19 @@ module Herd
 
     # POST /assets
     def create
-
       if transform_params.present?
         parent = Asset.find(params[:asset][:parent_asset_id])
         params[:asset][:transform].delete(:type) unless params[:asset][:transform][:type].present?
         @transform = parent.class.default_transform.where_t(transform_params).first_or_create
         params[:asset][:transform_id] = @transform.id
       end
-      # if asset_params[:file]
-
-      # elsif asset_params.keys.sort == %s{transform_id parent_id}.sort
-        # binding.pry
-      # end
 
       if @asset = Asset.create(asset_params)
+        if @asset.child?
+          @asset = Asset.find @asset.id
+          @asset.generate
+        end
+
         render json: @asset, serializer: AssetSerializer
       else
         render json: @asset.errors, status: :unprocessable_entity
@@ -107,13 +93,13 @@ module Herd
     end
 
     def scoped_assets
-      assets = Asset.order(:position)
+      assets = Asset.order :position
       if params[:assetable_type].present?
-        assets = assets.where(params.slice(:assetable_type,:assetable_id))
+        assets = assets.where params.permit(:assetable_type,:assetable_id)
       elsif params[:parent_id].present?
-        assets = assets.where(parent_asset_id:params[:parent_id])
+        assets = assets.where parent_asset_id:params.require(:parent_id)
       elsif params[:ids].present?
-        assets = assets.where(id:params[:id])
+        assets = assets.where id:params.require(:id)
       end
       assets
     end
@@ -128,13 +114,13 @@ module Herd
 
       # Only allow a trusted parameter "white list" through.
       def asset_params
-        params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position)
+        params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position, :created_at, :updated_at)
       end
       def metadata_params
         params.require(:asset).require(:metadata).permit!.symbolize_keys
       end
       def transform_params
-        params.require(:asset).require(:transform).permit(:type, :options, :format) if params[:asset][:transform].present?
+        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at) if params[:asset][:transform].present?
       end
   end
 end
