@@ -11,4 +11,3 @@ mixin Herd.LiveAssets
   actions:
     generateChild: (child, t) ->
       console.log child, t
-      debugger

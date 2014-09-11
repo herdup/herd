@@ -20,27 +20,27 @@ Herd.AssetContainerComponent = Ember.Component.extend
 
   +computed asset, transform, child.url, child.updatedAt
   assetUrl: ->
-    @child = @asset if @asset.assetableId == 0
-
     if @child and @child.url
       return "#{@child?.url}?#{@child.updatedAt.getTime()}"
 
     else if @asset and (@t or @n)
-      @child = @asset.n @n if @n
+      @child = @asset if @asset.assetableId == 0
+      @child = @asset.n @n if !@child and @n
       @child = @asset.t @t unless @child
 
       if @child?.url
         return "#{@child?.url}?#{@child.updatedAt.getTime()}"
       else
-        # this needs to be refactored into a controller, maybe using @sendAction
-        @child = @asset.store.createRecord 'asset',
-          parentAsset: @asset
-          transform: @transform || @asset.store.createRecord 'transform',
-            name: @n
-            options: @t
-            assetableType: @asset.assetableType
+        Ember.run =>
+          # this needs to be refactored into a controller, maybe using @sendAction
+          @child = @asset.store.createRecord 'asset',
+            parentAsset: @asset
+            transform: @transform || @asset.store.createRecord 'transform',
+              name: @n
+              options: @t
+              assetableType: @asset.assetableType
 
-        @child.save()
+          @child.save()
 
       "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
     else if @asset
