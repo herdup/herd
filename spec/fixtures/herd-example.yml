@@ -1,0 +1,19 @@
+transforms:
+  -
+    name: index
+    assetable_type: Post
+    type: Herd::Transform::Magick
+    options:
+      resize: 320x
+  -
+    name: uploader.index
+    assetable_type: Post
+    type: Herd::Transform::Magick
+    options:
+      resize: 600x
+  -
+    name: uploader.index
+    assetable_type: Post
+    type: Herd::Transform::Ffmpeg
+    options:
+      resize: 400x

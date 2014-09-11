@@ -4,6 +4,7 @@ require 'ember_script-rails'
 require 'emblem/rails'
 require 'jquery-rails'
 require 'jquery-ui-rails'
+
 require 'active_model_serializers'
 require 'filemagic'
 require 'mini_magick'
@@ -11,6 +12,11 @@ require 'exifr'
 require 'sidekiq'
 require 'streamio-ffmpeg'
 require 'progressbar'
+require 'open-uri'
+require 'zip'
+require 'sidekiq'
+require 'sidekiq-status'
+require 'rb-fsevent'
 
 module Herd
   class Engine < ::Rails::Engine
@@ -31,8 +37,9 @@ module Herd
     end
 
     initializer 'activeservice.autoload', :before => :set_autoload_paths do |app|
-      app.config.eager_load_paths << "#{config.root}/app/workers"
-      app.config.eager_load_paths << "#{config.root}/lib"
+      app.config.autoload_paths << "#{config.root}/app/workers"
+      app.config.autoload_paths << "#{config.root}/app/serializers/concerns"
+      app.config.autoload_paths << "#{config.root}/lib"
     end
 
     initializer :append_herd_migrations do |app|
@@ -42,5 +49,25 @@ module Herd
         end
       end
     end
+
+    initializer :setup_sidekiq_middlewares do |app|
+      Sidekiq.configure_client do |config|
+        config.redis = { url: ENV['REDIS_DATABASE_URL'], namespace: Rails.application.class.parent_name }
+        config.client_middleware do |chain|
+          chain.add Sidekiq::Status::ClientMiddleware
+        end
+      end
+
+      Sidekiq.configure_server do |config|
+        config.redis = { url: ENV['REDIS_DATABASE_URL'], namespace: Rails.application.class.parent_name }
+        config.server_middleware do |chain|
+          chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.minutes # default
+        end
+        config.client_middleware do |chain|
+          chain.add Sidekiq::Status::ClientMiddleware
+        end
+      end
+    end
+
   end
 end

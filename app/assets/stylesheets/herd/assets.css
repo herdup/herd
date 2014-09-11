@@ -8,3 +8,15 @@
 .herd-wrap .transform-list {
   color: pink;
 }
+
+/*.asset-container video {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -1000;
+  overflow: hidden
+}*/

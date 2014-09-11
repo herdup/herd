@@ -5,7 +5,7 @@ module Herd
       attr_accessor :accept_extensions
 
       def accept_extensions
-        @accept_extensions ||= %w(.jpg .gif .png .mp4 .mov .webm)
+        @accept_extensions ||= %w(.jpg .gif .png .mp4 .mov .webm .m4v .tif)
       end
       def self.import(zip_path)
         new(zip_path).import
@@ -26,13 +26,16 @@ module Herd
             end
           },
           :progress_proc => lambda {|s|
-            @pbar.set s if @pbar
+            @pbar.set s if @pbar and s <= @pbar.total
           }
 
         assets=[]
 
         ::Zip::File.open(zip_data) do |zip|
+          @pbar = ProgressBar.new(File.basename(zip_path), zip.count)
           zip.each do |entry|
+            @pbar.inc if @pbar
+
             next if entry.name =~ /\.DS_Store|__MACOSX|(^|\/)\._/
             next unless accept_extensions.include? File.extname(entry.name).downcase
 
@@ -46,24 +49,44 @@ module Herd
             asset_file = parts.pop
             assetable_slug = parts.pop
 
-            begin
-              klass = class_from_path parts.join '/'
-              object = klass.friendly.find assetable_slug
-            rescue Exception => e
-              puts "no item found #{assetable_slug} #{e} #{parts}"
-              next
-            end
-
-            assetable_path = Rails.root.join 'tmp','import',*parts,assetable_slug
-            asset_path = File.join assetable_path,asset_file
+            assetable_path = Rails.root.join 'tmp', 'import', *parts, assetable_slug
+            asset_path = File.join assetable_path, asset_file
 
             FileUtils.mkdir_p assetable_path
             FileUtils.rm asset_path if File.exist? asset_path
 
             entry.extract asset_path
 
+            begin
+              klass = class_from_path parts.join '/'
+            rescue Exception => e
+            end
+
+            if assetable_slug == '_missing'
+              if klass.missing.nil?
+                klass.missing_asset = Asset.create(file: asset_path)
+              else
+                klass.missing.update file: asset_path
+              end
+              assets << klass.missing
+              next
+            else
+              begin
+                object = klass.friendly.find assetable_slug
+              rescue Exception => e
+                puts "no item found #{assetable_slug} #{e} #{parts}"
+                next
+              end
+            end
+
             if found = object.assets.master.find_by(file_name: File.basename(asset_path))
-              puts "linked this file is #{asset_path} \n exist: #{found}"
+
+              if File.stat(asset_path).size == found.file_size
+                puts "linked this file is #{asset_path} \n exist: #{found} and same size: #{found.file_size}"
+              else
+                found.update(file: asset_path)
+                assets << found
+              end
             else
               assets << object.assets.create(file: asset_path.to_s)
             end

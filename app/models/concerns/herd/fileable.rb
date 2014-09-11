@@ -2,8 +2,9 @@ module Herd::Fileable
 	extend ActiveSupport::Concern
 
 	def base_path(abs=true)
-	  parts = ["/uploads", sanitized_classname, fileable_directory_fields]
-	  parts.unshift [Rails.root,'public'] if abs
+	  parts = ["/uploads", Rails.env, sanitized_classname]
+		parts.concat fileable_directory_fields
+	  parts.unshift *[Rails.root,'public'] if abs
 	  File.join(*parts)
 	end
 
@@ -27,35 +28,13 @@ module Herd::Fileable
 	  File.join(base_path, file_name_with_ext(ext))
 	end
 
-	def filename=(filename)
-		@filename = filename
-	end
-
-  def filename
-    if @filename.nil?
-      @filename = Pathname.new(file_field).basename.to_s
-    end
-    @filename
-  end
-
 	def file_path
-	  if @file_path.nil?
-	    base = base_path
-	    unless File.exists? base
-	    	FileUtils.mkdir_p base
-	    	FileUtils.chmod 0775, base
-	    end
-	    @file_path = "#{base}/#{filename}"
-	  end
-	  @file_path
+		FileUtils.mkdir_p base_path unless File.exist? base_path
+		File.join base_path, file_field
 	end
 
 	def file_url
-	  if @file_url.nil?
-	    base = base_url
-	    @file_url = "#{base}/#{filename}"
-	  end
-	  @file_url
+		File.join base_url, file_field
 	end
 
 	def file_exists?
@@ -68,28 +47,26 @@ module Herd::Fileable
 		Dir::Tmpname.tmpdir + "/" + seed
 	end
 
-	def writeable_tempfile(ext=nil)
-		# @DEPRECATED: use unique_tmppath -- no reason to make files... yet
-	  ext  ||= file_ext
-	  seed ||= file_name_with_ext(ext)
-	  @tempfile = Tempfile.new([File.basename(seed, '.*'), File.extname(seed)])
-	  @tempfile.binmode
-	  @tempfile
+	def sanitized_classname
+		# use the second path chunk for now (i.e. what's after "Rcms::")
+		# not ideal but cant figure out an easy way around it
+		type_s = self.type
+		type_s ||= self.class.to_s
+		type_s.split("::").second.pluralize.downcase
 	end
 
 	module ClassMethods
 		def file_field(sym)
 			define_method :file_field do
-				send(sym)
+				send(sym) || ''
 			end
 		end
 		def fileable_directory_fields(block=nil)
 			define_method :fileable_directory_fields do
-				pattern = ""
 				if block.present?
-					pattern << block.call(self)
+					block.call(self)
 				else
-					pattern << self.id.to_s
+					self.id.to_s
 				end
 			end
 		end
