@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    herd (0.1.5)
+    herd (0.2.0)
       active_model_serializers (= 0.8.1)
       coffee-rails
       ember-rails

@@ -1,42 +1,46 @@
 require 'spec_helper'
 
 describe Herd::Config do
+  let :yml_path do
+    Rails.root.join('../../spec/fixtures/herd-test.yml')
+  end
+  let :img_path do
+    Rails.root.join('../../spec/fixtures/guac.png')
+  end
+  let :vid_path do
+    Rails.root.join('../../spec/fixtures/test.mov')
+  end
   it "should load transforms from yml" do
-    path =  Rails.root.join('../../spec/fixtures/herd-example.yml')
-    Herd::Config.load_transforms path
+    Herd::Config.load_transforms Rails.root.join('../../spec/fixtures/herd-example.yml')
 
     expect(Herd::Transform.count).to be 3
     expect(Post.transforms.count).to be 3
   end
 
   it "should save new transforms to yml" do
-    path =  Rails.root.join('../../spec/fixtures/guac.png')
-    Post.missing_asset = Herd::Asset.create file: path
+    Post.missing_asset = Herd::Asset.create file: img_path
 
     child = Post.missing.n 'test.hole','resize: 350x'
 
     expect(child.width).to be 350
     expect(Herd::Transform.count).to be 1
 
-    Herd::Config.save_transforms Rails.root.join('tmp/herd-test.yml'), false
+    Herd::Config.save_transforms yml_path, false
     yml = YAML::load_file Rails.root.join 'tmp/herd-test.yml'
     expect(yml['transforms'].count).to be 1
 
     child2 = child.n 'test.rotated','rotate: 90>'
     expect(child2.height).to be 350
 
-    Herd::Config.save_transforms Rails.root.join('tmp/herd-test.yml'), false
-    yml = YAML::load_file Rails.root.join 'tmp/herd-test.yml'
+    Herd::Config.save_transforms yml_path, false
+    yml = YAML::load_file yml_path
     expect(yml['transforms'].count).to be 2
   end
 
   it "should re-read transforms saved to yml" do
-    path =  Rails.root.join('../../spec/fixtures/guac.png')
-    Post.missing_asset = Herd::Asset.create file: path
+    Post.missing_asset = Herd::Asset.create file: img_path
 
     child = Post.missing.n 'test.hole','resize: 350x'
-
-    yml_path = Rails.root.join 'tmp/herd-test.yml'
 
     Herd::Config.save_transforms yml_path, false
 
@@ -61,9 +65,8 @@ describe Herd::Config do
   end
 
   it "should nestify hash and deep_merge!" do
-    path =  Rails.root.join('../../spec/fixtures/guac.png')
-    Post.missing_asset = Herd::Asset.create file: path
-    Herd::Page.missing_asset = Herd::Asset.create file: path
+    Post.missing_asset = Herd::Asset.create file: img_path
+    Herd::Page.missing_asset = Herd::Asset.create file: img_path
 
     child = Post.missing.n 'test.hole','resize: 350x'
     child2 = Post.missing.n 'test.crop','crop: 350x350+100+0'
@@ -86,20 +89,16 @@ describe Herd::Config do
   end
 
   it "should output nested yml" do
-    path =  Rails.root.join('../../spec/fixtures/guac.png')
-    Herd::Page.missing_asset = Herd::Asset.create file: path
+    Herd::Page.missing_asset = Herd::Asset.create file: img_path
 
     post = Post.create title:'test'
 
-    post.assets.create file: path
-    path =  Rails.root.join('../../spec/fixtures/test.mov')
-    post.assets.create file: path
+    post.assets.create file: img_path
+    post.assets.create file: vid_path
 
     child = post.master_assets.to_a.first.n 'test.hole','resize: 350x'
     child2 = post.master_assets.to_a.last.n 'test.hole','resize: 350x'
     child3 = Herd::Page.missing.n 'hole.2', 'crop: 350x350+100+0'
-
-    yml_path = Rails.root.join 'tmp/herd-test.yml'
 
     Herd::Config.save_transforms yml_path, true
 
@@ -150,8 +149,6 @@ describe Herd::Config do
     expect(Herd::Transform::Magick.defaults).not_to be_nil
     expect(Herd::Transform.count).to eq 2
 
-    yml_path = Rails.root.join 'tmp/herd-test.yml'
-
     Herd::Config.save_transforms yml_path
 
     yml = YAML::load_file Rails.root.join yml_path
@@ -159,22 +156,19 @@ describe Herd::Config do
     expect(yml['defaults']['Magick'].count).to eq 1
     expect(yml['defaults']['Ffmpeg'].count).to eq 1
 
-
     yml['defaults']['Magick']['options']['quality'] = 50
 
     yml_path.write yml.to_yaml
 
     Herd::Config.load_transforms yml_path
 
-    path =  Rails.root.join('../../spec/fixtures/guac.png')
-    Herd::Page.missing_asset = Herd::Asset.create file: path
+    Herd::Page.missing_asset = Herd::Asset.create file: img_path
 
     child = Herd::Page.missing.n 'spot'
     expect(child.transform.options_with_defaults).to eq Herd::Transform::Magick.defaults
     expect(child.transform.options_with_defaults[:quality]).to eq 50
 
-    path =  Rails.root.join('../../spec/fixtures/test.mov')
-    Post.missing_asset = Herd::Asset.create file: path
+    Post.missing_asset = Herd::Asset.create file: vid_path
 
     child = Post.missing.n 'spot'
     expect(child.transform.options_with_defaults).to eq Herd::Transform::Ffmpeg.defaults
