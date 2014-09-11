@@ -76,7 +76,7 @@ module Herd
       hash = {parent_asset:self, transform:transform}
       child = Asset.where(hash).take || Asset.create(hash)
 
-      child.class.to_s == child.type ? child : child.becomes(type.constantize)
+      child.becomes(type.constantize) rescue child
     end
 
 
