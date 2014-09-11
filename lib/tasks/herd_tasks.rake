@@ -20,7 +20,7 @@ namespace :herd do
     Herd::Transform.all.map do |t|
       Herd::Asset.master.where(assetable_type:t.assetable_type).map do |a|
         t.async = true
-        a.child_with_transform t
+        ap a.child_with_transform t
       end
     end
   end
