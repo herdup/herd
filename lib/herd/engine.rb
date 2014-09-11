@@ -37,9 +37,9 @@ module Herd
     end
 
     initializer 'activeservice.autoload', :before => :set_autoload_paths do |app|
-      app.config.eager_load_paths << "#{config.root}/app/workers"
-      app.config.eager_load_paths << "#{config.root}/app/serializers/concerns"
-      app.config.eager_load_paths << "#{config.root}/lib"
+      app.config.autoload_paths << "#{config.root}/app/workers"
+      app.config.autoload_paths << "#{config.root}/app/serializers/concerns"
+      app.config.autoload_paths << "#{config.root}/lib"
     end
 
     initializer :append_herd_migrations do |app|
