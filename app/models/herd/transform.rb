@@ -32,10 +32,6 @@ module Herd
       end if default? and options_changed?
     }
 
-    after_create -> {
-      TransformExportWorker.perform_async
-    }
-
     def self.options_from_string(string)
       yaml = string.split('|').map(&:strip).join("\n")
       hash = YAML::load(yaml).with_indifferent_access
