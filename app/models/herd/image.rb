@@ -12,12 +12,12 @@ module Herd
       end
     end
 
-    def mini_magick
-      @mini_magick ||= ::MiniMagick::Image.open(file_path)
+    def mini_magick(modify_orig=false)
+      modify_orig ? MiniMagick::Image.new(file_path) : MiniMagick::Image.open(file_path)
     end
 
     def rmagick
-      @rmagick ||= Magick::Image.read(file_path).first
+      Magick::Image.read(file_path).first
     end
 
     def did_identify_type
@@ -26,7 +26,7 @@ module Herd
     end
 
     def load_meta
-      image = mini_magick
+      image = mini_magick(true)
       meta[:height] = image[:height]
       meta[:width] = image[:width]
 
@@ -38,11 +38,9 @@ module Herd
     end
 
     def auto_orient
-      image = mini_magick
+      image = mini_magick(true)
       image.auto_orient
-      image.write file_path
     end
-
 
   end
 end
