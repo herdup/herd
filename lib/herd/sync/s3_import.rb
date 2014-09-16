@@ -16,7 +16,7 @@ module Herd
         @accept_extensions
       end
 
-      def import_s3(prefix=nil, s3_key=Rails.application.secrets.herd_s3_id, s3_secret=Rails.application.secrets.herd_s3_secret)
+      def import_s3(prefix=nil, s3_key=ENV['HERD_S3_KEY'], s3_secret=ENV['HERD_S3_SECRET'])
         assets = []
 
         AWS.config access_key_id:s3_key, secret_access_key: s3_secret
