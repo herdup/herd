@@ -104,7 +104,7 @@ module Herd
           self.file_name = File.basename(@file)
           self.file = File.open(@file)
         else
-          self.file_name = File.basename URI.parse(@file).path
+          self.file_name = URI.unescape(File.basename(URI.parse(@file).path))
 
           # testme
           self.file = open @file,
