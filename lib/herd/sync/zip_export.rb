@@ -1,6 +1,6 @@
 module Herd
-  module Zip
-    class Export < Base
+  module Sync
+    class ZipExport < Base
       attr_accessor :seed_path
       attr_accessor :zip_path
       attr_accessor :output_assets
