@@ -19,5 +19,3 @@ gem 'spring'
 gem 'pry'
 gem 'puma'
 gem 'quiet_assets'
-
-# gem 'aws-sdk-v1'#, '~> 1.5.7'
