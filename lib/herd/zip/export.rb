@@ -66,9 +66,10 @@ module Herd
         end
       end
 
-      def export
+      def export(delete_seeds=true)
         generate_seeds_folder
         zip_folder @seed_path, @zip_path
+        FileUtils.rm_fr @seed_path if delete_
       end
     end
   end
