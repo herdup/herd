@@ -1,19 +1,19 @@
 module Herd
   module Sync
     class S3Import < Base
-      attr_accessor :zip_path
+      attr_accessor :bucket
       attr_accessor :accept_extensions
 
       def accept_extensions
         @accept_extensions ||= %w(.jpg .gif .png .mp4 .mov .webm .m4v .tif)
       end
-      def self.import(zip_path)
-        new(zip_path).import
+      def self.import(bucket, prefix=nil)
+        new(bucket).import_s3 prefix
       end
 
-      def initialize(zip_path)
-        @zip_path = zip_path
-        @accept_extensions
+      def initialize(bucket)
+        @bucket = bucket
+        accept_extensions
       end
 
       def import_s3(prefix=nil, s3_key=ENV['HERD_S3_KEY'], s3_secret=ENV['HERD_S3_SECRET'])
@@ -22,8 +22,8 @@ module Herd
         AWS.config access_key_id:s3_key, secret_access_key: s3_secret
         s3 = AWS::S3.new
 
-        objects = s3.buckets[zip_path].objects
-        objects = objects.with_prefix(prefix) if prefix
+        objects = s3.buckets[bucket].objects
+        objects = objects.with_prefix(bucket) if prefix
 
         objects.each do |o|
           remote_path = o.key
