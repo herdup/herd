@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-describe Herd::Zip::Export do
+describe Herd::Sync::Base do
   it "should make file map with assetable model structure" do
 
     ap Herd::Asset.all
     page = Herd::Page.create path: 'home'
 
-    exporter = Herd::Zip::Export.new
+    exporter = Herd::Sync::ZipExport.new
     map = exporter.folder_map
     expect(map.keys).to include exporter.path_from_class(page.class)
     expect(map.keys.count).to eq Herd::ASSETABLE_MODELS.count
@@ -23,7 +23,7 @@ describe Herd::Zip::Export do
     # second asset with same name should be renamed
     expect(missing_asset.file_name).not_to eq page.asset.file_name
 
-    exporter = Herd::Zip::Export.new
+    exporter = Herd::Sync::ZipExport.new
     exporter.generate_seeds_folder
 
     expect(Dir["#{exporter.seed_path}/**/**.png"].count).to be 2
@@ -33,7 +33,7 @@ describe Herd::Zip::Export do
 
   it "should make a zip with expected files" do
     Herd::Page.missing_asset = Herd::Asset.create file: Rails.root.join('../../spec/fixtures/guac.png')
-    exporter = Herd::Zip::Export.new
+    exporter = Herd::Sync::ZipExport.new
     exporter.export
 
     ::Zip::File.open(exporter.zip_path) do |zip|

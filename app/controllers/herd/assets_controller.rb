@@ -18,6 +18,8 @@ module Herd
     end
 
     def live
+      return raise 'HERD_LIVE_ASSETS disabled' unless ENV['HERD_LIVE_ASSETS'] == '1'
+
       response.headers['Content-Type'] = 'text/event-stream'
       sse = SSE.new(response.stream, event:'assets')
       # NB: this is a blocking, infinite loop.
@@ -30,7 +32,7 @@ module Herd
     rescue IOError
       puts "user closed connection"
     ensure
-      sse.close
+      sse.close if sse
     end
 
     # GET /assets

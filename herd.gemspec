@@ -38,6 +38,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'sidekiq-status'
   s.add_dependency 'sinatra'
   s.add_dependency 'rb-fsevent'
+  s.add_dependency 'aws-sdk-v1'
 
   s.add_development_dependency "sqlite3"
 

@@ -1,7 +1,9 @@
 language: ruby
 rvm: 2.1.2
 gemfile: Gemfile
-cache: apt
+cache:
+  apt: true
+  bundler: true
 env:
   global:
   - RAILS_ENV=test

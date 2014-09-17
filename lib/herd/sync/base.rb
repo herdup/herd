@@ -1,5 +1,5 @@
 module Herd
-  module Zip
+  module Sync
     class Base
       def class_from_path(path)
         path.classify.constantize

@@ -6,6 +6,8 @@ module Herd
     file_field :file_name
     # validates_presence_of :file_name
 
+    attr_accessor :delete_original
+
     attr_accessor :jid
     attr_accessor :generate_sync
 
@@ -79,7 +81,6 @@ module Herd
       child.becomes(type.constantize) rescue child
     end
 
-
     def t(transform_string, name=nil, async=nil)
       return unless id
       transform = computed_class.default_transform.find_or_create_with_options_string transform_string, name, assetable_type
@@ -95,13 +96,15 @@ module Herd
     end
 
     def prepare_file
+      @file = @file.to_s if @file.kind_of? URI::HTTPS
+
       case @file
       when String
         if File.file? file
           self.file_name = File.basename(@file)
           self.file = File.open(@file)
         else
-          self.file_name = File.basename URI.parse(@file).path
+          self.file_name = URI.unescape(File.basename(URI.parse(@file).path))
 
           # testme
           self.file = open @file,
@@ -115,7 +118,6 @@ module Herd
               @pbar.set s if @pbar and s <= @pbar.total
             }
         end
-
       when Pathname
         # test me
         raise "no file found #{self.file}" unless @file.exist?
@@ -160,6 +162,7 @@ module Herd
 
     def save_file
       File.open(file_path, "wb") { |f| f.write(file.read) }
+      FileUtils.rm file.path if delete_original || file.path.match(Dir.tmpdir)
       @file = nil
       sub = becomes(type.constantize)
 
@@ -171,9 +174,7 @@ module Herd
 
     def cleanup_file
       FileUtils.rm_f file_path
-      if Dir["#{base_path}/*"].empty?
-        FileUtils.rm_rf base_path
-      end
+      FileUtils.rm_rf base_path if Dir["#{base_path}/*"].empty?
     end
 
     def computed_class
