@@ -12,7 +12,7 @@ module Herd
       end
 
       def initialize(bucket)
-        @zip_path = bucket
+        @bucket = bucket
         accept_extensions
       end
 
