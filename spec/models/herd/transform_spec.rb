@@ -8,6 +8,15 @@ module Herd
     let :jpg_path do
       Rails.root.join('../../spec/fixtures/shutter.jpg')
     end
+
+    it "should create transform from master" do
+      asset = Herd::Asset.create file: png_path
+      asset = Herd::Asset.find asset.id # hack cuz need type
+      child = asset.t "resize: 30x", 'test'
+      expect(child.id).not_to be_nil
+      expect(File.exist?(child.file_path)).to be true
+    end
+
     it "should recreate child assets with tranform has changed sync" do
       asset = Herd::Asset.create file: png_path
       asset = Herd::Asset.find asset.id # hack cuz need type

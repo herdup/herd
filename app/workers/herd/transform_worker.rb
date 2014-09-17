@@ -9,6 +9,7 @@ module Herd
       file = child.transform.perform child.parent_asset, child.transform.options_with_defaults do |p|
         at p * 100.0, "transcoding"
       end
+
       child.update file: file
       child.jid = nil
 
