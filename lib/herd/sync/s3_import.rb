@@ -43,7 +43,7 @@ module Herd
           assetable_slug = parts.pop
 
           assetable_path = Rails.root.join 'tmp', 'import', *parts, assetable_slug
-          asset_path = o.url_for(:read)
+          asset_path = o.url_for(:read).to_s
 
           # FileUtils.mkdir_p assetable_path
           # FileUtils.rm asset_path if File.exist? asset_path
