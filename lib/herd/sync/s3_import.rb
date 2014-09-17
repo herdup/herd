@@ -79,7 +79,7 @@ module Herd
           end
 
           if found = object.assets.master.find_by(file_name: File.basename(remote_path))
-            if File.stat(asset_path).size == found.file_size
+            if File.exist?(asset_path) and File.stat(asset_path).size == found.file_size
               puts "linked this file is #{asset_path} \n exist: #{found} and same size: #{found.file_size}"
             else
               found.update file: asset_path
