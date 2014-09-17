@@ -1,3 +1,7 @@
+MiniMagick::Image.class_eval do
+  attr_reader :tempfile
+end
+
 module Herd
   class Transform::Magick < Transform
     def perform(asset_or_id, options)
@@ -29,6 +33,12 @@ module Herd
       end
       out = asset.unique_tmppath(options[:format])
       image.write out
+
+      # hack for OSX? bug leaving ~ file around
+      if File.exist? "#{image.tempfile.path}~"
+        FileUtils.rm "#{image.tempfile.path}~"
+      end
+
       out
     end
   end

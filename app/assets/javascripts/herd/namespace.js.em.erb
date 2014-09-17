@@ -11,4 +11,4 @@
 
 window.Herd = Ember.Namespace.create
   VERSION: '1.0.0'
-  RAILS_ENV: "<%= Rails.env %>"
+  LIVE_ASSETS: <%= ENV['HERD_LIVE_ASSETS'] == '1' ? 'true' : 'false' %>
