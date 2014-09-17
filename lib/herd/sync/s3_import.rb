@@ -23,7 +23,7 @@ module Herd
         s3 = AWS::S3.new
 
         objects = s3.buckets[bucket].objects
-        objects = objects.with_prefix(bucket) if prefix
+        objects = objects.with_prefix(prefix) if prefix
 
         objects.each do |o|
           remote_path = o.key
