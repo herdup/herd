@@ -1,6 +1,6 @@
 module Herd
-  module Zip
-    class Import < Base
+  module Sync
+    class ZipImport < Base
       attr_accessor :zip_path
       attr_accessor :accept_extensions
 
@@ -98,7 +98,6 @@ module Herd
 
         assets
       end
-
     end
   end
 end

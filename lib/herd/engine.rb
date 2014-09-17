@@ -17,6 +17,7 @@ require 'zip'
 require 'sidekiq'
 require 'sidekiq-status'
 require 'rb-fsevent'
+require 'aws-sdk-v1'
 
 module Herd
   class Engine < ::Rails::Engine
