@@ -33,8 +33,13 @@ module Herd::Fileable
 		File.join base_path, file_field
 	end
 
-	def file_url
-		File.join base_url, file_field
+	def file_url(absolute=ActionController::Base.asset_host.present?)
+		relative = File.join base_url, file_field
+		if absolute
+			ActionController::Base.helpers.asset_url relative
+		else
+			relative
+		end
 	end
 
 	def file_exists?
