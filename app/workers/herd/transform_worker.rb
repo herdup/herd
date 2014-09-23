@@ -13,7 +13,9 @@ module Herd
       child.update file: file
       child.jid = nil
 
-      Redis.new.publish 'assets', AssetSerializer.new(child).to_json
+      if ENV['HERD_LIVE_ASSETS'] == '1'
+        Redis.new.publish 'assets', AssetSerializer.new(child).to_json
+      end
     end
   end
 end
