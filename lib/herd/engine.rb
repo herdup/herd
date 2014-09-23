@@ -53,14 +53,14 @@ module Herd
 
     initializer :setup_sidekiq_middlewares do |app|
       Sidekiq.configure_client do |config|
-        config.redis = { url: ENV['REDIS_DATABASE_URL'], namespace: Rails.application.class.parent_name }
+        config.redis = { namespace: Rails.application.class.parent_name }
         config.client_middleware do |chain|
           chain.add Sidekiq::Status::ClientMiddleware
         end
       end
 
       Sidekiq.configure_server do |config|
-        config.redis = { url: ENV['REDIS_DATABASE_URL'], namespace: Rails.application.class.parent_name }
+        config.redis = { namespace: Rails.application.class.parent_name }
         config.server_middleware do |chain|
           chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.minutes # default
         end
