@@ -2,13 +2,15 @@ language: ruby
 rvm: 2.1.2
 gemfile: Gemfile
 cache:
-  apt: true
-  bundler: true
-env:
-  global:
-  - RAILS_ENV=test
+  - apt
+  - bundler
 services:
   - redis-server
+notifications:
+  hipchat:
+    rooms: gwTrCRFewy9uLATIF6i7gBMRFhBocdA2881A4OxP@SweetDev
+    template: "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message} (<a href=\"%{build_url}\">Details</a>/<a href=\"%{compare_url}\">Change view</a>)"
+    format: html
 before_install:
 - sudo sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
 - sudo apt-get install libmagic-dev
@@ -18,12 +20,5 @@ before_install:
 # - sudo apt-get install ffmpeg
 # - sudo apt-get install libavcodec-extra
 - sudo apt-get install mpeg2dec vorbis-tools id3v2 mpg321 mpg123 libflac++6 ffmpeg tagtool easytag id3tool lame libjpeg-progs flac faac faad sox ffmpeg2theora libmpeg2-4 flac libmpeg3-1 mpeg3-utils mpegdemux liba52-0.7.4-dev libquicktime2 --fix-missing
-install:
-- bundle install --path .bundle
 script:
 - bundle exec rspec
-notifications:
-  hipchat:
-    rooms: gwTrCRFewy9uLATIF6i7gBMRFhBocdA2881A4OxP@SweetDev
-    template: "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message} (<a href=\"%{build_url}\">Details</a>/<a href=\"%{compare_url}\">Change view</a>)"
-    format: html
