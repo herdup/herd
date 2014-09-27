@@ -7,28 +7,35 @@ Herd.AssetContainerComponent = Ember.Component.extend
   transform: null
   t: null
   n: null
+  suffix: null
 
-  +computed asset, child
-  isImage: ->
+
+  combinedName: ~>
+    if @suffix
+      [@n,@suffix].join '-'
+    else
+      @n
+
+  isImage: ~>
     return @asset?.type == 'Herd::Image' unless @child
     @child.type == 'Herd::Image' and !@bgImage
 
-  +computed child
-  isVideo: ->
+
+  isVideo: ~>
     return @asset?.type == 'Herd::Video' unless @child
     @child.type == 'Herd::Video'
 
-  +computed asset, transform, child.url, child.updatedAt
-  assetUrl: ->
+
+  assetUrl: ~>
     if @child
       if Ember.empty @child.fileName
         return "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
       else
         return "#{@child?.url}?b=#{@child.updatedAt.getTime()}"
 
-    else if @asset and (@t or @n)
+    else if @asset and (@t or @combinedName)
       @child = @asset if @asset.assetableId == 0
-      @child = @asset.n @n if !@child and @n
+      @child = @asset.n @combinedName if !@child and @combinedName
       @child = @asset.t @t unless @child
 
       if @child?.url
@@ -39,7 +46,7 @@ Herd.AssetContainerComponent = Ember.Component.extend
           @child = @asset.store.createRecord 'asset',
             parentAsset: @asset
             transform: @transform || @asset.store.createRecord 'transform',
-              name: @n
+              name: @combinedName
               options: @t
               assetableType: @asset.assetableType
 
@@ -49,7 +56,7 @@ Herd.AssetContainerComponent = Ember.Component.extend
     else if @asset
       @asset.url
     else
-      "http://www.york.ac.uk/media/environment/images/staff/NoImageAvailableFemale.jpg"
+      null
 
   actions:
     metaUpdate: ->

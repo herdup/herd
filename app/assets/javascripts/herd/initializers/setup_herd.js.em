@@ -4,3 +4,4 @@ Ember.Application.initializer
   initialize: (container, application) ->
     application.register "transform:raw", DS.RawTransform
     application.register "transform:yaml", DS.YamlTransform
+  

@@ -64,10 +64,13 @@ module Herd
       end
 
       if @asset = Asset.create(asset_params)
-        if @asset.child?
-          @asset = Asset.find @asset.id
-          @asset.generate
-        end
+        # if @asset.child?
+          # hack
+          # @asset = Asset.find @asset.id
+          puts "HERD LIVE ASSETS #{ENV['HERD_LIVE_ASSETS']}"
+
+          # @asset.generate (ENV['HERD_LIVE_ASSETS'] == '1')
+        # end
 
         render json: @asset, serializer: AssetSerializer
       else
@@ -122,7 +125,7 @@ module Herd
         params.require(:asset).require(:metadata).permit!.symbolize_keys
       end
       def transform_params
-        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at) if params[:asset][:transform].present?
+        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at, :async) if params[:asset][:transform].present?
       end
   end
 end
