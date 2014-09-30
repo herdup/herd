@@ -6,6 +6,7 @@ class Herd.Transform extends DS.Model
 
   options: DS.attr 'string'
   assets: DS.hasMany 'asset'
+  
 
   +computed options
   cleanOptions: ->
