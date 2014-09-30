@@ -3,7 +3,7 @@ class Herd.AssetsIndexController extends Ember.ArrayController
 
   +computed arrangedContent.@each.position #, arrangedContent.@each.parentAsset,
   filteredContent: ->
-    @arrangedContent.filterBy('parentAsset', null)
+    @arrangedContent.rejectBy('parentAsset')
 
   updateSortOrder: (indexes) ->
     @forEach (asset) ->
@@ -13,7 +13,7 @@ class Herd.AssetsIndexController extends Ember.ArrayController
   actions:
     destroy: (asset) ->
       asset.destroyRecord()
-      @model.removeObject asset
+      @model.removeObject asset if @model.contains asset
 
     uploadFinished: (resp) ->
       @store.pushPayload resp

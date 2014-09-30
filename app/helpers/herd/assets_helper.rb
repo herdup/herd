@@ -1,6 +1,7 @@
 module Herd
   module AssetsHelper
     def herd_tag(asset, options={})
+      asset.generate unless asset.file_name
       case asset
       when Image
         if options[:bg]

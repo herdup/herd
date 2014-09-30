@@ -1,1 +1,4 @@
-Herd.AssetInfoComponent = Herd.AssetContainerComponent.extend()
+class Herd.AssetInfoComponent extends Herd.AssetContainerComponent
+  actions:
+    destroyChild: (asset) ->
+      asset.destroyRecord()

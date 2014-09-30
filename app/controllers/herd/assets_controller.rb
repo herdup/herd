@@ -59,19 +59,12 @@ module Herd
       if transform_params.present?
         parent = Asset.find(params[:asset][:parent_asset_id])
         params[:asset][:transform].delete(:type) unless params[:asset][:transform][:type].present?
-        @transform = parent.class.default_transform.where_t(transform_params).first_or_create
-        params[:asset][:transform_id] = @transform.id
+        transform = parent.class.default_transform.where_t(transform_params).first_or_create
+        params[:asset][:transform_id] = transform.id
+        @asset = parent.child_with_transform(transform)
       end
 
-      if @asset = Asset.create(asset_params)
-        # if @asset.child?
-          # hack
-          # @asset = Asset.find @asset.id
-          puts "HERD LIVE ASSETS #{ENV['HERD_LIVE_ASSETS']}"
-
-          # @asset.generate (ENV['HERD_LIVE_ASSETS'] == '1')
-        # end
-
+      if @asset || Asset.create(asset_params)
         render json: @asset, serializer: AssetSerializer
       else
         render json: @asset.errors, status: :unprocessable_entity
