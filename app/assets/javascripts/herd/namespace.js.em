@@ -11,7 +11,6 @@
 
 window.Herd = Ember.Namespace.create
   VERSION: '1.0.0'
-  LIVE_ASSETS: <%= ENV['HERD_LIVE_ASSETS'] == '1' ? 'true' : 'false' %>
 
 # Override the default adapter with the `DS.ActiveModelAdapter` which
 # is built to work nicely with the ActiveModel::Serializers gem.
