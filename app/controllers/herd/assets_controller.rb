@@ -66,7 +66,7 @@ module Herd
 
       if @asset || Asset.create(asset_params)
 
-        @asset.generate unless @asset.file_name
+        @asset.generate unless @asset.jid or @asset.file_name
 
         render json: @asset, serializer: AssetSerializer
       else
