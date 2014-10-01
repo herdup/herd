@@ -10,7 +10,7 @@ Herd.AssetContainerComponent = Ember.Component.extend
   suffix: null
 
   combinedName: ~>
-    @suffix
+    if @suffix
       [@n,@suffix].join '-'
     else
       @n
