@@ -14,7 +14,6 @@ Herd.AssetContainerComponent = Ember.Component.extend
       [@n,@suffix].join '-'
     else
       @n
-    console.log 'combinedName: ', name, @asset.assetableType, @asset.assetableId
     name
 
   +computed child asset
@@ -42,24 +41,17 @@ Herd.AssetContainerComponent = Ember.Component.extend
       @child = @asset.n @combinedName if !@child and @combinedName
       @child = @asset.t @t unless @child
 
-
-
       if @child?.fileName and @child?.url
-        return "#{@child?.url}?b=#{@child.updatedAt.getTime()}"
+        return @assetUrl()
+        
       else if !@child
-
         @child = @assetManager.pushRequest @asset.store.createRecord 'asset',
           parentAsset: @asset
           transform:  @transform || @asset.store.createRecord 'transform',
             name: @combinedName
             options: @t
             assetableType: @asset.assetableType
-
-        console.log('jus pushRequest', @child)
-
-        #return "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
-    else
-      null
+    null
 
   processChildElements: ->
     console.log @futureChild
