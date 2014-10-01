@@ -26,16 +26,6 @@ module Herd
 
     module ClassMethods
 
-      def applicable_transform
-        define_method :applicable_transform do |t|
-          if block_given?
-            yield t
-          else
-            true
-          end
-        end
-      end
-
       def transforms
         Transform.where assetable_type: to_s
       end
