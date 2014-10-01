@@ -3,7 +3,7 @@ class Herd.AssetsIndexController extends Ember.ArrayController
 
   +computed arrangedContent.@each.position #, arrangedContent.@each.parentAsset,
   filteredContent: ->
-    @arrangedContent.rejectBy('parentAsset')
+    @arrangedContent.rejectBy 'parentAsset'
 
   updateSortOrder: (indexes) ->
     @forEach (asset) ->
@@ -17,7 +17,7 @@ class Herd.AssetsIndexController extends Ember.ArrayController
 
     uploadFinished: (resp) ->
       @store.pushPayload resp
-      @model.pushObject @store.getById('asset', resp.asset?.id)
+      @model.pushObject @store.getById 'asset', resp.asset?.id
 
     uploadProgressed: (e) ->
       console.log('prog ', e)

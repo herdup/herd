@@ -21,7 +21,7 @@ class Herd.Asset extends DS.Model
   transform: DS.belongsTo 'transform'
 
   childTransforms: ~>
-    @childAssets.mapBy('transform')
+    @childAssets.mapBy 'transform'
 
   t: (trans) ->
     @childAssets.find (item, ix) ->

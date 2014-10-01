@@ -12,11 +12,9 @@ class Herd.AssetManager extends Ember.Object
 
   work: ->
     @currentAsset = @assetQueue.popObject()
-    console.log 'about to save asset', @currentAsset._data
 
     @currentAsset?.save().then(
       (a) =>
-        console.log 'saved asset ', a
         @work()
       (e) =>
         console.log e
