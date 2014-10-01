@@ -23,10 +23,10 @@ namespace :herd do
     args.with_defaults(:async => false)
 
     Herd::Asset.master.where.not(assetable:nil).map do |a|
-      a.transforms.each do |t|
+      a.assetable.transforms.each do |t|
         t.async = args.async
         a.child_with_transform t
-      end
+      end if a.assetable
     end
   end
 end
