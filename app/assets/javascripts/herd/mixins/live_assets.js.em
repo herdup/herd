@@ -2,12 +2,12 @@ mixin Herd.LiveAssets
   LIVE_ASSETS: ~> $('meta[name="herd-live-assets"]').attr('content') == 'true'
 
   init: ->
-    super()
+    @_super()
 
     if @LIVE_ASSETS
       source = new EventSource '/herd/assets/live'
       source.addEventListener 'assets', (e) =>
-        Ember.run =>
+        Ember.run.scheduleOnce 'afterRender', @, ->
           @store.pushPayload JSON.parse(e.data)
 
   actions:
