@@ -65,6 +65,9 @@ module Herd
       end
 
       if @asset || Asset.create(asset_params)
+
+        @asset.generate unless @asset.file_name
+
         render json: @asset, serializer: AssetSerializer
       else
         render json: @asset.errors, status: :unprocessable_entity
