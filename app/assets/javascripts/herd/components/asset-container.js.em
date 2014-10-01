@@ -10,10 +10,12 @@ Herd.AssetContainerComponent = Ember.Component.extend
   suffix: null
 
   combinedName: ~>
-    if @suffix
+    name = if @suffix
       [@n,@suffix].join '-'
     else
       @n
+    console.log 'combinedName: ', name, @asset.assetableType, @asset.assetableId
+    name
 
   +computed child asset
   isImage: ->
@@ -41,25 +43,21 @@ Herd.AssetContainerComponent = Ember.Component.extend
       @child = @asset.t @t unless @child
 
 
+
       if @child?.fileName and @child?.url
         return "#{@child?.url}?b=#{@child.updatedAt.getTime()}"
-      else
-        Ember.run.scheduleOnce 'afterRender', @, ->
-          @asset.store.createRecord('asset',{
-            parentAsset: @asset
-            transform:  @transform || @asset.store.createRecord('transform',{
-              name: @combinedName
-              options: @t
-              assetableType: @asset.assetableType
-            })
-          }).save().then(
-            (child) =>
-              @child = child
-          )
+      else if !@child
 
-        "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
-    else if @asset
-      @asset.url
+        @child = @assetManager.pushRequest @asset.store.createRecord 'asset',
+          parentAsset: @asset
+          transform:  @transform || @asset.store.createRecord 'transform',
+            name: @combinedName
+            options: @t
+            assetableType: @asset.assetableType
+
+        console.log('jus pushRequest', @child)
+
+        #return "https://d13yacurqjgara.cloudfront.net/users/82092/screenshots/1073359/spinner.gif"
     else
       null
 
