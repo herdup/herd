@@ -21,12 +21,10 @@ Herd.AssetContainerComponent = Ember.Component.extend
     return @asset?.type == 'Herd::Image' unless @child
     @child.type == 'Herd::Image' and !@bgImage
 
-
   +computed child asset
   isVideo: ->
     return @asset?.type == 'Herd::Video' unless @child
     @child.type == 'Herd::Video'
-
 
   +computed child.fileName
   assetUrl: ->
@@ -42,8 +40,8 @@ Herd.AssetContainerComponent = Ember.Component.extend
       @child = @asset.t @t unless @child
 
       if @child?.fileName and @child?.url
-        return @assetUrl()
-        
+        return @assetUrl
+
       else if !@child
         @child = @assetManager.pushRequest @asset.store.createRecord 'asset',
           parentAsset: @asset
