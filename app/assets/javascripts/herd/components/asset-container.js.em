@@ -50,11 +50,3 @@ Herd.AssetContainerComponent = Ember.Component.extend
             options: @t
             assetableType: @asset.assetableType
     null
-
-  processChildElements: ->
-    console.log @futureChild
-    debugger
-
-  actions:
-    metaUpdate: ->
-      @asset.save()
