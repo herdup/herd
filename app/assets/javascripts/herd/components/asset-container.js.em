@@ -10,11 +10,10 @@ Herd.AssetContainerComponent = Ember.Component.extend
   suffix: null
 
   combinedName: ~>
-    name = if @suffix
+    @suffix
       [@n,@suffix].join '-'
     else
       @n
-    name
 
   +computed child asset
   isImage: ->
