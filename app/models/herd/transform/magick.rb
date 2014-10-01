@@ -36,11 +36,6 @@ module Herd
       puts "--file at #{image.tempfile.path}"
       image.write out
 
-      # # hack for OSX? bug leaving ~ file around
-      # if File.exist? "#{image.tempfile.path}~"
-      #   FileUtils.rm "#{image.tempfile.path}~"
-      # end
-
       out
     end
   end
