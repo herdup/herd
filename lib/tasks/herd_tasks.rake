@@ -22,11 +22,11 @@ namespace :herd do
   task :generate, [:async] => [:environment] do |t,args|
     args.with_defaults(:async => false)
 
-    Herd::Transform.all.map do |t|
-      Herd::Asset.master.where(assetable_type:t.assetable_type).map do |a|
+    Herd::Asset.master.where.not(assetable:nil).map do |a|
+      a.assetable.transforms.each do |t|
         t.async = args.async
-        child = a.child_with_transform t
-      end
+        a.child_with_transform t
+      end if a.assetable
     end
   end
 end

@@ -9,5 +9,5 @@ class Herd.ApplicationSerializer extends DS.ActiveModelSerializer
 # is built to work nicely with the ActiveModel::Serializers gem.
 class Herd.ApplicationAdapter extends DS.ActiveModelAdapter
   namespace: 'herd'
-  headers:
+  headers: ~>
     'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')

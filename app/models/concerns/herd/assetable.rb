@@ -25,6 +25,7 @@ module Herd
     end
 
     module ClassMethods
+
       def transforms
         Transform.where assetable_type: to_s
       end

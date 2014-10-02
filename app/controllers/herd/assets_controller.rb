@@ -59,15 +59,14 @@ module Herd
       if transform_params.present?
         parent = Asset.find(params[:asset][:parent_asset_id])
         params[:asset][:transform].delete(:type) unless params[:asset][:transform][:type].present?
-        @transform = parent.class.default_transform.where_t(transform_params).first_or_create
-        params[:asset][:transform_id] = @transform.id
+        transform = parent.class.default_transform.where_t(transform_params).first_or_create
+        params[:asset][:transform_id] = transform.id
+        @asset = parent.child_with_transform(transform)
       end
 
-      if @asset = Asset.create(asset_params)
-        if @asset.child?
-          @asset = Asset.find @asset.id
-          @asset.generate
-        end
+      if @asset || Asset.create(asset_params)
+
+        @asset.generate unless @asset.jid or @asset.file_name
 
         render json: @asset, serializer: AssetSerializer
       else
@@ -122,7 +121,7 @@ module Herd
         params.require(:asset).require(:metadata).permit!.symbolize_keys
       end
       def transform_params
-        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at) if params[:asset][:transform].present?
+        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at, :async) if params[:asset][:transform].present?
       end
   end
 end
