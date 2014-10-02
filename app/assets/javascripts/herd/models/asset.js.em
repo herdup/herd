@@ -20,12 +20,8 @@ class Herd.Asset extends DS.Model
 
   transform: DS.belongsTo 'transform'
 
-  +computed metadata
-  permalink: (key, permalinkString)->
-    if arguments.length == 1
-      @metadata.permalink
-    else
-      @metadata.permalink = permalinkString
+  childTransforms: ~>
+    @childAssets.mapBy 'transform'
 
   t: (trans) ->
     @childAssets.find (item, ix) ->

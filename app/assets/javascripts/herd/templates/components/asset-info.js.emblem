@@ -1,7 +1,6 @@
 div.herd-wrap
+  each child in asset.childAssets
+    a.delete{action 'destroyChild' child} x
+    .transform #{child.id} | #{child.transform.id} | #{child.transform.name} | #{child.transform.options}
+
   = partial 'assets/asset'
-  / br
-  / = input action='metaUpdate' value=asset.permalink placeholder='permalink'
-  / ul.transform-list
-  /   each asset in asset.childAssets
-  /     li #{asset.transform.options} #{asset.id}

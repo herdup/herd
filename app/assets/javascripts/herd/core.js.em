@@ -1,4 +1,3 @@
-#= require jquery
 #= require jquery.ui.sortable
 #= require handlebars
 #= require ember

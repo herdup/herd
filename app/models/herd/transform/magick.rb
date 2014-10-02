@@ -32,12 +32,9 @@ module Herd
         end
       end
       out = asset.unique_tmppath(options[:format])
+      puts "--about to write to #{out}"
+      puts "--file at #{image.tempfile.path}"
       image.write out
-
-      # hack for OSX? bug leaving ~ file around
-      if File.exist? "#{image.tempfile.path}~"
-        FileUtils.rm "#{image.tempfile.path}~"
-      end
 
       out
     end
