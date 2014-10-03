@@ -18,10 +18,7 @@ module Herd
     }
 
     after_save -> {
-      # trigger asset regen if changed
-      assets.map do |a|
-        a.generate async
-      end if options_changed?
+      cascade if options_changed?
 
       # trigger all assets of all similarly typed (sti) transforms assets
       self.class.all.map do |t|
@@ -33,8 +30,8 @@ module Herd
     }
 
     def self.options_from_string(string)
-      yaml = string.split('|').map(&:strip).join("\n")
-      hash = YAML::load(yaml).with_indifferent_access
+      hash = YAML::load string.split('|').map(&:strip).join("\n")
+      hash ? hash.with_indifferent_access : {}
     end
 
     def self.where_t(params)
@@ -52,6 +49,13 @@ module Herd
       where_t(params).first_or_create
     end
 
+    def cascade
+      # trigger asset regen if changed
+      assets.map do |a|
+        a.generate async
+      end
+    end
+
     def perform(parent_asset, options)
       raise 'subclass this'
     end
@@ -61,7 +65,7 @@ module Herd
     end
 
     def options_with_defaults
-      options.reverse_merge! self.class.defaults || {}
+      options.reverse_merge self.class.defaults || {}
     end
 
     def default?
