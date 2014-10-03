@@ -64,7 +64,7 @@ module Herd
         @asset = parent.child_with_transform(transform)
       end
 
-      if @asset || Asset.create(asset_params)
+      if @asset ||= Asset.create(asset_params)
 
         @asset.generate unless @asset.jid or @asset.file_name
 
