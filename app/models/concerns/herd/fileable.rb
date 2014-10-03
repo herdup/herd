@@ -2,10 +2,14 @@ module Herd::Fileable
 	extend ActiveSupport::Concern
 
 	def base_path(abs=true)
-	  parts = ["/uploads", Rails.env, sanitized_classname]
-		parts.concat fileable_directory_fields
-	  parts.unshift *[Rails.root,'public'] if abs
-	  File.join(*parts)
+	  path_with_fields fileable_directory_fields, abs
+	end
+
+	def path_with_fields(fields, abs=true)
+		parts = ["/uploads", Rails.env, sanitized_classname]
+		parts.concat fields
+		parts.unshift *[Rails.root,'public'] if abs
+		File.join(*parts)
 	end
 
 	def base_url
@@ -28,8 +32,8 @@ module Herd::Fileable
 	  File.join(base_path, file_name_with_ext(ext))
 	end
 
-	def file_path
-		FileUtils.mkdir_p base_path unless File.exist? base_path
+	def file_path(create=nil)
+		FileUtils.mkdir_p base_path if create
 		File.join base_path, file_field
 	end
 
@@ -58,6 +62,18 @@ module Herd::Fileable
 		type_s = self.type
 		type_s ||= self.class.to_s
 		type_s.split("::").second.pluralize.downcase
+	end
+
+	def cleanup_file
+		FileUtils.rm_f file_path if File.exist? file_path
+
+		# cleanup empty folders like a nice boy
+		fields = fileable_directory_fields
+		while fields.present? do
+			path = path_with_fields fields
+			FileUtils.rm_rf path if Dir["#{path}/*"].empty?
+			fields.pop
+		end
 	end
 
 	module ClassMethods
