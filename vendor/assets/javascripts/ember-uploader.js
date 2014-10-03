@@ -7,6 +7,7 @@ Ember.Uploader = Ember.Object.extend(Ember.Evented, {
   url: null,
   paramNamespace: null,
   paramName: 'file',
+  headers: null,
 
   /**
    * ajax request type (method), by default it will be POST
@@ -17,14 +18,15 @@ Ember.Uploader = Ember.Object.extend(Ember.Evented, {
 
   upload: function(file, extra) {
     extra = extra || {};
-    var data = this.setupFormData(file, extra);
-    var url  = get(this, 'url');
-    var type = get(this, 'type');
-    var self = this;
+    var data    = this.setupFormData(file, extra);
+    var url     = get(this, 'url');
+    var headers = get(this, 'headers')
+    var type    = get(this, 'type');
+    var self    = this;
 
     set(this, 'isUploading', true);
 
-    return this.ajax(url, data, type).then(function(respData) {
+    return this.ajax(url, headers, data, type).then(function(respData) {
       self.didUpload(respData);
       return respData;
     });
@@ -63,11 +65,12 @@ Ember.Uploader = Ember.Object.extend(Ember.Evented, {
     this.trigger('progress', e);
   },
 
-  ajax: function(url, params, method) {
+  ajax: function(url, headers, params, method) {
     var self = this;
     var settings = {
       url: url,
       type: method || 'POST',
+      headers: headers,
       contentType: false,
       processData: false,
       xhr: function() {
