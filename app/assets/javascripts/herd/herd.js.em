@@ -1,6 +1,6 @@
+#= require ./store
 #= require_tree ./mixins
 #= require_tree ./initializers
-#= require ./store
 #= require_tree ./models
 #= require_self
 #= require_tree ./controllers
