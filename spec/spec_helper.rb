@@ -18,6 +18,8 @@ ActiveRecord::Migration.maintain_test_schema!
 RSpec.configure do |config|
   config.before(:each) do
     Sidekiq::Worker.clear_all
+    FileUtils.rm_rf File.join(Rails.root, 'public', 'uploads')
+
   end
   # ## Mock Framework
   #
