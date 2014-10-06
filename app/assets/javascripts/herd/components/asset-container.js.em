@@ -41,11 +41,12 @@ Herd.AssetContainerComponent = Ember.Component.extend
       if @child?.fileName and @child?.url
         return @assetUrl
 
-      else if !@child
-        @child = @assetManager.pushRequest @asset.store.createRecord 'asset',
-          parentAsset: @asset
-          transform:  @transform || @asset.store.createRecord 'transform',
-            name: @combinedName
-            options: @t
-            assetableType: @asset.assetableType
+      else if !@child or !@child.fileName
+        @assetManager.pushRequest @asset,{
+          name: @combinedName
+          options: @t
+          assetableType: @asset.assetableType
+        }, (child) =>
+          @child = child
+
     null

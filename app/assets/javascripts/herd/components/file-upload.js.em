@@ -9,6 +9,8 @@ Herd.FileUploadComponent = Ember.FileField.extend
     uploader = Ember.Uploader.create
       url: @url
       paramNamespace: 'asset'
+      headers:
+        'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
 
     for file in @files
       uploader.upload file, window.assetable

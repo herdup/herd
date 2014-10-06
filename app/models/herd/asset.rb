@@ -73,6 +73,19 @@ module Herd
       reload
     end
 
+    def reset
+      cleanup_file
+
+      hash = {
+        file_name: nil,
+        file_size: nil,
+        content_type: nil,
+        meta: nil
+      }
+
+      update_attributes hash
+    end
+
     def child_with_transform(transform)
       # first_or_create will generate a child_asset who's parent_asset is inaccessible
       # because it's tainted with the transform_id: transform.id scope for some reason
@@ -149,12 +162,10 @@ module Herd
       end
 
 
-      if master? # tested
+      if master? and new_record? # tested
         o_file_name_wo_ext = file_name_wo_ext
-        # self.file_name = "#{o_file_name_wo_ext}.#{file_ext}"
-
         ix = 0
-        while self.class.unscoped.master.exists? file_name: self.file_name do
+        while File.exist? file_path do
           ix += 1
           self.file_name = "#{o_file_name_wo_ext}-#{ix}.#{file_ext}"
         end
@@ -162,7 +173,7 @@ module Herd
     end
 
     def save_file
-      File.open(file_path, "wb") { |f| f.write(file.read) }
+      File.open(file_path(true), "wb") { |f| f.write(file.read) }
       FileUtils.rm file.path if delete_original || file.path.match(Dir.tmpdir)
       @file = nil
       sub = becomes(type.constantize)
@@ -171,11 +182,6 @@ module Herd
       # the problem is due to the type change that happened above
       sub.did_identify_type
       sub.save if sub.changed?
-    end
-
-    def cleanup_file
-      FileUtils.rm_f file_path
-      FileUtils.rm_rf base_path if Dir["#{base_path}/*"].empty?
     end
 
     def computed_class
