@@ -18,7 +18,8 @@ module Herd
 
       def import_s3(prefix=nil, s3_key=ENV['HERD_S3_KEY'], s3_secret=ENV['HERD_S3_SECRET'])
         assets = []
-
+        # you can update the timeouts (with seconds)
+        AWS.config(:http_open_timeout => 25, :http_read_timeout => 120)
         AWS.config access_key_id:s3_key, secret_access_key: s3_secret
         s3 = AWS::S3.new
 
@@ -78,8 +79,8 @@ module Herd
             end
           end
 
-          if found = object.assets.master.find_by(file_name: File.basename(remote_path))
-            if File.exist?(asset_path) and File.stat(asset_path).size == found.file_size
+          if found = object.assets.master.find_by("file_name like ?","%#{File.basename(remote_path,'.*')}%")
+            if o.content_length == found.file_size
               puts "linked this file is #{asset_path} \n exist: #{found} and same size: #{found.file_size}"
             else
               found.update file: asset_path
