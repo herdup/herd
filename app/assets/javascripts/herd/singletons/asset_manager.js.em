@@ -1,22 +1,30 @@
 class Herd.AssetManager extends Ember.Object
-  assetQueue: []
-  currentAsset: null
+  taskQueue: []
+  currentTask: null
 
-  pushRequest: (asset) ->
-    @assetQueue.pushObject asset
+  pushRequest: (asset, transform, done) ->
+    @taskQueue.pushObject Ember.Object.create
+      asset: asset
+      transform: transform
+      callback: done
 
-    unless @currentAsset
+    unless @currentTask
       Ember.run.scheduleOnce 'afterRender', @, 'work'
 
-    asset
-
   work: ->
-    @currentAsset = @assetQueue.popObject()
+    return unless @taskQueue.length
 
-    @currentAsset?.save().then(
+    @currentTask = @taskQueue.shiftObject()
+
+    @child = @store.createRecord 'asset',
+      parentAsset: @currentTask.asset
+      transform: @store.createRecord 'transform', @currentTask.transform
+
+    @child.save().then(
       (a) =>
+        @currentTask.callback(a)
         @work()
       (e) =>
         console.log e
     ).finally =>
-      @currentAsset = null
+      @currentTask = null
