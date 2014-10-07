@@ -121,8 +121,9 @@ module Herd
           self.file_name = URI.unescape(File.basename(URI.parse(@file).path))
 
           download_file = File.open unique_tmppath,'wb'
-          request = Typhoeus::Request.new(@file)
+          request = Typhoeus::Request.new(@file,followlocation: true)
           request.on_headers do |response|
+            ap response.headers
             if len = response.headers['Content-Length'].try(:to_i)
               @pbar = ProgressBar.new self.file_name, len
             end
@@ -165,6 +166,8 @@ module Herd
         self.type = 'Herd::Image'
       when 'video'
         self.type = 'Herd::Video'
+      when 'audio'
+        self.type = 'Herd::Audio'
       end
 
 
@@ -188,6 +191,10 @@ module Herd
       # the problem is due to the type change that happened above
       sub.did_identify_type
       sub.save if sub.changed?
+    end
+
+    def did_identify_type
+      
     end
 
     def computed_class
