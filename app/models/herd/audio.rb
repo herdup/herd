@@ -1,5 +1,5 @@
 module Herd
-  class Audio
-    
+  class Audio < Asset
+
   end
 end
