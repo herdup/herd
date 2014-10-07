@@ -26,6 +26,7 @@ PATH
       sidekiq-unique-jobs
       sinatra
       streamio-ffmpeg
+      typhoeus
 
 GEM
   remote: https://rubygems.org/
@@ -109,8 +110,11 @@ GEM
       ember-rails (>= 0.14.0)
     emblem-source (0.3.17)
     erubis (2.7.0)
+    ethon (0.7.1)
+      ffi (>= 1.3.0)
     execjs (2.2.1)
     exifr (1.1.3)
+    ffi (1.9.3)
     flip (1.0.1)
       activesupport (>= 3.0, < 5)
       i18n
@@ -232,6 +236,8 @@ GEM
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
+    typhoeus (0.6.9)
+      ethon (>= 0.7.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
 
@@ -246,3 +252,4 @@ DEPENDENCIES
   quiet_assets
   spring
   sqlite3
+  typhoeus
