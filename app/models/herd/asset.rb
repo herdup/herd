@@ -120,17 +120,23 @@ module Herd
         else
           self.file_name = URI.unescape(File.basename(URI.parse(@file).path))
 
+          download_file = File.open unique_tmppath,'wb'
+          request = Typhoeus::Request.new(@file)
+          request.on_headers do |response|
+            if len = response.headers['Content-Length'].try(:to_i)
+              @pbar = ProgressBar.new self.file_name, len
+            end
+          end
+          request.on_body do |chunk|
+            download_file.write(chunk)
+            @pbar.inc chunk.size if @pbar
+          end
+          request.on_complete do |response|
+            download_file.close
+          end
+          request.run
+          self.file = File.open download_file.path
           # testme
-          self.file = open @file,
-            :content_length_proc => lambda {|t|
-              if t and 0 < t and !@pbar
-                @pbar = ProgressBar.new self.file_name, t
-                @pbar.file_transfer_mode
-              end
-            },
-            :progress_proc => lambda {|s|
-              @pbar.set s if @pbar and s <= @pbar.total
-            }
         end
       when Pathname
         # test me
