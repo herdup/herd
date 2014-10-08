@@ -119,11 +119,16 @@ module Herd
           self.file = File.open(@file)
         else
           self.file_name = URI.unescape(File.basename(URI.parse(@file).path))
+          self.meta[:content_url] = @file
 
           download_file = File.open unique_tmppath,'wb'
           request = Typhoeus::Request.new(@file,followlocation: true)
           request.on_headers do |response|
-            ap response.headers
+
+            self.meta[:effective_url] = response.effective_url
+
+            self.file_name = URI.unescape(File.basename(URI.parse(response.effective_url).path))
+
             if len = response.headers['Content-Length'].try(:to_i)
               @pbar = ProgressBar.new self.file_name, len
             end
@@ -136,6 +141,7 @@ module Herd
             download_file.close
           end
           request.run
+
           self.file = File.open download_file.path
           # testme
         end
@@ -190,11 +196,12 @@ module Herd
       # ugly callback -- should ideally be automatically chained
       # the problem is due to the type change that happened above
       sub.did_identify_type
-      sub.save if sub.changed?
+      puts "identified type changed? #{sub.changed?}"
+      sub.save unless meta == sub.meta
     end
 
     def did_identify_type
-      
+
     end
 
     def computed_class
