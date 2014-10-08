@@ -1,6 +1,8 @@
 module Herd
   module AssetSerializable
     extend ActiveSupport::Concern
+    
+    cache_me
 
     included do
       has_many :assets, serializer: Herd::AssetSerializer, include: true
