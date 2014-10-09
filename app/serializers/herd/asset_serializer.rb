@@ -13,8 +13,6 @@ module Herd
 
     has_one :transform,  embed: :ids, include: true, serializer: TransformSerializer
 
-    cache_me
-
     def url
       object.file_url
     end
