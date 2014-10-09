@@ -5,7 +5,6 @@ module Herd
 
     included do
       has_many :assets, serializer: Herd::AssetSerializer, include: true
-      cache_me
     end
     
     def assetable_object
