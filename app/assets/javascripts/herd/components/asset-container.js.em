@@ -47,6 +47,6 @@ Herd.AssetContainerComponent = Ember.Component.extend
           options: @t
           assetableType: @asset.assetableType
         }, (child) =>
-          @child = child
+          @child = child unless @isDestroyed
 
     null
