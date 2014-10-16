@@ -125,12 +125,15 @@ module Herd
           request = Typhoeus::Request.new(@file,followlocation: true)
           request.on_headers do |response|
 
-            self.meta[:effective_url] = response.effective_url
+            if response.effective_url != self.meta[:content_url]
+              self.meta[:effective_url] = response.effective_url
+            end
 
             self.file_name = URI.unescape(File.basename(URI.parse(response.effective_url).path))
 
             if len = response.headers['Content-Length'].try(:to_i)
               @pbar = ProgressBar.new self.file_name, len
+              @pbar.file_transfer_mode
             end
           end
           request.on_body do |chunk|
@@ -196,12 +199,11 @@ module Herd
       # ugly callback -- should ideally be automatically chained
       # the problem is due to the type change that happened above
       sub.did_identify_type
-      puts "identified type changed? #{sub.changed?}"
       sub.save unless meta == sub.meta
     end
 
     def did_identify_type
-
+      puts "subclass me bae"
     end
 
     def computed_class
