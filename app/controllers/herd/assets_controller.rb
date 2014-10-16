@@ -118,7 +118,7 @@ module Herd
         params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position, :created_at, :updated_at)
       end
       def metadata_params
-        params.require(:asset).require(:metadata).permit!.symbolize_keys
+        params.require(:asset).require(:metadata).permit!.symbolize_keys rescue nil
       end
       def transform_params
         params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at, :async) if params[:asset][:transform].present?
