@@ -199,7 +199,7 @@ module Herd
       # ugly callback -- should ideally be automatically chained
       # the problem is due to the type change that happened above
       sub.did_identify_type
-      sub.save unless meta == sub.meta
+      sub.save #if changed?
     end
 
     def did_identify_type
