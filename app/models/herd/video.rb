@@ -10,12 +10,13 @@ module Herd
     end
 
     def did_identify_type
-      load_meta
+      self.meta.merge load_meta
     end
 
     def load_meta
       movie = ffmpeg
-      self.meta = {
+      
+      {
         resolution: movie.resolution,
         height: movie.height,
         width: movie.width,
