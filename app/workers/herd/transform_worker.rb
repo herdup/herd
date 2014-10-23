@@ -13,9 +13,9 @@ module Herd
       child.update file: file
       child.jid = nil
 
-      Redis.new.publish 'assets', AssetSerializer.new(child).to_json 
+      Redis.new.publish 'assets', AssetSerializer.new(child).to_json
 
-    rescue Redis::CannotConnectError => e
+    rescue => e
       puts e
     end
   end
