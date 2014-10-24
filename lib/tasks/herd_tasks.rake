@@ -12,7 +12,9 @@ namespace :herd do
 
   namespace :config do
     task import: :environment do |t,args|
-      Herd::TransformImportWorker.new.perform Rails.root.join 'config/herd.yml'
+      args.with_defaults(:async => false)
+
+      Herd::TransformImportWorker.new.perform Rails.root.join 'config/herd.yml', args.async
     end
     task export: :environment do |t,args|
       Herd::TransformExportWorker.new.perform Rails.root.join 'config/herd.yml'
