@@ -6,8 +6,17 @@ module Herd
     included do
       ASSETABLE_MODELS.push(self)
 
-      has_many :assets, -> {order(:position)}, as: :assetable, class_name: 'Herd::Asset', dependent: :destroy
-      has_many :master_assets, -> {master.order(:position)}, as: :assetable, class_name: 'Herd::Asset', dependent: :destroy
+      has_many :assets, -> {order(:position)},
+        as:         :assetable,
+        class_name: 'Herd::Asset',
+        dependent:  :destroy,
+        touch:      true
+
+      has_many :master_assets, -> {master.order(:position)},
+        as:         :assetable,
+        class_name: 'Herd::Asset',
+        dependent:  :destroy,
+        touch:      true
 
       assetable_slug
     end
@@ -51,6 +60,24 @@ module Herd
         end
       end
 
+      def has_many(name, scope = nil, options = { }, &extension)
+        reflection = TouchMany.build self, name, scope, options, &extension
+
+        if reflection.options.delete :touch
+          after_save -> {
+            send(name).update_all updated_at: Time.now
+          }
+        end
+
+        ActiveRecord::Reflection.add_reflection self, name, reflection
+      end
+
+    end
+  end
+
+  class TouchMany < ::ActiveRecord::Associations::Builder::HasMany
+    def valid_options
+      super + [ :touch ]
     end
   end
 end
