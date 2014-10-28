@@ -142,7 +142,11 @@ module Herd
 
         # Watch the above directories
         @fsevent.watch(config_path, file_events: true) do |dirs|
-          TransformImportWorker.perform_async config_path
+          if ENV['HERD_LIVE_ASSETS'] == '1'
+            TransformImportWorker.perform_async config_path
+          else
+            TransformImportWorker.perform config_path
+          end
         end
 
         @fsevent.run
