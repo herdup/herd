@@ -25,7 +25,7 @@ Herd.AssetContainerComponent = Ember.Component.extend
     return @asset?.type == 'Herd::Video' unless @child
     @child.type == 'Herd::Video'
 
-  +computed child.fileName
+  +computed asset child.fileName
   assetUrl: ->
     if @child
       if Ember.empty @child.fileName
