@@ -47,6 +47,8 @@ module Herd
     }
     after_create -> {
       generate if child? and transform.present? and !@file.present?
+
+      assetable.try :touch
     }
 
     after_destroy :cleanup_file
