@@ -19,14 +19,6 @@ module Herd
 
     after_save -> {
       cascade if options_changed?
-
-      # trigger all assets of all similarly typed (sti) transforms assets
-      self.class.all.map do |t|
-        next if t == self
-        t.assets.map do |a|
-          a.generate async
-        end
-      end if default? and options_changed?
     }
 
     def self.options_from_string(string)
@@ -54,6 +46,15 @@ module Herd
       assets.map do |a|
         a.generate async
       end
+
+      # trigger all assets of all similarly typed (sti) transforms assets
+      self.class.unscoped.all.map do |t|
+        next if t == self
+        
+        t.assets.map do |a|
+          a.generate async
+        end
+      end if default?
     end
 
     def perform(parent_asset, options)
@@ -84,7 +85,6 @@ module Herd
 
       def defaults=(options)
         trans = default_transform
-        trans.async = true
 
         if options != trans.options
           trans.options = options

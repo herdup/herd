@@ -68,6 +68,7 @@ module Herd
         parent = Asset.find(params[:asset][:parent_asset_id])
         params[:asset][:transform].delete(:type) unless params[:asset][:transform][:type].present?
         transform = parent.class.default_transform.where_t(transform_params).first_or_create
+        #TODO: check for / respond w errors here
         params[:asset][:transform_id] = transform.id
         @asset = parent.child_with_transform(transform)
       end
