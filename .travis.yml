@@ -12,13 +12,18 @@ notifications:
     template: "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message} (<a href=\"%{build_url}\">Details</a>/<a href=\"%{compare_url}\">Change view</a>)"
     format: html
 before_install:
-- sudo sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
-- sudo apt-get install libmagic-dev
-- sudo apt-get install ubuntu-restricted-extras
+-  sudo sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
+-  sudo add-apt-repository ppa:jon-severinsson/ffmpeg
+-  sudo apt-get install libmagic-dev
+-  sudo apt-get update
+-  sudo apt-get install ffmpeg
+-  sudo apt-get install frei0r-plugins
+
+#- sudo apt-get install ubuntu-restricted-extras
 # - sudo add-apt-repository ppa:jon-severinsson/ffmpeg -y
-- sudo apt-get update -y
+#- sudo apt-get update -y
 # - sudo apt-get install ffmpeg
 # - sudo apt-get install libavcodec-extra
-- sudo apt-get install mpeg2dec vorbis-tools id3v2 mpg321 mpg123 libflac++6 ffmpeg tagtool easytag id3tool lame libjpeg-progs flac faac faad sox ffmpeg2theora libmpeg2-4 flac libmpeg3-1 mpeg3-utils mpegdemux liba52-0.7.4-dev libquicktime2 --fix-missing
+#- sudo apt-get install mpeg2dec vorbis-tools id3v2 mpg321 mpg123 libflac++6 ffmpeg tagtool easytag id3tool lame libjpeg-progs flac faac faad sox ffmpeg2theora libmpeg2-4 flac libmpeg3-1 mpeg3-utils mpegdemux liba52-0.7.4-dev libquicktime2 --fix-missing
 script:
 - bundle exec rspec
