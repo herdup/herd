@@ -120,7 +120,7 @@ module Herd
           self.file = File.open(@file)
 
         #TODO: make this work with non-1 starting shnitzeldorfs
-        elsif first = sprintf(file, 1) and File.file? first
+        elsif file =~ /\%d/ and first = sprintf(file, 1) and File.file? first
           self.file_name = File.basename(first)
 
           count = 1

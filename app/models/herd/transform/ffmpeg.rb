@@ -4,11 +4,12 @@ module Herd
     def parse_ffmpeg_options(options)
       if string = options.delete(:resize)
         t_width, t_height = string.match(/(\d*)x(\d*)/).captures
-        t_width = -1 if t_width.empty?
-        t_height = -1 if t_height.empty?
+        t_width = -2 if t_width.empty?
+        t_height = -2 if t_height.empty?
         #TODO: ensure integers, even?
         options[:custom] ||= ''
         options[:custom] += "-vf scale=#{t_width}:#{t_height}"
+        # options[:custom] += "-vf scale=trunc(#{t_width}/2)*2:trunc(#{t_height}/2)*2"
       end
       options
     end
