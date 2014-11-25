@@ -6,10 +6,9 @@ module Herd
         t_width, t_height = string.match(/(\d*)x(\d*)/).captures
         t_width = "trunc(ow/a/2)*2" if t_width.empty?
         t_height = "trunc(ow/a/2)*2" if t_height.empty?
-        #TODO: ensure integers, even?
+
         options[:custom] ||= ''
         options[:custom] += "-vf scale='#{t_width}:#{t_height}'"
-        # options[:custom] += "-vf scale=trunc(#{t_width}/2)*2:trunc(#{t_height}/2)*2"
       end
       options
     end
