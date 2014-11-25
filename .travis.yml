@@ -12,8 +12,8 @@ notifications:
     template: "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message} (<a href=\"%{build_url}\">Details</a>/<a href=\"%{compare_url}\">Change view</a>)"
     format: html
 before_install:
--  sudo sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
--  sudo rm -rf /var/lib/apt/lists/*
+# -  sudo sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
+# -  sudo rm -rf /var/lib/apt/lists/*
 -  sudo add-apt-repository ppa:mc3man/precise-media  -y
 # -  sudo add-apt-repository ppa:jon-severinsson/ffmpeg -y
 -  sudo apt-get update
