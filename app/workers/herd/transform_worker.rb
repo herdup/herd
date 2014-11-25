@@ -6,14 +6,18 @@ module Herd
 
     def perform(child_asset_id, opts={})
       child = Asset.find child_asset_id
+
+      @pbar = ProgressBar.new child.parent_asset.file_name, 100
+
       file = child.transform.perform child.parent_asset, child.transform.options_with_defaults do |p|
         at p * 100.0, "transcoding"
+        @pbar.set(p * 100.0) unless p > 100
       end
 
       child.update file: file
       child.jid = nil
 
-      Redis.new.publish 'assets', AssetSerializer.new(child).to_json 
+      Redis.new.publish 'assets', AssetSerializer.new(child).to_json
 
     rescue Redis::CannotConnectError => e
       puts e

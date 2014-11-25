@@ -55,8 +55,11 @@ module Herd
 
     # GET /assets/1
     def show
+
+      #TODO: make/use detail serializer
       respond_to do |format|
-        format.json {render json: @asset, serializer: AssetSerializer}
+        #untested
+        format.json {render json: @asset.child_assets || @asset, serializer: AssetSerializer}
         format.html
       end
 
@@ -66,8 +69,25 @@ module Herd
     def create
       if transform_params.present?
         parent = Asset.find(params[:asset][:parent_asset_id])
-        params[:asset][:transform].delete(:type) unless params[:asset][:transform][:type].present?
-        transform = parent.class.default_transform.where_t(transform_params).first_or_create
+
+        klass = params[:asset][:transform][:type].constantize rescue parent.class.default_transform
+        params[:asset][:transform].delete(:type)
+
+        #TODO: dont use default_transform here
+        transform = unless transform_params[:name].empty?
+          klass.find_by(name:transform_params[:name]).tap do |t|
+            if t
+              t_options = t.class.options_from_string(transform_params[:options])
+              unless t_options == t.options
+                t.options = t_options
+                t.save
+              end
+            end
+          end
+        end
+        transform ||= klass.where_t(transform_params).first_or_create
+
+
         #TODO: check for / respond w errors here
         params[:asset][:transform_id] = transform.id
         @asset = parent.child_with_transform(transform)

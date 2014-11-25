@@ -5,6 +5,7 @@ module Herd
     attr_accessor :file
     file_field :file_name
     # validates_presence_of :file_name
+    attr_accessor :frame_count
 
     attr_accessor :delete_original
 
@@ -117,6 +118,17 @@ module Herd
         if File.file? file
           self.file_name = File.basename(@file)
           self.file = File.open(@file)
+
+        #TODO: make this work with non-1 starting shnitzeldorfs
+        elsif first = sprintf(file, 1) and File.file? first
+          self.file_name = File.basename(first)
+
+          count = 1
+          while File.file? sprintf(file,count)
+            count += 1
+          end
+          self.frame_count = count
+          self.file = File.open(first)
         else
           self.file_name = URI.unescape(File.basename(URI.parse(@file).path))
           self.meta[:content_url] = @file
@@ -179,7 +191,6 @@ module Herd
         self.type = 'Herd::Audio'
       end
 
-
       if master? and new_record? # tested
         o_file_name_wo_ext = file_name_wo_ext
         ix = 0
@@ -193,12 +204,21 @@ module Herd
     def save_file
       File.open(file_path(true), "wb") { |f| f.write(file.read) }
       FileUtils.rm file.path if delete_original || file.path.match(Dir.tmpdir)
+
+      if self.frame_count
+        FileUtils.cp_r "#{File.dirname(file.path)}/.", File.dirname(file_path)
+      end
+
       @file = nil
       sub = becomes(type.constantize)
+
+
+
 
       # ugly callback -- should ideally be automatically chained
       # the problem is due to the type change that happened above
       sub.did_identify_type
+      sub.meta[:frame_count] = self.frame_count
       sub.save #if changed?
     end
 
