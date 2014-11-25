@@ -10,8 +10,9 @@ module Herd
       @pbar = ProgressBar.new child.parent_asset.file_name, 100
 
       file = child.transform.perform child.parent_asset, child.transform.options_with_defaults do |p|
-        at p * 100.0, "transcoding"
-        @pbar.set(p * 100.0) unless p > 100
+        p *= 100.0
+        at p, "transcoding"
+        @pbar.set(p) unless p > 100
       end
 
       child.update file: file
