@@ -112,6 +112,7 @@ module Herd
 
     def prepare_file
       @file = @file.to_s if @file.kind_of? URI::HTTPS
+      puts @file
 
       case @file
       when String
@@ -122,7 +123,6 @@ module Herd
         #TODO: make this work with non-1 starting shnitzeldorfs
         elsif file =~ /\%d/ and first = sprintf(file, 1) and File.file? first
           self.file_name = File.basename(first)
-
           count = 1
           while File.file? sprintf(file,count)
             count += 1
@@ -203,17 +203,17 @@ module Herd
 
     def save_file
       File.open(file_path(true), "wb") { |f| f.write(file.read) }
-      FileUtils.rm file.path if delete_original || file.path.match(Dir.tmpdir)
 
       if self.frame_count
-        FileUtils.cp_r "#{File.dirname(file.path)}/.", File.dirname(file_path)
+        FileUtils.cp_r "#{File.dirname(file.path)}/.", File.dirname(file_path(true))
+        FileUtils.rm_rf File.dirname(file.path) if delete_original || file.path.match(Dir.tmpdir)
+      else
+        FileUtils.rm file.path if delete_original || file.path.match(Dir.tmpdir)
       end
+
 
       @file = nil
       sub = becomes(type.constantize)
-
-
-
 
       # ugly callback -- should ideally be automatically chained
       # the problem is due to the type change that happened above
