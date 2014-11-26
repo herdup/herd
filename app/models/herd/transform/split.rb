@@ -10,8 +10,7 @@ module Herd
 
       out = dir + '/%d.' + options.delete(:format)
 
-      asset.ffmpeg.transcode(out, parsed_options, {validate:false}) #{ |progress| yield progress if block_given? }
-
+      asset.ffmpeg.transcode(out, parsed_options, {validate:false}) { |progress| yield progress if block_given? }
       out
     end
   end
