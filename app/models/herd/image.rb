@@ -16,20 +16,17 @@ module Herd
       modify_orig ? MiniMagick::Image.new(file_path) : MiniMagick::Image.open(file_path)
     end
 
-    def rmagick
-      Magick::Image.read(file_path).first
-    end
-
     def did_identify_type
       self.meta.merge! load_meta
       auto_orient # for camera/phone pictures that were taken at weird angles
     end
 
     def load_meta
-      image = mini_magick(true)
       hash = {}
-      hash[:height] = image[:height]
-      hash[:width]  = image[:width]
+      image = mini_magick(true)
+
+      hash[:height] = image.height
+      hash[:width]  = image.width
 
       if exif.present?
         hash[:make] = exif.make
