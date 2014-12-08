@@ -22,6 +22,7 @@ module Herd
     }
 
     def self.options_from_string(string)
+      string ||= ''
       hash = YAML::load string.split('|').map(&:strip).join("\n")
       hash ? hash.with_indifferent_access : {}
     end
@@ -50,7 +51,7 @@ module Herd
       # trigger all assets of all similarly typed (sti) transforms assets
       self.class.unscoped.all.map do |t|
         next if t == self
-        
+
         t.assets.map do |a|
           a.generate async
         end
