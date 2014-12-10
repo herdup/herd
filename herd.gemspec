@@ -20,27 +20,34 @@ Gem::Specification.new do |s|
   s.add_dependency "rspec-rails"#, "~> 2.14.1"
   s.add_dependency "haml-rails"
   s.add_dependency "coffee-rails"
+
   s.add_dependency 'ember-rails'
   s.add_dependency 'ember-source'
   s.add_dependency 'emblem-rails'
   s.add_dependency 'ember_script-rails'
+
   s.add_dependency 'jquery-rails'#, '~> 3.1.0'
   s.add_dependency 'jquery-ui-rails'#, '4.1.2'
   s.add_dependency 'active_model_serializers'
   s.add_dependency 'progressbar'
   s.add_dependency 'ruby-filemagic'
-  s.add_dependency 'mini_magick'
-  s.add_dependency 'streamio-ffmpeg'
+  s.add_dependency 'mini_magick', '4.0.1'
   s.add_dependency 'exifr'
+
+  s.add_dependency 'streamio-ffmpeg'
   s.add_dependency 'rubyzip'
+
   s.add_dependency 'sidekiq'
   s.add_dependency 'sidekiq-status'
   s.add_dependency 'sidekiq-unique-jobs'
   s.add_dependency 'sinatra'
-  s.add_dependency 'rb-fsevent'
+
   s.add_dependency 'aws-sdk-v1'
-  s.add_dependency 'flip'
   s.add_dependency 'typhoeus'
+
+  s.add_dependency 'flip'
+  s.add_dependency 'rb-fsevent'
+
 
   s.add_development_dependency "sqlite3"
 
