@@ -45,7 +45,7 @@ describe Herd::Sync::Base do
   it "should export to s3 n stuff" do
     importer = Herd::Sync::S3Export.new 'sweetgreen-seeds-development'
     importer.delete_s3 'herd_export_test'
-    
+
     Herd::Page.missing_assets.create file: Rails.root.join('../../spec/fixtures/guac.png')
     Post.missing_assets.create file: Rails.root.join('../../spec/fixtures/shutter.jpg')
 
@@ -55,6 +55,8 @@ describe Herd::Sync::Base do
     post = Post.create title: 'Test 2'
 
     importer.export_s3 'herd_export_test'
+    
+    importer.s3.buckets['herd_export_test'].objects
   end
 
 end

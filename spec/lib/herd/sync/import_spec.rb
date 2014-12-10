@@ -13,7 +13,7 @@ describe Herd::Sync::Base do
     post = Post.create title: 'Test 1'
 
     importer = Herd::Sync::S3Import.new 'sweetgreen-seeds-development'
-    importer.import_s3 'herd_test/'
+    importer.import_s3 'herd_import_test'
 
     expect(post.assets.count).to eq 1
   end
