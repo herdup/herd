@@ -42,11 +42,6 @@ module Herd
           assetable_path = Rails.root.join 'tmp', 'import', *parts, assetable_slug
           asset_path = o.url_for(:read).to_s
 
-          # FileUtils.mkdir_p assetable_path
-          # FileUtils.rm asset_path if File.exist? asset_path
-
-          #entry.extract asset_path
-
           begin
            klass = class_from_path parts.join '/'
           rescue Exception => e
