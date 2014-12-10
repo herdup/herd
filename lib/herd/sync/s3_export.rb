@@ -7,7 +7,7 @@ module Herd
         @bucket = bucket
         @output_assets = output_assets
         AWS.config(:http_open_timeout => 25, :http_read_timeout => 120)
-        AWS.config access_key_id:@s3_key, secret_access_key: @s3_secret
+        AWS.config access_key_id:s3_key, secret_access_key: s3_secret
       end
 
       def s3
