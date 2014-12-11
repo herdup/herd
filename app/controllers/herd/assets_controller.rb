@@ -76,7 +76,7 @@ module Herd
         #TODO: dont use default_transform here
         transform = unless transform_params[:name].empty?
           klass.find_by(name:transform_params[:name]).tap do |t|
-            if t
+            if t and transform_params[:options]
               t_options = t.class.options_from_string(transform_params[:options])
               unless t_options == t.options
                 t.options = t_options
