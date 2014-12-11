@@ -16,25 +16,25 @@ module Herd
       modify_orig ? MiniMagick::Image.new(file_path) : MiniMagick::Image.open(file_path)
     end
 
+    def rmagick
+      Magick::Image.read(file_path).first
+    end
+
     def did_identify_type
-      self.meta.merge! load_meta
-      auto_orient # for camera/phone pictures that were taken at weird angles
+      load_meta
+      auto_orient # for camera pictures that were taken at weird angles
     end
 
     def load_meta
-      hash = {}
       image = mini_magick(true)
-
-      hash[:height] = image.height
-      hash[:width]  = image.width
+      meta[:height] = image[:height]
+      meta[:width] = image[:width]
 
       if exif.present?
-        hash[:make] = exif.make
-        hash[:model] = exif.model
-        hash[:gps] = exif.gps.try(:to_h)
+        meta[:make] = exif.make
+        meta[:model] = exif.model
+        meta[:gps] = exif.gps.try(:to_h)
       end
-      hash.delete_if {|k,v|v.nil?} # make sense er na? cleaner db
-      hash
     end
 
     def auto_orient

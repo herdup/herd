@@ -45,21 +45,10 @@ module Herd
       end
     end
 
-    def search
-      @assets = Asset.where("meta LIKE ?","%#{params[:meta]}%")
-      respond_to do |format|
-        format.json { render json: @assets,  each_serializer: AssetSerializer  }
-        format.html
-      end
-    end
-
     # GET /assets/1
     def show
-
-      #TODO: make/use detail serializer
       respond_to do |format|
-        #untested
-        format.json {render json: @asset.child_assets || @asset, serializer: AssetSerializer}
+        format.json {render json: @asset, serializer: AssetSerializer}
         format.html
       end
 
@@ -69,43 +58,15 @@ module Herd
     def create
       if transform_params.present?
         parent = Asset.find(params[:asset][:parent_asset_id])
-
-        klass = params[:asset][:transform][:type].constantize rescue parent.class.default_transform
-        params[:asset][:transform].delete(:type)
-
-        #TODO: dont use default_transform here
-        transform = unless transform_params[:name].empty?
-          klass.find_by(name:transform_params[:name]).tap do |t|
-            if t
-              t_options = t.class.options_from_string(transform_params[:options])
-              unless t_options == t.options
-                t.options = t_options
-                t.save
-              end
-            end
-          end
-        end
-        transform ||= klass.where_t(transform_params).first_or_create
-
-
-        #TODO: check for / respond w errors here
+        params[:asset][:transform].delete(:type) unless params[:asset][:transform][:type].present?
+        transform = parent.class.default_transform.where_t(transform_params).first_or_create
         params[:asset][:transform_id] = transform.id
         @asset = parent.child_with_transform(transform)
-      end
-
-      if asset_params[:file].kind_of? String
-        @asset = Asset.find_by("meta like ?", "%content_url: #{asset_params[:file]}%")
       end
 
       if @asset ||= Asset.create(asset_params)
 
         @asset.generate unless @asset.jid or @asset.file_name
-
-        if metadata_params.present?
-          pre = @asset.meta
-          @asset.meta.reverse_merge! metadata_params
-          @asset.save unless pre == @asset.meta
-        end
 
         render json: @asset, serializer: AssetSerializer
       else
@@ -117,7 +78,7 @@ module Herd
     def update
       if @asset.update(asset_params)
         if metadata_params.present?
-          @asset.meta.merge! metadata_params
+          @asset.meta = metadata_params
           @asset.save if @asset.meta_changed?
         end
         respond_with(@asset, serializer: AssetSerializer)
