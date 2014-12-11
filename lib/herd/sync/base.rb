@@ -1,24 +1,6 @@
 module Herd
   module Sync
     class Base
-      attr_accessor :accept_extensions
-
-      def accept_extensions
-        @accept_extensions ||= %w(.jpg .gif .png .mp4 .mov .webm .m4v .tif)
-      end
-
-      def folder_map
-        # loop through all assetable models and build hash of :slug
-        folder_map = Herd::ASSETABLE_MODELS.inject({}) do |h,model|
-          # convert module structure to path structure
-          path = path_from_class model
-          # populate hash with array of slugs; return hash
-          h[path] = model.group(model.assetable_slug_column).map(&:assetable_slug); h
-        end
-      end
-
-      
-
       def class_from_path(path)
         path.classify.constantize
       end

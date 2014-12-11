@@ -3,7 +3,7 @@ namespace :herd do
 
   desc "Remove public/assets folder"
   task :cleanup do
-    FileUtils.rm_rf File.join(Rails.root, 'public', 'uploads', Rails.env)
+    FileUtils.rm_rf File.join(Rails.root, 'public', 'uploads')
   end
 
   task watch: :environment do
