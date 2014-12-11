@@ -7,4 +7,4 @@ mixin Herd.Assetable
 
   +computed masterAssets.@each
   asset: ->
-    @masterAssets?.firstObject 
+    @masterAssets.firstObject

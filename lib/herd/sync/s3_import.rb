@@ -2,7 +2,11 @@ module Herd
   module Sync
     class S3Import < Base
       attr_accessor :bucket
+      attr_accessor :accept_extensions
 
+      def accept_extensions
+        @accept_extensions ||= %w(.jpg .gif .png .mp4 .mov .webm .m4v .tif)
+      end
       def self.import(bucket, prefix=nil)
         new(bucket).import_s3 prefix
       end
@@ -42,6 +46,11 @@ module Herd
           assetable_path = Rails.root.join 'tmp', 'import', *parts, assetable_slug
           asset_path = o.url_for(:read).to_s
 
+          # FileUtils.mkdir_p assetable_path
+          # FileUtils.rm asset_path if File.exist? asset_path
+
+          #entry.extract asset_path
+
           begin
            klass = class_from_path parts.join '/'
           rescue Exception => e
@@ -72,9 +81,8 @@ module Herd
 
           if found = object.assets.master.find_by("file_name like ?","%#{File.basename(remote_path,'.*')}%")
             if o.content_length == found.file_size
-              #puts "linked this file is #{asset_path} \n exist: #{found} and same size: #{found.file_size}"
+              puts "linked this file is #{asset_path} \n exist: #{found} and same size: #{found.file_size}"
             else
-              puts "updaing file with #{asset_path}"
               found.update file: asset_path
               assets << found
             end
