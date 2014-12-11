@@ -5,6 +5,7 @@ module Herd
     attr_accessor :file
     file_field :file_name
     # validates_presence_of :file_name
+    attr_accessor :frame_count
 
     attr_accessor :delete_original
 
@@ -113,26 +114,53 @@ module Herd
 
     def prepare_file
       @file = @file.to_s if @file.kind_of? URI::HTTPS
+      puts @file
 
       case @file
       when String
         if File.file? file
           self.file_name = File.basename(@file)
           self.file = File.open(@file)
+
+        #TODO: make this work with non-1 starting shnitzeldorfs
+        elsif file =~ /\%d/ and first = sprintf(file, 1) and File.file? first
+          self.file_name = File.basename(first)
+          count = 1
+          while File.file? sprintf(file,count)
+            count += 1
+          end
+          self.frame_count = count
+          self.file = File.open(first)
         else
           self.file_name = URI.unescape(File.basename(URI.parse(@file).path))
+          self.meta[:content_url] = @file
 
+          download_file = File.open unique_tmppath,'wb'
+          request = Typhoeus::Request.new(@file,followlocation: true)
+          request.on_headers do |response|
+
+            if response.effective_url != self.meta[:content_url]
+              self.meta[:effective_url] = response.effective_url
+            end
+
+            self.file_name = URI.unescape(File.basename(URI.parse(response.effective_url).path))
+
+            if len = response.headers['Content-Length'].try(:to_i)
+              @pbar = ProgressBar.new self.file_name, len
+              @pbar.file_transfer_mode
+            end
+          end
+          request.on_body do |chunk|
+            download_file.write(chunk)
+            @pbar.inc chunk.size if @pbar
+          end
+          request.on_complete do |response|
+            download_file.close
+          end
+          request.run
+
+          self.file = File.open download_file.path
           # testme
-          self.file = open @file,
-            :content_length_proc => lambda {|t|
-              if t and 0 < t and !@pbar
-                @pbar = ProgressBar.new self.file_name, t
-                @pbar.file_transfer_mode
-              end
-            },
-            :progress_proc => lambda {|s|
-              @pbar.set s if @pbar and s <= @pbar.total
-            }
         end
       when Pathname
         # test me
@@ -161,8 +189,9 @@ module Herd
         self.type = 'Herd::Image'
       when 'video'
         self.type = 'Herd::Video'
+      when 'audio'
+        self.type = 'Herd::Audio'
       end
-
 
       if master? and new_record? # tested
         o_file_name_wo_ext = file_name_wo_ext
@@ -176,14 +205,27 @@ module Herd
 
     def save_file
       File.open(file_path(true), "wb") { |f| f.write(file.read) }
-      FileUtils.rm file.path if delete_original || file.path.match(Dir.tmpdir)
+
+      if self.frame_count
+        FileUtils.cp_r "#{File.dirname(file.path)}/.", File.dirname(file_path(true))
+        FileUtils.rm_rf File.dirname(file.path) if delete_original || file.path.match(Dir.tmpdir)
+      else
+        FileUtils.rm file.path if delete_original || file.path.match(Dir.tmpdir)
+      end
+
+
       @file = nil
       sub = becomes(type.constantize)
 
       # ugly callback -- should ideally be automatically chained
       # the problem is due to the type change that happened above
       sub.did_identify_type
-      sub.save if sub.changed?
+      sub.meta[:frame_count] = self.frame_count
+      sub.save #if changed?
+    end
+
+    def did_identify_type
+      puts "subclass me bae"
     end
 
     def computed_class
