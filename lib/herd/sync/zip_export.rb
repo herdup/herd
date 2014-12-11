@@ -11,6 +11,46 @@ module Herd
         @output_assets = output_assets
       end
 
+      def folder_map
+        # loop through all assetable models and build hash of :slug
+        folder_map = Herd::ASSETABLE_MODELS.inject({}) do |h,model|
+          # convert module structure to path structure
+          path = path_from_class model
+          # populate hash with array of slugs; return hash
+          h[path] = model.group(model.assetable_slug_column).map(&:assetable_slug); h
+        end
+      end
+
+      def generate_seeds_folder(pre_clean=true)
+        FileUtils.rm_rf @seed_path if pre_clean
+        # build folder structure into seed_path
+        folder_map.each do |class_path,assetables|
+
+          assetable_path = File.join @seed_path, class_path, '_missing'
+          FileUtils.mkdir_p assetable_path
+
+          klass = class_from_path class_path
+          if klass.missing.present?
+            a = klass.missing
+            FileUtils.cp a.file_path, File.join(assetable_path, a.file_name)
+          end
+
+          assetables.each do |slug|
+            assetable_path = File.join @seed_path, class_path, slug
+            # make a directory for each assetable item's slug
+            FileUtils.mkdir_p assetable_path
+
+            # copy the object's assets into their seed folder
+            if @output_assets
+              object = class_from_path(class_path).find_by_assetable_slug slug
+              object.assets.master.each do |a|
+                FileUtils.cp a.file_path, File.join(assetable_path, a.file_name)
+              end
+            end
+          end
+        end
+      end
+
       def zip_folder(source_path, zip_path)
         # make sure no existing zip
         FileUtils.rm_rf zip_path
@@ -25,38 +65,6 @@ module Herd
           end
         end
       end
-
-      def generate_seeds_folder(pre_clean=true)
-        FileUtils.rm_rf @seed_path if pre_clean
-        # build folder structure into seed_path
-        folder_map.each do |class_path,assetables|
-
-          assetable_path = File.join @seed_path, class_path, '_missing'
-          FileUtils.mkdir_p assetable_path
-
-          klass = class_from_path class_path
-          if @output_assets and klass.missing.present?
-            a = klass.missing
-            FileUtils.cp a.file_path, File.join(assetable_path, a.file_name)
-          end
-
-          assetables.each do |slug|
-            assetable_path = File.join @seed_path, class_path, slug
-            # make a directory for each assetable item's slug
-            FileUtils.mkdir_p assetable_path
-
-            # copy the object's assets into their seed folder
-            if @output_assets
-              object = klass.find_by_assetable_slug slug
-              object.assets.master.each do |a|
-                a = a.n 'jpg' unless a.content_type == 'image/jpeg'
-                FileUtils.cp a.file_path, File.join(assetable_path, a.file_name)
-              end
-            end
-          end
-        end
-      end
-
 
       def export
         generate_seeds_folder

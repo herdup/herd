@@ -20,9 +20,7 @@ module Herd
           'defaults'    => defaults
         }
 
-        File.open(path,'w') do |file|
-          file.write container.to_yaml
-        end
+        path.write container.to_yaml
 
         container
       end

@@ -13,12 +13,6 @@ module Herd
 
     has_one :transform,  embed: :ids, include: true, serializer: TransformSerializer
 
-    attributes :transform_name
-
-    def transform_name
-      object.try(:transform).try(:name)
-    end
-
     def url
       object.file_url
     end

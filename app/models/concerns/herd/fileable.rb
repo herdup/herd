@@ -50,7 +50,7 @@ module Herd::Fileable
 	  File.exists? file_path
 	end
 
-	def unique_tmppath(seed=nil,ext=nil)
+	def unique_tmppath(ext=nil)
 	  ext  ||= file_ext
 	  seed ||= file_name_with_ext(ext)
 		Dir::Tmpname.tmpdir + "/" + seed
