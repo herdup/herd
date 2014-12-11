@@ -97,7 +97,7 @@ describe Herd::Config do
     post.assets.create file: vid_path
 
     child = post.master_assets.to_a.first.n 'test.hole','resize: 350x'
-    child2 = post.master_assets.to_a.last.n 'test.hole','resize: 350x'
+    child2 = post.master_assets.to_a.last.n 'test.holey','resize: 350x'
     child3 = Herd::Page.missing.n 'hole.2', 'crop: 350x350+100+0'
 
     Herd::Config.save_transforms yml_path, true

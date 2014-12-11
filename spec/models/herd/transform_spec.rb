@@ -64,7 +64,9 @@ module Herd
 
       large_size = child.file_size
       Transform::Magick.defaults = { quality: 50 }
-      expect(TransformWorker.jobs.size).to eq 1
+
+      # no longer async
+      #expect(TransformWorker.jobs.size).to eq 1
 
       TransformWorker.drain
       small_size = child.reload.file_size
