@@ -1,11 +1,11 @@
-- content_for :head do
-  :javascript
-    window.assetable = {
-      assetable_id: "#{object.id}",
-      assetable_type: "#{object.class.to_s}"
-    }
-  = javascript_include_tag "herd/application"
-  = stylesheet_link_tag "herd/application"
-  = tag :meta, name: 'herd-live-assets', content: ENV['HERD_LIVE_ASSETS'] == '1' ? 'true' : 'false'
+-# - content_for :head do
+:javascript
+  window.assetable = {
+    assetable_id: "#{object.id}",
+    assetable_type: "#{object.class.to_s}"
+  }
+= javascript_include_tag "herd/application"
+= stylesheet_link_tag "herd/application"
+= tag :meta, name: 'herd-live-assets', content: ENV['HERD_LIVE_ASSETS'] == '1' ? 'true' : 'false'
 
 #herd-uploader
