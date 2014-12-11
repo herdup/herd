@@ -12,9 +12,9 @@ PATH
       exifr
       flip
       haml-rails
-      jquery-rails
-      jquery-ui-rails
-      mini_magick (= 4.0.1)
+      jquery-rails (~> 3.1.0)
+      jquery-ui-rails (= 4.1.2)
+      mini_magick
       progressbar
       rails (> 4)
       rb-fsevent
@@ -26,7 +26,6 @@ PATH
       sidekiq-unique-jobs
       sinatra
       streamio-ffmpeg
-      typhoeus
 
 GEM
   remote: https://rubygems.org/
@@ -61,30 +60,30 @@ GEM
       tzinfo (~> 1.1)
     arel (5.0.1.20140414130214)
     awesome_print (1.2.0)
-    aws-sdk-v1 (1.59.0)
+    aws-sdk-v1 (1.54.0)
       json (~> 1.4)
       nokogiri (>= 1.4.4)
-    barber (0.5.0)
+    barber (0.4.2)
       ember-source
       execjs
-      handlebars-source (>= 1.0.0.rc.4)
+      handlebars-source
     barber-emblem (0.1.1)
       barber (>= 0.4.1)
       emblem-source
     builder (3.2.2)
-    celluloid (0.16.0)
-      timers (~> 4.0.0)
+    celluloid (0.15.2)
+      timers (~> 1.1.0)
     coderay (1.1.0)
-    coffee-rails (4.1.0)
+    coffee-rails (4.0.1)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0, < 5.0)
     coffee-script (2.3.0)
       coffee-script-source
       execjs
     coffee-script-source (1.8.0)
-    connection_pool (2.1.0)
+    connection_pool (2.0.0)
     diff-lcs (1.2.5)
-    ember-data-source (1.0.0.beta.12)
+    ember-data-source (1.0.0.beta.10)
       ember-source
     ember-rails (0.15.0)
       active_model_serializers
@@ -95,7 +94,7 @@ GEM
       handlebars-source (> 1.0.0)
       jquery-rails (>= 1.0.17)
       railties (>= 3.1)
-    ember-source (1.8.1)
+    ember-source (1.7.0)
       handlebars-source (~> 1.0)
     ember_script (0.0.5)
       ember_script-source (>= 0.0.2)
@@ -110,15 +109,12 @@ GEM
       ember-rails (>= 0.14.0)
     emblem-source (0.3.17)
     erubis (2.7.0)
-    ethon (0.7.1)
-      ffi (>= 1.3.0)
-    execjs (2.2.2)
-    exifr (1.2.0)
-    ffi (1.9.3)
+    execjs (2.2.1)
+    exifr (1.1.3)
     flip (1.0.1)
       activesupport (>= 3.0, < 5)
       i18n
-    haml (4.0.6)
+    haml (4.0.5)
       tilt
     haml-rails (0.5.3)
       actionpack (>= 4.0.1)
@@ -127,25 +123,26 @@ GEM
       railties (>= 4.0.1)
     handlebars-source (1.3.0)
     hike (1.2.3)
-    hitimes (1.2.2)
     i18n (0.6.11)
     jquery-rails (3.1.2)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
-    jquery-ui-rails (5.0.3)
-      railties (>= 3.2.16)
+    jquery-ui-rails (4.1.2)
+      railties (>= 3.1.0)
     json (1.8.1)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     method_source (0.8.2)
     mime-types (1.25.1)
-    mini_magick (4.0.1)
-    mini_portile (0.6.1)
+    mini_magick (3.8.1)
+      subexec (~> 0.2.1)
+    mini_portile (0.6.0)
     minitest (5.4.0)
+    mock_redis (0.13.2)
     multi_json (1.10.1)
-    nokogiri (1.6.5)
-      mini_portile (~> 0.6.0)
+    nokogiri (1.6.3.1)
+      mini_portile (= 0.6.0)
     polyglot (0.3.5)
     progressbar (0.21.0)
     pry (0.10.0)
@@ -181,12 +178,12 @@ GEM
     redis (3.1.0)
     redis-namespace (1.5.1)
       redis (~> 3.0, >= 3.0.4)
-    rspec-core (3.1.7)
+    rspec-core (3.1.4)
       rspec-support (~> 3.1.0)
     rspec-expectations (3.1.2)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.1.0)
-    rspec-mocks (3.1.3)
+    rspec-mocks (3.1.2)
       rspec-support (~> 3.1.0)
     rspec-rails (3.1.0)
       actionpack (>= 3.0)
@@ -196,18 +193,19 @@ GEM
       rspec-expectations (~> 3.1.0)
       rspec-mocks (~> 3.1.0)
       rspec-support (~> 3.1.0)
-    rspec-support (3.1.2)
+    rspec-support (3.1.1)
     ruby-filemagic (0.6.1)
     rubyzip (1.1.6)
-    sidekiq (3.3.0)
-      celluloid (>= 0.16.0)
+    sidekiq (3.2.5)
+      celluloid (= 0.15.2)
       connection_pool (>= 2.0.0)
       json
       redis (>= 3.0.6)
       redis-namespace (>= 1.3.1)
     sidekiq-status (0.5.1)
       sidekiq (>= 2.7, < 3.4)
-    sidekiq-unique-jobs (3.0.10)
+    sidekiq-unique-jobs (3.0.2)
+      mock_redis
       sidekiq (>= 2.6)
     sinatra (1.4.5)
       rack (~> 1.4)
@@ -215,27 +213,25 @@ GEM
       tilt (~> 1.3, >= 1.3.4)
     slop (3.6.0)
     spring (1.1.3)
-    sprockets (2.12.3)
+    sprockets (2.12.2)
       hike (~> 1.2)
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-    sprockets-rails (2.2.2)
+    sprockets-rails (2.1.4)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
-      sprockets (>= 2.8, < 4.0)
+      sprockets (~> 2.8)
     sqlite3 (1.3.9)
     streamio-ffmpeg (1.0.0)
+    subexec (0.2.3)
     thor (0.19.1)
     thread_safe (0.3.4)
     tilt (1.4.1)
-    timers (4.0.1)
-      hitimes
+    timers (1.1.0)
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
-    typhoeus (0.6.9)
-      ethon (>= 0.7.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
 
@@ -250,4 +246,3 @@ DEPENDENCIES
   quiet_assets
   spring
   sqlite3
-  typhoeus
