@@ -45,10 +45,21 @@ module Herd
       end
     end
 
+    def search
+      @assets = Asset.where("meta LIKE ?","%#{params[:meta]}%")
+      respond_to do |format|
+        format.json { render json: @assets,  each_serializer: AssetSerializer  }
+        format.html
+      end
+    end
+
     # GET /assets/1
     def show
+
+      #TODO: make/use detail serializer
       respond_to do |format|
-        format.json {render json: @asset, serializer: AssetSerializer}
+        #untested
+        format.json {render json: @asset.child_assets || @asset, serializer: AssetSerializer}
         format.html
       end
 
@@ -82,9 +93,19 @@ module Herd
         @asset = parent.child_with_transform(transform)
       end
 
+      if asset_params[:file].kind_of? String
+        @asset = Asset.find_by("meta like ?", "%content_url: #{asset_params[:file]}%")
+      end
+
       if @asset ||= Asset.create(asset_params)
 
         @asset.generate unless @asset.jid or @asset.file_name
+
+        if metadata_params.present?
+          pre = @asset.meta
+          @asset.meta.reverse_merge! metadata_params
+          @asset.save unless pre == @asset.meta
+        end
 
         render json: @asset, serializer: AssetSerializer
       else
@@ -96,7 +117,7 @@ module Herd
     def update
       if @asset.update(asset_params)
         if metadata_params.present?
-          @asset.meta = metadata_params
+          @asset.meta.merge! metadata_params
           @asset.save if @asset.meta_changed?
         end
         respond_with(@asset, serializer: AssetSerializer)

@@ -18,6 +18,7 @@ require 'sidekiq'
 require 'sidekiq-status'
 require 'rb-fsevent'
 require 'aws-sdk-v1'
+require 'typhoeus'
 
 module Herd
   class Engine < ::Rails::Engine
