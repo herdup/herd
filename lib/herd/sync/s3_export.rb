@@ -21,14 +21,13 @@ module Herd
       def export_s3(prefix=nil)
         folder_map.each do |class_path, assetables|
           klass = class_from_path class_path
+          if @output_assets and klass.missing.present?
+            a = klass.missing
+            asset_key = File.join prefix, class_path, '_missing', File.basename(a.file_name)
+            s3.buckets[@bucket].objects[asset_key].write(file: a.file_path)
+          end
 
           assetables.each do |slug|
-            if @output_assets and klass.missing.present?
-              a = klass.missing
-              asset_key = File.join prefix, class_path, '_missing', File.basename(a.file_name)
-              s3.buckets[@bucket].objects[asset_key].write(file: a.file_path)
-            end
-
             s3.buckets[@bucket].objects[File.join(prefix, class_path, slug) + '/'].write data: ''
 
             if @output_assets
