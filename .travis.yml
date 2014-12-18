@@ -14,6 +14,7 @@ notifications:
 before_install:
 -  sudo sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
 -  sudo add-apt-repository ppa:jon-severinsson/ffmpeg -y
+-  sudo add-apt-repository ppa:dhor/myway -y
 -  sudo apt-get update -y
 -  sudo apt-get install graphicsmagick
 -  sudo apt-get install libmagic-dev
