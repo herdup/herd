@@ -29,6 +29,13 @@ module Herd
       g.template_engine :haml
     end
 
+    initializer 'configure_minimagick' do |app|
+      MiniMagick.configure do |config|
+        config.cli = :graphicsmagick
+        config.timeout = 5
+      end
+    end
+
     initializer "add herd to precompile", :group => :all do |app|
       app.config.assets.precompile += %w(
         application.css
