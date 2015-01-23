@@ -15,6 +15,8 @@ module Herd
 
     attributes :transform_name
 
+    attributes :content
+
     def transform_name
       object.try(:transform).try(:name)
     end
@@ -25,6 +27,10 @@ module Herd
 
     def metadata
       object.meta
+    end
+
+    def content
+      object.try :content
     end
   end
 end

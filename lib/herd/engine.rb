@@ -19,6 +19,7 @@ require 'sidekiq-status'
 require 'rb-fsevent'
 require 'aws-sdk-v1'
 require 'typhoeus'
+require 'redcarpet'
 
 module Herd
   class Engine < ::Rails::Engine

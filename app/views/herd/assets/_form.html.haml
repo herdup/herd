@@ -1,0 +1,10 @@
+= form_for ['herd',Herd::Asset.new(assetable: object)], url: herd.herd_assets_url do |f|
+  = f.hidden_field :assetable_type
+  = f.hidden_field :assetable_id
+  = f.file_field :file
+  = f.submit
+
+
+- object.assets.master.each do |a|
+  = herd_tag a.n 'upload'
+  = button_to 'x', herd.herd_asset_url(a), method: :delete
