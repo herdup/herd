@@ -4,7 +4,7 @@ module Herd
       attr_accessor :accept_extensions
 
       def accept_extensions
-        @accept_extensions ||= %w(.jpg .jpeg .gif .png .mp4 .mov .webm .m4v .tif)
+        @accept_extensions ||= %w(.jpg .jpeg .gif .png .mp4 .mov .webm .m4v .tif .md)
       end
 
       def folder_map
