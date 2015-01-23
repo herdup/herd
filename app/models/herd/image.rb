@@ -23,7 +23,11 @@ module Herd
     def load_meta
       hash = {}
       image = mini_magick(true)
-      image.auto_orient
+      begin
+        image.auto_orient
+      rescue NoMethodError
+        print "This verison of magic does not support `auto_orient` command"
+      end
 
       hash[:height] = image.height
       hash[:width]  = image.width
