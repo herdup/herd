@@ -14,6 +14,8 @@ module Herd
         options[:size] ||= "#{asset.width}x#{asset.height}"
 
         video_tag(asset.file_url, options)
+      when Text
+        raw asset.content
       end
     end
   end

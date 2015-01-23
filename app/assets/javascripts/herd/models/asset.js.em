@@ -20,6 +20,8 @@ class Herd.Asset extends DS.Model
 
   transform: DS.belongsTo 'transform'
 
+  content: DS.attr 'string'
+
   childTransforms: ~>
     @childAssets.mapBy 'transform'
 
