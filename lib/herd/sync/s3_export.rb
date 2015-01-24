@@ -28,6 +28,8 @@ module Herd
           end
 
           assetables.each do |slug|
+            next unless slug
+            
             s3.buckets[@bucket].objects[File.join(prefix, class_path, slug) + '/'].write data: ''
 
             if @output_assets

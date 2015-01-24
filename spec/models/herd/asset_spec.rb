@@ -87,5 +87,18 @@ module Herd
       child = asset.t 'resize: 300x', 'small', true
       expect(child.file_name).to be_nil
     end
+
+    it "should create text asset from md file" do
+      path = Rails.root.join('../../spec/fixtures/copy.md')
+      asset = Herd::Asset.create file: path
+      asset = Herd::Asset.find asset.id
+
+      child = asset.n 'markd'
+
+      expect(child.class).to eq Herd::Text
+      expect(child.content).not_to be_nil
+
+
+    end
   end
 end

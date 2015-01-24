@@ -191,6 +191,8 @@ module Herd
         self.type = 'Herd::Video'
       when 'audio'
         self.type = 'Herd::Audio'
+      when 'text'
+        self.type = 'Herd::Text'
       end
 
       if master? and new_record? # tested
@@ -220,7 +222,7 @@ module Herd
       # ugly callback -- should ideally be automatically chained
       # the problem is due to the type change that happened above
       sub.did_identify_type
-      sub.meta[:frame_count] = self.frame_count
+      sub.meta[:frame_count] = self.frame_count if self.frame_count
       sub.save #if changed?
     end
 

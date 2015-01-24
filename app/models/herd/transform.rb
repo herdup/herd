@@ -30,6 +30,7 @@ module Herd
     def self.where_t(params)
       params[:options] = options_from_string(params[:options]).to_yaml if params[:options]
       params.delete_if {|k,v|v.nil?}
+
       where(params)
     end
 

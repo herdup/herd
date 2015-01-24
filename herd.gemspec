@@ -16,13 +16,13 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency "rails", "> 4"
+  s.add_dependency "rails", "<= 4.1.2"
   s.add_dependency "rspec-rails"#, "~> 2.14.1"
   s.add_dependency "haml-rails"
   s.add_dependency "coffee-rails"
 
-  s.add_dependency 'ember-rails'
-  s.add_dependency 'ember-source'
+  s.add_dependency 'ember-rails'#, '~> 0.16'
+  s.add_dependency 'ember-source', '~> 1.6.1'
   s.add_dependency 'emblem-rails'
   s.add_dependency 'ember_script-rails'
 
@@ -48,6 +48,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'flip'
   s.add_dependency 'rb-fsevent'
 
+  s.add_dependency 'redcarpet'
 
   s.add_development_dependency "sqlite3"
 

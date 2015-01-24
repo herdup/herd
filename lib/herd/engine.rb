@@ -19,6 +19,7 @@ require 'sidekiq-status'
 require 'rb-fsevent'
 require 'aws-sdk-v1'
 require 'typhoeus'
+require 'redcarpet'
 
 module Herd
   class Engine < ::Rails::Engine
@@ -27,6 +28,13 @@ module Herd
     config.generators do |g|
       g.test_framework :rspec
       g.template_engine :haml
+    end
+
+    initializer 'configure_minimagick' do |app|
+      MiniMagick.configure do |config|
+        config.cli = :graphicsmagick
+        config.timeout = 5
+      end
     end
 
     initializer "add herd to precompile", :group => :all do |app|
