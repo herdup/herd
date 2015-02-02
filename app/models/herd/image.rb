@@ -18,28 +18,28 @@ module Herd
 
     def did_identify_type
       self.meta.merge! load_meta
-      auto_orient # for camera/phone pictures that were taken at weird angles
     end
 
     def load_meta
       hash = {}
       image = mini_magick(true)
+      begin
+        image.auto_orient
+      rescue NoMethodError
+        print "This verison of magic does not support `auto_orient` command"
+      end
 
       hash[:height] = image.height
       hash[:width]  = image.width
 
       if exif.present?
-        hash[:make] = exif.make
-        hash[:model] = exif.model
-        hash[:gps] = exif.gps.try(:to_h)
+        hash[:make]   = exif.make
+        hash[:model]  = exif.model
+        hash[:gps]    = exif.gps.try(:to_h)
       end
+
       hash.delete_if {|k,v|v.nil?} # make sense er na? cleaner db
       hash
-    end
-
-    def auto_orient
-      image = mini_magick(true)
-      image.auto_orient
     end
 
   end
