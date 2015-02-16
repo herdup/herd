@@ -1,6 +1,12 @@
 # desc "Explaining what the task does"
 namespace :herd do
 
+  task reset: :environment do
+    Herd::Asset.destroy_all
+    Herd::Transform.destroy_all
+    FileUtils.rm_rf File.join(Rails.root, 'public', 'uploads', Rails.env)
+  end
+
   desc "Remove public/assets folder"
   task :cleanup do
     FileUtils.rm_rf File.join(Rails.root, 'public', 'uploads', Rails.env)

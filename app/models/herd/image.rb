@@ -23,20 +23,21 @@ module Herd
     def load_meta
       hash = {}
       image = mini_magick(true)
-      begin
-        image.auto_orient
-      rescue NoMethodError
-        print "This verison of magic does not support `auto_orient` command"
-      end
-
-      hash[:height] = image.height
-      hash[:width]  = image.width
 
       if exif.present?
         hash[:make]   = exif.make
         hash[:model]  = exif.model
         hash[:gps]    = exif.gps.try(:to_h)
+
+        begin
+          image.auto_orient
+        rescue NoMethodError
+          print "This verison of magic does not support `auto_orient` command"
+        end
       end
+
+      hash[:height] = image.height
+      hash[:width]  = image.width
 
       hash.delete_if {|k,v|v.nil?} # make sense er na? cleaner db
       hash
