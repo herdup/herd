@@ -8,7 +8,7 @@ Herds of Assets for your Rails 4 Apps.
 Just add Herd to your Gemfile:
 
 ```ruby
-gem 'herd', github: 'herdupio/herd', branch: 'master'
+gem 'herd', github: 'herdup/herd', branch: 'master'
 ```
 
 And then bundle it up and run a migration:
