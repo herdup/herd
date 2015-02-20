@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = Herd::VERSION
   s.authors     = ["Sebastian Bean"]
   s.email       = ["sebastian@ginlanemedia.com"]
-  s.homepage    = "nah.com"
-  s.summary     = "Asset mgmt for 2020"
-  s.description = "TODO: Description of Herd."
+  s.homepage    = "herdup.io"
+  s.summary     = "Herds of Assets for your Rails 4 App"
+  s.description = "Herd is Rails Engine that provides a simple interface for managing assets."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
@@ -52,3 +52,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "sqlite3"
 
 end
+
+
