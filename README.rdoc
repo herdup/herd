@@ -5,3 +5,19 @@ This project rocks and uses MIT-LICENSE.
 
 ``
 brew install imagemagick --with-libtiff
+
+
+Steps:
+
+- Add
+<%= yield :head %>
+
+to app head
+
+
+ *= require herd/uploader
+
+
+mount point
+
+ html: { multipart: true }
