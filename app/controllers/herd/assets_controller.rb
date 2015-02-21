@@ -48,14 +48,13 @@ module Herd
     def search
       @assets = Asset.where("meta LIKE ?","%#{params[:meta]}%")
       respond_to do |format|
-        format.json { render json: @assets,  each_serializer: AssetSerializer  }
+        format.json { render json: @assets }
         format.html
       end
     end
 
     # GET /assets/1
     def show
-
       #TODO: make/use detail serializer
       respond_to do |format|
         #untested
