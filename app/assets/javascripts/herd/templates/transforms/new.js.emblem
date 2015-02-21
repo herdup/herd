@@ -1,5 +1,0 @@
-h1 New Transform
-
-Herd.TransformsEditView transform=model
-
-button{action 'update'} Create
