@@ -1,0 +1,24 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'herd/uploader' %>
+  <%= javascript_include_tag "herd/uploader" %>
+<% end %>
+
+<herd-uploader data-assetable-id="<%= object.id %>" data-assetable-type="<%= object.class.to_s %>" data-instantiated="false">
+  <header>
+    <h1>Assets</h1>
+  </header>
+  <section>
+    <h1>Loading...</h1>
+  </section>
+  <button>
+    + Add Asset
+  </button>
+</herd-uploader>
+
+<script>
+  var newUploaderTags = document.querySelectorAll('herd-uploader[data-instantiated="false"]');
+  for (var i = 0; i < newUploaderTags.length; i++) {
+    var element = newUploaderTags[i];
+    window.Herd.createUploader(element);
+  }
+</script>

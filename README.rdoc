@@ -5,3 +5,12 @@ This project rocks and uses MIT-LICENSE.
 
 ``
 brew install imagemagick --with-libtiff
+
+
+Steps:
+
+
+
+*= require herd/uploader
+html: { multipart: true }
+assets_attributes: [ :id, :file, :_destroy ]

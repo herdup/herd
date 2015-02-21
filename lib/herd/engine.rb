@@ -1,10 +1,8 @@
 require 'haml-rails'
-require 'ember-rails'
-require 'ember_script-rails'
-require 'emblem/rails'
 require 'jquery-rails'
 require 'jquery-ui-rails'
 
+require 'responders'
 require 'active_model_serializers'
 require 'filemagic'
 require 'mini_magick'
@@ -35,13 +33,11 @@ module Herd
         config.timeout = 5
       end
     end
-    
+
     initializer "add herd to precompile", :group => :all do |app|
       app.config.assets.precompile += %w(
-        application.css
-        application.js
-        core.js
-        namespace.js
+        herd/uploader.js
+        herd/uploader.css
       )
     end
 

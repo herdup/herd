@@ -21,14 +21,12 @@ Gem::Specification.new do |s|
   s.add_dependency "haml-rails"
   s.add_dependency "coffee-rails"
 
-  s.add_dependency 'ember-rails'
-  s.add_dependency 'ember-source'
-  s.add_dependency 'emblem-rails'
-  s.add_dependency 'ember_script-rails'
-
   s.add_dependency 'jquery-rails'#, '~> 3.1.0'
   s.add_dependency 'jquery-ui-rails'#, '4.1.2'
+
   s.add_dependency 'active_model_serializers'
+  s.add_dependency "responders", '~> 2.0'
+
   s.add_dependency 'progressbar'
   s.add_dependency 'ruby-filemagic'
   s.add_dependency 'mini_magick', '4.0.1'
@@ -47,7 +45,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'flip'
   s.add_dependency 'rb-fsevent'
-
 
   s.add_development_dependency "sqlite3"
 
