@@ -5,32 +5,21 @@ var Asset = function(index) {
 var Uploader = function (element) {
   this.Asset          = Asset;
   this.assets         = [];
-  // this.status         = "ok";
-  // this.data           = {};
-  // this.mountPoint     = mountPoint;
   this.element        = element;
   this.assetable_id   = element.getAttribute("data-assetable-id");
   this.assetable_type = element.getAttribute("data-assetable-type");
-  // this.getAssets();
   this.setupAssetList();
   this.setupButtons();
   element.setAttribute("data-instantiated", "true");
 };
-
-// Uploader.prototype.getAssets = function() {
-//   var xhReq = new XMLHttpRequest();
-//   xhReq.onreadystatechange = this.handleReadyStateChange.bind(this, xhReq);
-//   xhReq.open("GET", this.mountPoint+"/assets.json", true);
-//   this.status = "loading";
-//   xhReq.send();
-// };
 
 Uploader.prototype.setupAssetList = function() {
   var list = this.element.querySelector("section ul");
   var fileFields = list.querySelectorAll('input[type="file"]');
   for (var i = 0; i < fileFields.length; i++) {
     var fileField = fileFields[i];
-    var assetId   = fileField.getAttribute('id').split('_')[3];
+    var parts     = fileField.getAttribute('id').split('_')
+    var assetId   = parts[parts.length - 2];
     this.assets.push(new this.Asset(assetId));
   }
 };
@@ -68,35 +57,7 @@ Uploader.prototype.createTagForAsset = function(asset) {
   return listItem;
 };
 
-// Uploader.prototype.handleReadyStateChange = function(xhReq) {
-//   if (xhReq.readyState === xhReq.DONE) {
-//     if(xhReq.status == 200){
-//       this.data = JSON.parse(xhReq.responseText);
-//       this.status = "ok";
-//     }
-//     else if(xhReq.status == 400) {
-//       this.status = "error";
-//     }
-//     else {
-//       this.status = "error";
-//     }
-//     this.setupView();
-//   }
-// };
-
-// Uploader.prototype.setupView = function() {
-//   var section = this.element.querySelector("section");
-//   if (this.data['assets'] && this.data['assets'].length) {
-//     section.innerHTML = "<h2>Assets</h2>";
-//   } else {
-//     section.innerHTML = "<h2>No Assets exist for this "+this.assetable_type+".</h2>";
-//   }
-
-// };
-
 (function (global) {
-  // TODO - Pass this in?
-  // this.mountPoint = "/herd";
   this.uploaders = [];
   this.Uploader = Uploader;
   this.createUploader = function(element) {
@@ -104,9 +65,3 @@ Uploader.prototype.createTagForAsset = function(asset) {
   };
   global.Herd = this;
 }(window));
-
-
-
-
-// <input type="file" name="comment[assets_attributes][0][file]" id="comment_assets_attributes_0_file">
-// <input type="hidden" value="25" name="comment[assets_attributes][0][id]" id="comment_assets_attributes_0_id">
