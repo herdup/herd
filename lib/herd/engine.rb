@@ -37,7 +37,6 @@ module Herd
     initializer "add herd to precompile", :group => :all do |app|
       app.config.assets.precompile += %w(
         herd/uploader.js
-        herd/uploader.css
       )
     end
 
