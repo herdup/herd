@@ -1,7 +1,4 @@
 require 'haml-rails'
-require 'jquery-rails'
-require 'jquery-ui-rails'
-
 require 'responders'
 require 'active_model_serializers'
 require 'filemagic'
