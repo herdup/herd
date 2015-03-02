@@ -20,6 +20,12 @@ Gem::Specification.new do |s|
   s.add_dependency "rspec-rails"#, "~> 2.14.1"
   s.add_dependency "haml-rails"
 
+  s.add_dependency 'ember-rails'
+  s.add_dependency 'ember-source'
+  s.add_dependency 'emblem-rails'
+  s.add_dependency 'ember_script-rails'
+  s.add_dependency 'jquery-rails'#, '~> 3.1.0'
+  s.add_dependency 'jquery-ui-rails'#, '4.1.2'
   s.add_dependency 'active_model_serializers'
   s.add_dependency 'responders'
   s.add_dependency 'progressbar'
