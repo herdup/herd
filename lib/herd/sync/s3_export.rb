@@ -3,7 +3,7 @@ module Herd
     class S3Export < Base
       attr_accessor :output_assets
 
-      def initialize(bucket, output_assets=true, s3_key=ENV['HERD_S3_KEY'], s3_secret=ENV['HERD_S3_SECRET'])
+      def initialize(bucket, output_assets=true, s3_key=ENV['AWS_ACCESS_KEY_ID'], s3_secret=ENV['AWS_SECRET_ACCESS_KEY'])
         @bucket = bucket
         @output_assets = output_assets
         AWS.config(:http_open_timeout => 25, :http_read_timeout => 120)
