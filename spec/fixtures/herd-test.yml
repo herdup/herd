@@ -1,0 +1,9 @@
+---
+transforms:
+- type: Herd::Transform::Magick
+  assetable_type: Post
+  name: test.hole
+  options:
+    resize: 350x
+    quality: 80
+defaults: []
