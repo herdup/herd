@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = Herd::VERSION
   s.authors     = ["Sebastian Bean"]
   s.email       = ["sebastian@ginlanemedia.com"]
-  s.homepage    = "nah.com"
-  s.summary     = "Asset mgmt for 2020"
-  s.description = "TODO: Description of Herd."
+  s.homepage    = "http://herdup.io"
+  s.summary     = "Herds of Assets for your Rails 4 App"
+  s.description = "Herd is Rails Engine that provides a simple interface for managing assets."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
@@ -19,16 +19,9 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "> 4"
   s.add_dependency "rspec-rails"#, "~> 2.14.1"
   s.add_dependency "haml-rails"
-  s.add_dependency "coffee-rails"
 
-  s.add_dependency 'ember-rails'
-  s.add_dependency 'ember-source', '~> 1.9.1'
-  s.add_dependency 'emblem-rails'
-  s.add_dependency 'ember_script-rails'
-
-  s.add_dependency 'jquery-rails'#, '~> 3.1.0'
-  s.add_dependency 'jquery-ui-rails'#, '4.1.2'
   s.add_dependency 'active_model_serializers'
+  s.add_dependency 'responders'
   s.add_dependency 'progressbar'
   s.add_dependency 'ruby-filemagic'
   s.add_dependency 'mini_magick', '4.0.1'
@@ -48,7 +41,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'flip'
   s.add_dependency 'rb-fsevent'
 
-
   s.add_development_dependency "sqlite3"
 
 end
+
+

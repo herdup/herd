@@ -19,6 +19,8 @@ module Herd
         touch:      true
 
       assetable_slug
+
+      accepts_nested_attributes_for :assets, reject_if: lambda { |a| a[:file].blank? }, allow_destroy: true
     end
 
     def asset
