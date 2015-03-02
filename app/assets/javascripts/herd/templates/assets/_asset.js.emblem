@@ -1,0 +1,14 @@
+if isImage
+  if bgImage
+    = background-image src=assetUrl
+  else
+    = img src=assetUrl
+else
+  if isVideo
+    video width=child.width height=child.height autoplay=false
+      source src=assetUrl type=child.contentType
+  else
+    if bgImage
+      = background-image src=assetUrl
+    else
+      = img src=assetUrl

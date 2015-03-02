@@ -1,0 +1,6 @@
+/ ul
+/   li= link-to 'assets' | Assets
+/   li= link-to 'transforms' | Transforms
+
+section
+  = outlet

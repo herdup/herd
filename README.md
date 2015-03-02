@@ -27,32 +27,7 @@ end
 ```
 
 ### Using the Uploader
-
-Add the required JS to your Application (or appropriate) JS Manifest.
-
-```js
-//= require herd/uploader
-
-```
-
-In your Controller, whitelist the asset params:
-
-```ruby
-def post_params
-  params.require(:post).permit(assets_attributes: [ :id, :file, :_destroy ])
-end
-```
-
-Now you can use the Uploader with your `form_for` helpers (Don't forget to make it Multipart!).
-
-```haml
-= form_for @post, html: { multipart: true } do |f|
-
-  = render 'herd/uploader', form: f, assetable: @post
-
-  .actions
-    = f.submit 'Save'
-```
+We're in the process of building a standard uploader component in React.  Coming soon!
 
 ### Versioning
 
