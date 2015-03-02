@@ -7,6 +7,7 @@ spec/dummy/log/*.log
 spec/dummy/tmp/
 spec/dummy/public/
 spec/dummy/.sass-cache
+spec/fixtures/herd-test.yml
 
 .DS_Store
 .profile
