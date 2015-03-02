@@ -1,0 +1,4 @@
+.field
+  Ember.TextField valueBinding="type" placeholder='type'
+.field
+  Ember.TextArea valueBinding="options" placeholder='options' rows='10' cols='20'

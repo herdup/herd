@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Herd</title>
+  <%= stylesheet_link_tag    "herd/application", media: "all" %>
+  <%= csrf_meta_tags %>
+  <%= content_for?(:head) ? yield(:head) : '' %>
+</head>
+<body>
+  <div id="herd-uploader">
+    <%= yield %>
+  </div>
+</body>
+</html>
