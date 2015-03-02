@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = Herd::VERSION
   s.authors     = ["Sebastian Bean"]
   s.email       = ["sebastian@ginlanemedia.com"]
-  s.homepage    = "herdup.io"
+  s.homepage    = "http://herdup.io"
   s.summary     = "Herds of Assets for your Rails 4 App"
   s.description = "Herd is Rails Engine that provides a simple interface for managing assets."
   s.license     = "MIT"
