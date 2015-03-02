@@ -55,6 +55,7 @@ module Herd
 
     # GET /assets/1
     def show
+
       #TODO: make/use detail serializer
       respond_to do |format|
         #untested
