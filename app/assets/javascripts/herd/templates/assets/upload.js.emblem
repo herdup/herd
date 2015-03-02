@@ -1,6 +1,0 @@
-.file-uploader
-  .upload-wrap
-    = file-upload
-
-  .progress.large-9.success.round
-    span.meter style=view.progressStyle
