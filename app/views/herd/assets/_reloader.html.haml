@@ -1,8 +1,0 @@
-:javascript
-  $(function() {
-    var source = new EventSource('/herd/assets/live');
-    source.addEventListener('assets', function(e) {
-      console.log(e)
-      window.location.reload()
-    });
-  })
