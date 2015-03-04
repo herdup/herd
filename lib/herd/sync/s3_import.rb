@@ -12,11 +12,10 @@ module Herd
         accept_extensions
       end
 
-      def import_s3(prefix=nil, s3_key=ENV['HERD_S3_KEY'], s3_secret=ENV['HERD_S3_SECRET'])
+      def import_s3(prefix=nil)
         assets = []
         # you can update the timeouts (with seconds)
         AWS.config(:http_open_timeout => 25, :http_read_timeout => 120)
-        AWS.config access_key_id:s3_key, secret_access_key: s3_secret
         s3 = AWS::S3.new
 
         objects = s3.buckets[bucket].objects
