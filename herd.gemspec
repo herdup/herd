@@ -21,8 +21,8 @@ Gem::Specification.new do |s|
   s.add_dependency "haml-rails"
   s.add_dependency "coffee-rails"
 
-  s.add_dependency 'ember-rails'
-  s.add_dependency 'ember-source'
+  s.add_dependency 'ember-rails', '0.16.2'
+  s.add_dependency 'ember-source', '~> 1.9.1'
   s.add_dependency 'emblem-rails'
   s.add_dependency 'ember_script-rails'
 
