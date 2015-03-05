@@ -1,0 +1,9 @@
+machine:
+  timezone:
+    America/New_York
+  ruby:
+    version: 2.1.2
+database:
+  override:
+    - bundle exec rake db:create
+    - bundle exec rake db:migrate
