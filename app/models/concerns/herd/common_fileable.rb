@@ -19,9 +19,7 @@ module Herd
     end
 
     def unique_tmp_path(ext=nil)
-      unique_filename = SecureRandom.urlsafe_base64
-      unique_filename = "#{unique_filename}.#{ext}" unless ext.nil?
-      Dir::Tmpname.tmpdir + "/" + unique_filename
+      Dir::Tmpname.tmpdir + "/" + "#{file_name_wo_ext}.#{file_ext}"
     end
 
     def sanitized_classname
@@ -30,7 +28,19 @@ module Herd
       type_s.split("::").second.pluralize.downcase
     end
 
-    def become_type
+    def set_asset_type
+      raise ArgumentError, 'Asset content_type cannot be nil' if self.content_type.nil?
+      case self.content_type.split('/').first
+      when 'image'
+        self.type = 'Herd::Image'
+      when 'video'  
+        self.type = 'Herd::Video'
+      when 'audio'
+        self.type = 'Herd::Audio'
+      end
+    end
+
+    def become_asset_type
       file = nil
       sub = becomes(type.constantize)
       sub.did_identify_type
@@ -75,7 +85,7 @@ module Herd
     module ClassMethods
       def file_field(sym)
         define_method :file_field do
-          send(sym) || ''
+          send(sym) || send(:file).to_s
         end
       end
 

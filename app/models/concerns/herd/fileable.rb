@@ -12,11 +12,11 @@ module Herd
     end
 
     def file_ext
-      @file_ext ||= File.extname(file_field).tr('.','') rescue ''
+      File.extname(file_field).tr('.','') rescue ''
     end
 
     def file_name_wo_ext
-      @file_name_wo_ext ||= File.basename(file_field,'.*')
+      File.basename(file_field,'.*')
     end
 
     def file_path(create=nil)
@@ -37,12 +37,10 @@ module Herd
       case input_file
       when String
         if File.file? input_file
-          binding.pry
           self.file = File.open(input_file)
           self.file_name = File.basename(input_file)
         #TODO: make this work with non-1 starting shnitzeldorfs
         elsif input_file =~ /\%d/ and first = sprintf(input_file, 1) and File.file? first
-          binding.pry
           count = 1
           while File.file? sprintf(input_file,count)
             count += 1
@@ -81,26 +79,27 @@ module Herd
           self.file_name = URI.unescape(File.basename(URI.parse(input_file).path))
         end
       when Pathname
-        binding.pry
         raise "no file found #{self.file}" unless input_file.exist?
         self.file = input_file.open
         self.file_name = input_file.basename.to_s
       when ActionDispatch::Http::UploadedFile
-        binding.pry
         self.file_name = input_file.original_filename
       when File
-        binding.pry
         self.file_name = File.basename(input_file.path)
       end
 
-      self.file_size = input_file.size
+      self.file_size = file.size
       self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(file.path).split(';').first.to_s
+
+      set_asset_type
+
 
       if master? and new_record?
         ix = 0
+        o_file_name_wo_ext = file_name_wo_ext
         while File.exist? file_path do
           ix += 1
-          self.file_name = "#{file_name_wo_ext}-#{ix}.#{file_ext}"
+          self.file_name = "#{o_file_name_wo_ext}-#{ix}.#{file_ext}"
         end
       end
 
@@ -116,7 +115,7 @@ module Herd
         FileUtils.rm file.path if delete_original || file.path.match(Dir.tmpdir)
       end
 
-      become_type
+      become_asset_type
     end
 
     def delete_file

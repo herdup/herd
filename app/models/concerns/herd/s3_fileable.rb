@@ -74,10 +74,11 @@ module Herd
       self.meta[:content_url] = content_url.to_s
       self.file_size = bucket.local_tempfile.size
       self.content_type = bucket[s3_path].content_type
+      set_asset_type
     end
 
     def save_file
-      become_type
+      become_asset_type
     end
 
     def delete_file

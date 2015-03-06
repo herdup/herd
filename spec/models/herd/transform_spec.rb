@@ -71,8 +71,6 @@ module Herd
       TransformWorker.drain
       small_size = child.reload.file_size
 
-      binding.pry
-
       expect(large_size).to be > small_size
     end
   end

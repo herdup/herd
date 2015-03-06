@@ -34,7 +34,6 @@ module Herd
         delete_file if file_name.present?
         @file = @file.to_s if @file.kind_of? URI::HTTPS
         copy_file @file
-        set_type
       end
     }
 
@@ -103,20 +102,6 @@ module Herd
       trans = computed_class.default_transform.find_by(name: name) unless name.nil?
       child = child_with_transform(trans) if trans
       return child || t(transform_string, name, async)
-    end
-
-    def set_type
-      raise ArgumentError, 'Asset content_type cannot be nil' if self.content_type.nil?
-      # should class itself try and figure this out?
-      mime_parts = self.content_type.split('/')
-      case mime_parts.first
-      when 'image'
-        self.type = 'Herd::Image'
-      when 'video'  
-        self.type = 'Herd::Video'
-      when 'audio'
-        self.type = 'Herd::Audio'
-      end
     end
 
     def computed_class

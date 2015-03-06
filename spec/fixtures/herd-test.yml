@@ -1,11 +1,17 @@
 ---
-transforms: {}
-defaults:
-  Magick:
-    options:
-      resize: 120x
-      quality: 50
-  Ffmpeg:
-    options:
-      resize: 320x
-      frame_rate: 20
+transforms:
+  Post:
+    test.hole:
+      Magick:
+        options:
+          resize: 350x
+    test.holey:
+      Ffmpeg:
+        options:
+          resize: 350x
+  Herd::Page:
+    hole.2:
+      Magick:
+        options:
+          crop: 200x200+150+0
+defaults: {}
