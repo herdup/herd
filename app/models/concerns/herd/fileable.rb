@@ -1,96 +1,133 @@
-module Herd::Fileable
-	extend ActiveSupport::Concern
+module Herd
+  module Fileable
+    extend ActiveSupport::Concern
+    include CommonFileable
 
-	def base_path(abs=true)
-	  path_with_fields fileable_directory_fields, abs
-	end
+    def base_path(abs=true, fields = nil)
+      fields ||= fileable_directory_fields
+      parts = ["/uploads", Rails.env, sanitized_classname]
+      parts.concat fields
+      parts.unshift *[Rails.root,'public'] if abs
+      File.join(*parts)
+    end
 
-	def path_with_fields(fields, abs=true)
-		parts = ["/uploads", Rails.env, sanitized_classname]
-		parts.concat fields
-		parts.unshift *[Rails.root,'public'] if abs
-		File.join(*parts)
-	end
+    def file_ext
+      @file_ext ||= File.extname(file_field).tr('.','') rescue ''
+    end
 
-	def base_url
-	  base_path false
-	end
+    def file_name_wo_ext
+      @file_name_wo_ext ||= File.basename(file_field,'.*')
+    end
 
-	def file_ext
-	  File.extname(file_field).tr('.','') rescue ''
-	end
+    def file_path(create=nil)
+      FileUtils.mkdir_p base_path if create
+      File.join base_path, file_field
+    end
 
-	def file_name_wo_ext
-		File.basename(file_field,'.*')
-	end
+    def file_url(absolute=ActionController::Base.asset_host.present?)
+      relative = File.join base_path(false), file_field
+      if absolute
+        ActionController::Base.helpers.asset_url relative
+      else
+        relative
+      end
+    end
 
-	def file_name_with_ext(ext)
-	  "#{file_name_wo_ext}.#{ext}"
-	end
+    def copy_file(input_file)
+      case input_file
+      when String
+        if File.file? input_file
+          binding.pry
+          self.file = File.open(input_file)
+          self.file_name = File.basename(input_file)
+        #TODO: make this work with non-1 starting shnitzeldorfs
+        elsif input_file =~ /\%d/ and first = sprintf(input_file, 1) and File.file? first
+          binding.pry
+          count = 1
+          while File.file? sprintf(input_file,count)
+            count += 1
+          end
+          self.file = File.open(first)
+          self.file_name = File.basename(first)
+          self.frame_count = count
+        else
+          self.meta[:content_url] = strip_query_string input_file
+          download_file = File.open unique_tmp_path,'wb'
+          request = Typhoeus::Request.new input_file, followlocation: true
+          request.on_headers do |response|
+            effective_url = strip_query_string response.effective_url
+            self.meta[:effective_url] = effective_url if effective_url != self.meta[:content_url]
 
-	def path_with_ext(ext)
-	  File.join(base_path, file_name_with_ext(ext))
-	end
+            self.file_name = file_name_from_url response.effective_url
 
-	def file_path(create=nil)
-		FileUtils.mkdir_p base_path if create
-		File.join base_path, file_field
-	end
+            if len = response.headers['Content-Length'].try(:to_i)
+              @pbar = ProgressBar.new self.file_name, len
+              @pbar.file_transfer_mode
+            end
+          end
 
-	def file_url(absolute=ActionController::Base.asset_host.present?)
-		relative = File.join base_url, file_field
-		if absolute
-			ActionController::Base.helpers.asset_url relative
-		else
-			relative
-		end
-	end
+          request.on_body do |chunk|
+            download_file.write(chunk)
+            @pbar.inc chunk.size if @pbar
+          end
 
-	def file_exists?
-	  File.exists? file_path
-	end
+          request.on_complete do |response|
+            download_file.close
+          end
 
-	def unique_tmppath(seed=nil,ext=nil)
-	  ext  ||= file_ext
-	  seed ||= file_name_with_ext(ext)
-		Dir::Tmpname.tmpdir + "/" + seed
-	end
+          request.run
 
-	def sanitized_classname
-		# use the second path chunk for now (i.e. what's after "Rcms::")
-		# not ideal but cant figure out an easy way around it
-		type_s = self.type
-		type_s ||= self.class.to_s
-		type_s.split("::").second.pluralize.downcase
-	end
+          self.file = File.open download_file.path
+          self.file_name = URI.unescape(File.basename(URI.parse(input_file).path))
+        end
+      when Pathname
+        binding.pry
+        raise "no file found #{self.file}" unless input_file.exist?
+        self.file = input_file.open
+        self.file_name = input_file.basename.to_s
+      when ActionDispatch::Http::UploadedFile
+        binding.pry
+        self.file_name = input_file.original_filename
+      when File
+        binding.pry
+        self.file_name = File.basename(input_file.path)
+      end
 
-	def cleanup_file
-		FileUtils.rm_f file_path if File.exist? file_path
+      self.file_size = input_file.size
+      self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(file.path).split(';').first.to_s
 
-		# cleanup empty folders like a nice boy
-		fields = fileable_directory_fields
-		while fields.present? do
-			path = path_with_fields fields
-			FileUtils.rm_rf path if Dir["#{path}/*"].empty?
-			fields.pop
-		end
-	end
+      if master? and new_record?
+        ix = 0
+        while File.exist? file_path do
+          ix += 1
+          self.file_name = "#{file_name_wo_ext}-#{ix}.#{file_ext}"
+        end
+      end
 
-	module ClassMethods
-		def file_field(sym)
-			define_method :file_field do
-				send(sym) || ''
-			end
-		end
-		def fileable_directory_fields(block=nil)
-			define_method :fileable_directory_fields do
-				if block.present?
-					block.call(self)
-				else
-					self.id.to_s
-				end
-			end
-		end
-	end
+    end
 
+    def save_file
+      File.open(file_path(true), "wb") { |f| f.write(file.read) }
+
+      if self.frame_count
+        FileUtils.cp_r "#{File.dirname(file.path)}/.", File.dirname(file_path(true))
+        FileUtils.rm_rf File.dirname(file.path) if delete_original || file.path.match(Dir.tmpdir)
+      else
+        FileUtils.rm file.path if delete_original || file.path.match(Dir.tmpdir)
+      end
+
+      become_type
+    end
+
+    def delete_file
+      FileUtils.rm_f file_path if File.exist? file_path
+      # cleanup empty folders like a nice boy
+      fields = fileable_directory_fields
+      while fields.present? do
+        path = base_path true, fields
+        FileUtils.rm_rf path if Dir["#{path}/*"].empty?
+        fields.pop
+      end
+    end
+  end
 end

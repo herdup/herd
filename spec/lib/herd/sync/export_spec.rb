@@ -21,6 +21,7 @@ describe Herd::Sync::Base do
     expect(Herd::Asset.master.count).to be 2
 
     # second asset with same name should be renamed
+    binding.pry
     expect(missing_asset.file_name).not_to eq page.asset.file_name
 
     exporter = Herd::Sync::ZipExport.new

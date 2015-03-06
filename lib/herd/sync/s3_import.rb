@@ -37,7 +37,6 @@ module Herd
 
           asset_file = parts.pop
           assetable_slug = parts.pop
-
           assetable_path = Rails.root.join 'tmp', 'import', *parts, assetable_slug
           asset_path = o.url_for(:read).to_s
 
@@ -68,6 +67,7 @@ module Herd
               end
             end
           end
+
 
           if found = object.assets.master.find_by("file_name like ?","%#{File.basename(remote_path,'.*')}%")
             if o.content_length == found.file_size
