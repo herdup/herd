@@ -11,14 +11,6 @@ module Herd
       File.join(*parts)
     end
 
-    def file_ext
-      File.extname(file_field).tr('.','') rescue ''
-    end
-
-    def file_name_wo_ext
-      File.basename(file_field,'.*')
-    end
-
     def file_path(create=nil)
       FileUtils.mkdir_p base_path if create
       File.join base_path, file_field
@@ -90,9 +82,6 @@ module Herd
 
       self.file_size = file.size
       self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(file.path).split(';').first.to_s
-
-      set_asset_type
-
 
       if master? and new_record?
         ix = 0

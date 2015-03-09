@@ -6,10 +6,24 @@ module Herd
       file_field :file_name
       attr_accessor :file
       attr_accessor :delete_original
+      
+      after_save -> {
+        save_file if self.file.present?
+      }
+
+      after_destroy :delete_file
     end
 
     def file_name_from_url(url)
       URI.unescape(File.basename(URI.parse(url).path))
+    end
+
+    def file_ext
+      File.extname(file_field).tr('.','') rescue ''
+    end
+
+    def file_name_wo_ext
+      File.basename(file_field,'.*')
     end
 
     def strip_query_string(url)
@@ -23,13 +37,19 @@ module Herd
     end
 
     def sanitized_classname
+      # since this method is used to create paths in both s3/local file system
+      # to maintain consistency in paths between s3/local fs, we need to make sure the polymorphism is resolved
+      # before we write to any paths, remote or otherwise 
+      set_asset_type 
       type_s = self.type
       type_s ||= self.class.to_s
       type_s.split("::").second.pluralize.downcase
     end
 
     def set_asset_type
+      return if self.destroyed? # can't update attrs on destroyed/deleted objects
       raise ArgumentError, 'Asset content_type cannot be nil' if self.content_type.nil?
+      
       case self.content_type.split('/').first
       when 'image'
         self.type = 'Herd::Image'
@@ -42,7 +62,7 @@ module Herd
 
     def become_asset_type
       file = nil
-      sub = becomes(type.constantize)
+      sub = becomes(self.type.constantize)
       sub.did_identify_type
       sub.meta[:frame_count] = self.frame_count unless self.frame_count.nil?
       sub.save    
@@ -54,11 +74,7 @@ module Herd
       raise NotImplementedError, "implement me in a subclass bae"
     end
 
-    def file_ext
-      raise NotImplementedError, "implement me in a submodule bae"
-    end
-
-    def file_name_wo_ext
+    def base_path
       raise NotImplementedError, "implement me in a submodule bae"
     end
 

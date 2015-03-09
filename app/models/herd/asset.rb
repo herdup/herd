@@ -1,7 +1,10 @@
 module Herd
   class Asset < ActiveRecord::Base
-    include Fileable
-    # include S3Fileable
+    if Rails.application.secrets.herd_s3_enabled
+      include S3Fileable
+    else
+      include Fileable
+    end
 
     attr_accessor :frame_count
     attr_accessor :jid
@@ -37,16 +40,10 @@ module Herd
       end
     }
 
-    after_save -> {
-      save_file if @file.present?
-    }
-
     after_create -> {
       generate if child? and transform.present? and !@file.present?
       assetable.try :touch
     }
-
-    after_destroy :delete_file
 
     delegate :width, to: :meta_struct
     delegate :height, to: :meta_struct
@@ -67,19 +64,6 @@ module Herd
     def generate!
       TransformWorker.new.perform id, transform.options
       reload
-    end
-
-    def reset
-      delete_file
-
-      hash = {
-        file_name: nil,
-        file_size: nil,
-        content_type: nil,
-        meta: nil
-      }
-
-      update_attributes hash
     end
 
     def child_with_transform(transform)
