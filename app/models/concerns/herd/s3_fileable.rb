@@ -15,10 +15,11 @@ module Herd
         alias_method :old_delete, :delete
         def delete
           if @local_tempfile && @local_tempfile.is_a?(Tempfile)
+            path = @local_tempfile.path
             @local_tempfile.close
             @local_tempfile.unlink
             # force removal of file since the above commands leave it hanging for the duration of the thread/process
-            FileUtils.rm_f @local_tempfile.path
+            FileUtils.rm_f path
           end
           old_delete
         end
