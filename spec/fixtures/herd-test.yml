@@ -1,13 +1,17 @@
 ---
 transforms:
-- type: Herd::Transform::Magick
-  assetable_type: Post
-  name: test.hole
-  options:
-    resize: 350x
-- type: Herd::Transform::Magick
-  assetable_type: Post
-  name: test.rotated
-  options:
-    rotate: 90>
-defaults: []
+  Post:
+    test.hole:
+      Magick:
+        options:
+          resize: 350x
+    test.holey:
+      Ffmpeg:
+        options:
+          resize: 350x
+  Herd::Page:
+    hole.2:
+      Magick:
+        options:
+          crop: 200x200+150+0
+defaults: {}

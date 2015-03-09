@@ -37,7 +37,7 @@ module Herd
     end
 
     def sanitized_classname
-      # since this method is used to create paths in both s3/local file system
+      # since this method is used to create paths in both s3/local file systems
       # to maintain consistency in paths between s3/local fs, we need to make sure the polymorphism is resolved
       # before we write to any paths, remote or otherwise 
       set_asset_type 

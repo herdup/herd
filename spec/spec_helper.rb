@@ -18,8 +18,12 @@ ActiveRecord::Migration.maintain_test_schema!
 RSpec.configure do |config|
   config.before(:each) do
     Sidekiq::Worker.clear_all
-    FileUtils.rm_rf File.join(Rails.root, 'public', 'uploads')
-
+    if Rails.application.secrets.herd_s3_enabled
+      # clear out our tests
+      AWS::S3.new.buckets[Rails.application.secrets.herd_s3_bucket].clear!
+    else
+      FileUtils.rm_rf File.join(Rails.root, 'public', 'uploads')
+    end
   end
   # ## Mock Framework
   #

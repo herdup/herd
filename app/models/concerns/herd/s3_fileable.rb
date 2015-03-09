@@ -10,6 +10,8 @@ module Herd
       AWS::S3::S3Object.class_eval do
         attr_accessor :local_tempfile
 
+        # we add this to the s3 object since we need to abstract access to local files
+        # for herd to be able to perform transforms -- this is where we keep a reference to it for those purposes
         def local_tempfile
           return @local_tempfile unless @local_tempfile.nil?
           @local_tempfile = Tempfile.open('tmp', Dir::Tmpname.tmpdir) do |file|
@@ -44,7 +46,14 @@ module Herd
         value, content_type = value_and_content_type.shift 2
         # interface for writing/deleting remote files
         if value.nil?
-          # delete from s3
+          # delete from s3 and locally (if necessary)
+          if self[key].local_tempfile.is_a? Tempfile
+            self[key].local_tempfile.try :close
+            self[key].local_tempfile.try :unlink
+            # force removal of file since the above commands leave it hanging for the duration of the thread/process
+            FileUtils.rm_f self[key].local_tempfile.path
+          end
+          # remove the actual s3 object finally
           self[key].delete
           @obj_cache.delete key
         elsif value.class.in? [File, Tempfile]
@@ -66,35 +75,59 @@ module Herd
     def base_path
       # we need the asset type before we can write to s3
       # this is different from regular fileable because here we write the file first
-      @base_path ||= [Apartment::Tenant.current, Rails.env, sanitized_classname, fileable_directory_fields.join("/"), self.file_name].join("/")
+      [Rails.application.secrets.current_tenant, Rails.env, sanitized_classname, fileable_directory_fields.join("/"), self.file_name].join("/")
     end
 
     def file_path
       # check if local file exists and return that otherwise download the file 
-      path = bucket[base_path].local_tempfile.try :path
+      path = bucket[base_path].local_tempfile.try(:path).presence || ""
     end
 
     def file_url
       self.meta[:read_url]
     end
     
-    def copy_file(remote_path)
-      # download the file first if this is a remote path so we can do our asset type magic
-      local_tempfile = open(remote_path)
-      self.file_name  = file_name_from_url remote_path
-      self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(local_tempfile.path).split(';').first.to_s
-      
+    def copy_file(input_file)
+      case input_file
+      when String
+        # download the file first if this is a remote path so we can do our asset type magic
+        self.meta[:content_url] = strip_query_string input_file
+        self.file = open input_file
+        self.file_name  = file_name_from_url input_file
+      when Pathname
+        self.file = input_file.open
+        self.file_name = input_file.basename.to_s 
+      when ActionDispatch::Http::UploadedFile
+        self.file_name = input_file.original_filename
+      when File
+        self.file_name = File.basename(input_file.path)
+      end
+
+      self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(self.file.path).split(';').first.to_s
+
+      # check if this file exists in s3 at this base_path, and change the path accordingly with an index suffix
+      if master? and new_record?
+        ix = 0
+        o_file_name_wo_ext = file_name_wo_ext
+        while bucket[base_path].exists? do
+          ix += 1
+          self.file_name = "#{o_file_name_wo_ext}-#{ix}.#{file_ext}"
+        end
+      end
+
       # now write to the bucket since we have all the prerequisite information (content/asset type mainly)
-      bucket[base_path] = local_tempfile, self.content_type
+      bucket[base_path] = self.file, self.content_type
 
       # final bits of meta once we've successfully copied to s3
-      self.meta[:content_url] = strip_query_string @file
-      self.meta[:read_url] = strip_query_string bucket[base_path].url_for(:read).to_s
       self.file_size = bucket[base_path].local_tempfile.size
-      set_asset_type
+
+      # read url is the newly uploaded bucket url -- used in file_url for cdn origin downloading purposes
+      self.meta[:read_url] = strip_query_string bucket[base_path].url_for(:read).to_s
     end
 
     def save_file
+      # already saved because of a slightly different s3 flow
+      # so just become the new type and we're good
       become_asset_type
     end
 

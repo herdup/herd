@@ -68,7 +68,7 @@ module Herd
           request.run
 
           self.file = File.open download_file.path
-          self.file_name = URI.unescape(File.basename(URI.parse(input_file).path))
+          self.file_name = file_name_from_url input_file
         end
       when Pathname
         raise "no file found #{self.file}" unless input_file.exist?
@@ -80,8 +80,7 @@ module Herd
         self.file_name = File.basename(input_file.path)
       end
 
-      self.file_size = file.size
-      self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(file.path).split(';').first.to_s
+      self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(self.file.path).split(';').first.to_s
 
       if master? and new_record?
         ix = 0
@@ -92,6 +91,7 @@ module Herd
         end
       end
 
+      self.file_size = file.size
     end
 
     def save_file
