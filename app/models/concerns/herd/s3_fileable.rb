@@ -8,10 +8,21 @@ module Herd
       end
 
       AWS::S3::S3Object.class_eval do
-        attr_accessor :local_tempfile
-
         # we add this to the s3 object since we need to abstract access to local files
         # for herd to be able to perform transforms -- this is where we keep a reference to it for those purposes
+        attr_accessor :local_tempfile
+
+        alias_method :old_delete, :delete
+        def delete
+          if @local_tempfile && @local_tempfile.is_a?(Tempfile)
+            @local_tempfile.close
+            @local_tempfile.unlink
+            # force removal of file since the above commands leave it hanging for the duration of the thread/process
+            FileUtils.rm_f @local_tempfile.path
+          end
+          old_delete
+        end
+
         def local_tempfile
           return @local_tempfile unless @local_tempfile.nil?
           @local_tempfile = Tempfile.open('tmp', Dir::Tmpname.tmpdir) do |file|
@@ -19,6 +30,7 @@ module Herd
             self.read do |chunk|
               file.write(chunk)
             end
+            file
           end
         end
       end
@@ -46,15 +58,8 @@ module Herd
         value, content_type = value_and_content_type.shift 2
         # interface for writing/deleting remote files
         if value.nil?
-          # delete from s3 and locally (if necessary)
-          if self[key].local_tempfile.is_a? Tempfile
-            self[key].local_tempfile.try :close
-            self[key].local_tempfile.try :unlink
-            # force removal of file since the above commands leave it hanging for the duration of the thread/process
-            FileUtils.rm_f self[key].local_tempfile.path
-          end
-          # remove the actual s3 object finally
-          self[key].delete
+          obj = self[key]
+          obj.delete
           @obj_cache.delete key
         elsif value.class.in? [File, Tempfile]
           write_url = self[key].url_for(:write, content_type: content_type).to_s
@@ -80,7 +85,7 @@ module Herd
 
     def file_path
       # check if local file exists and return that otherwise download the file 
-      path = bucket[base_path].local_tempfile.try(:path).presence || ""
+      bucket[base_path].local_tempfile.try(:path).presence || ""
     end
 
     def file_url

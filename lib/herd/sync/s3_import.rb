@@ -15,8 +15,12 @@ module Herd
       def import_s3(prefix=nil, s3_key=ENV['AWS_ACCESS_KEY_ID'], s3_secret=ENV['AWS_SECRET_ACCESS_KEY'])
         assets = []
         # you can update the timeouts (with seconds)
-        AWS.config(:http_open_timeout => 25, :http_read_timeout => 120)
+
         s3 = AWS::S3.new
+        # clear out our old assets
+        s3.buckets[Rails.application.secrets.herd_s3_bucket].clear! if Rails.application.secrets.herd_s3_enabled
+
+        AWS.config(:http_open_timeout => 25, :http_read_timeout => 120)
 
         objects = s3.buckets[bucket].objects
         objects = objects.with_prefix(prefix) if prefix
