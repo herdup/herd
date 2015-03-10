@@ -59,8 +59,7 @@ module Herd
         value, content_type = value_and_content_type.shift 2
         # interface for writing/deleting remote files
         if value.nil?
-          obj = self[key]
-          obj.delete
+          self[key].delete
           @obj_cache.delete key
         elsif value.class.in? [File, Tempfile]
           write_url = self[key].url_for(:write, content_type: content_type).to_s
