@@ -14,14 +14,16 @@ module Herd
 
         alias_method :old_delete, :delete
         def delete
-          if @local_tmpfile && @local_tmpfile.is_a?(Tempfile)
-            path = @local_tmpfile.path
-            @local_tmpfile.close
-            @local_tmpfile.unlink
-            # force removal of file since the above commands leave it hanging for the duration of the thread/process
-            FileUtils.rm_f path
+          if self.exists?
+            if @local_tmpfile && @local_tmpfile.is_a?(Tempfile)
+              path = @local_tmpfile.path
+              @local_tmpfile.close
+              @local_tmpfile.unlink
+              # force removal of file since the above commands leave it hanging for the duration of the thread/process
+              FileUtils.rm_f path
+            end
+            old_delete
           end
-          old_delete
         end
 
         def local_tmpfile
@@ -94,38 +96,16 @@ module Herd
     def file_url
       self.meta[:read_url]
     end
+
+    def prepare_remote_file(input_file)
+      # download the file first if this is a remote path so we can do our asset type magic
+      input_file = input_file.to_s
+      self.meta[:content_url] = strip_query_string input_file
+      self.file = open input_file
+      self.file_name  = file_name_from_url input_file
+    end
     
-    def copy_file(input_file)
-      case input_file
-      when String
-        if File.file? input_file
-          self.file = File.open input_file
-          self.file_name = File.basename input_file
-        elsif input_file =~ /\%d/ and first = sprintf(input_file, 1) and File.file? first
-          count = 1
-          while File.file? sprintf(input_file, count)
-            count += 1
-          end
-          self.file = File.open first
-          self.file_name = File.basename first
-          self.frame_count = count
-        else
-          # download the file first if this is a remote path so we can do our asset type magic
-          self.meta[:content_url] = strip_query_string input_file
-          self.file = open input_file
-          self.file_name  = file_name_from_url input_file
-        end
-      when Pathname
-        self.file = input_file.open
-        self.file_name = input_file.basename.to_s 
-      when ActionDispatch::Http::UploadedFile
-        self.file_name = input_file.original_filename
-      when File
-        self.file_name = File.basename(input_file.path)
-      end
-
-      self.content_type = get_content_type_for_file self.file
-
+    def finalize_file
       # check if this file exists in s3 at this base_path, and change the path accordingly with an index suffix
       if master? and new_record?
         ix = 0

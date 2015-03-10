@@ -35,8 +35,8 @@ module Herd
 
       if file.present? # reupload
         delete_file if file_name.present?
-        @file = @file.to_s if @file.kind_of? URI::HTTPS
-        copy_file @file
+        prepare_file @file
+        copy_remote_file @file if @file.kind_of? URI::HTTPS
       end
     }
 
@@ -99,6 +99,5 @@ module Herd
     def child?
       !master?
     end
-
   end
 end

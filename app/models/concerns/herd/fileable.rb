@@ -25,63 +25,40 @@ module Herd
       end
     end
 
-    def copy_file(input_file)
-      case input_file
-      when String
-        if File.file? input_file
-          self.file = File.open input_file
-          self.file_name = File.basename input_file
-        #TODO: make this work with non-1 starting shnitzeldorfs
-        elsif input_file =~ /\%d/ and first = sprintf(input_file, 1) and File.file? first
-          count = 1
-          while File.file? sprintf(input_file, count)
-            count += 1
-          end
-          self.file = File.open first
-          self.file_name = File.basename first
-          self.frame_count = count
-        else
-          self.meta[:content_url] = strip_query_string input_file
-          
-          download_file = File.open unique_tmppath,'wb'
-          request = Typhoeus::Request.new input_file, followlocation: true
-          request.on_headers do |response|
-            effective_url = strip_query_string response.effective_url
-            self.meta[:effective_url] = effective_url if effective_url != self.meta[:content_url]
+    def prepare_remote_file(input_file)
+      input_file = input_file.to_s
+      self.meta[:content_url] = strip_query_string input_file
+      
+      download_file = File.open(unique_tmppath, 'wb')
 
-            self.file_name = file_name_from_url response.effective_url
+      request = Typhoeus::Request.new input_file, followlocation: true
 
-            if len = response.headers['Content-Length'].try(:to_i)
-              @pbar = ProgressBar.new self.file_name, len
-              @pbar.file_transfer_mode
-            end
-          end
-
-          request.on_body do |chunk|
-            download_file.write(chunk)
-            @pbar.inc chunk.size if @pbar
-          end
-
-          request.on_complete do |response|
-            download_file.close
-          end
-
-          request.run
-
-          self.file = File.open download_file.path
-          self.file_name = file_name_from_url input_file
+      request.on_headers do |response|
+        effective_url = strip_query_string response.effective_url
+        self.meta[:effective_url] = effective_url if effective_url != self.meta[:content_url]
+        self.file_name = file_name_from_url response.effective_url
+        if len = response.headers['Content-Length'].try(:to_i)
+          @pbar = ProgressBar.new self.file_name, len
+          @pbar.file_transfer_mode
         end
-      when Pathname
-        self.file = input_file.open
-        self.file_name = input_file.basename.to_s
-      when ActionDispatch::Http::UploadedFile
-        self.file_name = input_file.original_filename
-      when File
-        self.file_name = File.basename(input_file.path)
       end
 
-      self.content_type = get_content_type_for_file self.file
+      request.on_body do |chunk|
+        download_file.write(chunk)
+        @pbar.inc chunk.size if @pbar
+      end
 
+      request.on_complete do |response|
+        download_file.close
+      end
+
+      request.run
+
+      self.file = File.open download_file.path
+      self.file_name = file_name_from_url input_file
+    end
+
+    def finalize_file
       if master? and new_record?
         ix = 0
         o_file_name_wo_ext = file_name_wo_ext

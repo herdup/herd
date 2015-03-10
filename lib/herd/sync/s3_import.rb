@@ -14,12 +14,9 @@ module Herd
 
       def import_s3(prefix=nil, s3_key=ENV['AWS_ACCESS_KEY_ID'], s3_secret=ENV['AWS_SECRET_ACCESS_KEY'])
         assets = []
-        # you can update the timeouts (with seconds)
-
         s3 = AWS::S3.new
-        # clear out our old assets
-        s3.buckets[Rails.application.secrets.herd_s3_bucket].clear! if Rails.application.secrets.herd_s3_enabled
 
+        # you can update the timeouts (with seconds)
         AWS.config(:http_open_timeout => 25, :http_read_timeout => 120)
 
         objects = s3.buckets[bucket].objects
@@ -32,22 +29,14 @@ module Herd
           next unless accept_extensions.include? File.extname(remote_path).downcase
 
           parts = remote_path.split '/'
-
-          begin
-           parts.first.classify.constantize
-          rescue NameError
-           parts.shift
-          end
+          parts.first.classify.constantize rescue parts.shift
 
           asset_file = parts.pop
           assetable_slug = parts.pop
           assetable_path = Rails.root.join 'tmp', 'import', *parts, assetable_slug
-          asset_path = o.url_for(:read).to_s
+          asset_path = o.url_for :read
 
-          begin
-           klass = class_from_path parts.join '/'
-          rescue Exception => e
-          end
+          klass = class_from_path parts.join '/' rescue nil
 
           next unless klass
 
@@ -72,19 +61,19 @@ module Herd
             end
           end
 
-
           if found = object.assets.master.find_by("file_name like ?","%#{File.basename(remote_path,'.*')}%")
             if o.content_length == found.file_size
-              #puts "linked this file is #{asset_path} \n exist: #{found} and same size: #{found.file_size}"
+              puts "linked this file is #{asset_path} \n exist: #{found} and same size: #{found.file_size}"
             else
-              puts "updaing file with #{asset_path}"
+              puts "updating file with #{asset_path.to_s}"
               found.update file: asset_path
               assets << found
             end
           else
-            assets << object.assets.create(file: asset_path.to_s)
+            assets << object.assets.create(file: asset_path)
           end
         end
+
         # ap assets
       end
     end

@@ -46,6 +46,36 @@ module Herd
       type_s.split("::").second.pluralize.downcase
     end
 
+    def prepare_file(input_file)
+      case input_file
+      when String
+        if File.file? input_file
+          self.file = File.open input_file
+          self.file_name = File.basename input_file
+        elsif input_file =~ /\%d/ and first = sprintf(input_file, 1) and File.file? first
+          count = 1
+          while File.file? sprintf(input_file, count)
+            count += 1
+          end
+          self.file = File.open first
+          self.file_name = File.basename first
+          self.frame_count = count
+        end
+      when URI
+        prepare_remote_file input_file
+      when Pathname
+        self.file = input_file.open
+        self.file_name = input_file.basename.to_s
+      when ActionDispatch::Http::UploadedFile
+        self.file_name = input_file.original_filename
+      when File
+        self.file_name = File.basename(input_file.path)
+      end
+
+      self.content_type = get_content_type_for_file self.file
+      finalize_file
+    end
+
     def set_asset_type
       return if self.destroyed? # can't update attrs on destroyed/deleted objects
       raise ArgumentError, 'Asset content_type cannot be nil' if self.content_type.nil?
@@ -90,7 +120,11 @@ module Herd
       raise NotImplementedError, unimplemented_in_module_error_str
     end
 
-    def copy_file(file_or_url)
+    def prepare_remote_file(url_object)
+      raise NotImplementedError, unimplemented_in_module_error_str
+    end
+
+    def finalize_file
       raise NotImplementedError, unimplemented_in_module_error_str
     end
 
