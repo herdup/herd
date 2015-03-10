@@ -32,7 +32,7 @@ module Herd
       url.to_s
     end
 
-    def unique_tmp_path(ext=nil)
+    def unique_tmppath(ext=nil)
       Dir::Tmpname.tmpdir + "/" + "#{file_name_wo_ext}.#{file_ext}"
     end
 

@@ -42,7 +42,7 @@ module Herd
           self.frame_count = count
         else
           self.meta[:content_url] = strip_query_string input_file
-          download_file = File.open unique_tmp_path,'wb'
+          download_file = File.open unique_tmppath,'wb'
           request = Typhoeus::Request.new input_file, followlocation: true
           request.on_headers do |response|
             effective_url = strip_query_string response.effective_url

@@ -10,23 +10,23 @@ module Herd
       AWS::S3::S3Object.class_eval do
         # we add this to the s3 object since we need to abstract access to local files
         # for herd to be able to perform transforms -- this is where we keep a reference to it for those purposes
-        attr_accessor :local_tempfile
+        attr_accessor :local_tmpfile
 
         alias_method :old_delete, :delete
         def delete
-          if @local_tempfile && @local_tempfile.is_a?(Tempfile)
-            path = @local_tempfile.path
-            @local_tempfile.close
-            @local_tempfile.unlink
+          if @local_tmpfile && @local_tmpfile.is_a?(Tempfile)
+            path = @local_tmpfile.path
+            @local_tmpfile.close
+            @local_tmpfile.unlink
             # force removal of file since the above commands leave it hanging for the duration of the thread/process
             FileUtils.rm_f path
           end
           old_delete
         end
 
-        def local_tempfile
-          return @local_tempfile unless @local_tempfile.nil?
-          @local_tempfile = Tempfile.open('tmp', Dir::Tmpname.tmpdir) do |file|
+        def local_tmpfile
+          return @local_tmpfile unless @local_tmpfile.nil?
+          @local_tmpfile = Tempfile.open('tmp', Dir::Tmpname.tmpdir) do |file|
             file.binmode
             self.read do |chunk|
               file.write(chunk)
@@ -42,9 +42,9 @@ module Herd
         @obj_cache = {}
       end
 
-      def set_obj_cache(key, local_tempfile=nil)
+      def set_obj_cache(key, local_tmpfile=nil)
         obj = @s3.buckets[@bucket_name].objects[key]
-        obj.local_tempfile = local_tempfile unless local_tempfile.nil?
+        obj.local_tmpfile = local_tmpfile unless local_tmpfile.nil?
         @obj_cache[key] = obj
       end
       
@@ -88,7 +88,7 @@ module Herd
 
     def file_path
       # check if local file exists and return that otherwise download the file 
-      bucket[base_path].local_tempfile.try(:path).presence || ""
+      bucket[base_path].local_tmpfile.try(:path).presence || ""
     end
 
     def file_url
@@ -127,7 +127,7 @@ module Herd
       bucket[base_path] = self.file, self.content_type
 
       # final bits of meta once we've successfully copied to s3
-      self.file_size = bucket[base_path].local_tempfile.size
+      self.file_size = bucket[base_path].local_tmpfile.size
 
       # read url is the newly uploaded bucket url -- used in file_url for cdn origin downloading purposes
       self.meta[:read_url] = strip_query_string bucket[base_path].url_for(:read).to_s
