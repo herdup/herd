@@ -71,31 +71,31 @@ module Herd
     # define interface methods
 
     def did_identify_type
-      raise NotImplementedError, "implement me in a subclass bae"
+      raise NotImplementedError, unimplemented_in_class_error_str
     end
 
     def base_path
-      raise NotImplementedError, "implement me in a submodule bae"
+      raise NotImplementedError, unimplemented_in_module_error_str
     end
 
     def file_path
-      raise NotImplementedError, "implement me in a submodule bae"
+      raise NotImplementedError, unimplemented_in_module_error_str
     end
 
     def file_url
-      raise NotImplementedError, "implement me in a submodule bae"
+      raise NotImplementedError, unimplemented_in_module_error_str
     end
 
     def copy_file(file_or_url)
-      raise NotImplementedError, "implement me in a submodule bae"
+      raise NotImplementedError, unimplemented_in_module_error_str
     end
 
     def save_file
-      raise NotImplementedError, "implement me in a submodule bae"
+      raise NotImplementedError, unimplemented_in_module_error_str
     end
 
     def delete_file
-      raise NotImplementedError, "implement me in a submodule bae"
+      raise NotImplementedError, unimplemented_in_module_error_str
     end
 
     module ClassMethods
@@ -114,6 +114,15 @@ module Herd
           end
         end
       end
+    end
+
+    private 
+    def unimplemented_in_class_error_str
+      "This method must be implemented in a subclass of Herd:Asset"
+    end
+
+    def unimplemented_in_module_error_str
+      "This method must be implemented to conform to the common fileable interface"
     end
   end
 end
