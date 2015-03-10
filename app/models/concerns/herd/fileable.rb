@@ -29,19 +29,20 @@ module Herd
       case input_file
       when String
         if File.file? input_file
-          self.file = File.open(input_file)
-          self.file_name = File.basename(input_file)
+          self.file = File.open input_file
+          self.file_name = File.basename input_file
         #TODO: make this work with non-1 starting shnitzeldorfs
         elsif input_file =~ /\%d/ and first = sprintf(input_file, 1) and File.file? first
           count = 1
-          while File.file? sprintf(input_file,count)
+          while File.file? sprintf(input_file, count)
             count += 1
           end
-          self.file = File.open(first)
-          self.file_name = File.basename(first)
+          self.file = File.open first
+          self.file_name = File.basename first
           self.frame_count = count
         else
           self.meta[:content_url] = strip_query_string input_file
+          
           download_file = File.open unique_tmppath,'wb'
           request = Typhoeus::Request.new input_file, followlocation: true
           request.on_headers do |response|
@@ -71,7 +72,6 @@ module Herd
           self.file_name = file_name_from_url input_file
         end
       when Pathname
-        raise "no file found #{self.file}" unless input_file.exist?
         self.file = input_file.open
         self.file_name = input_file.basename.to_s
       when ActionDispatch::Http::UploadedFile
@@ -80,7 +80,7 @@ module Herd
         self.file_name = File.basename(input_file.path)
       end
 
-      self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(self.file.path).split(';').first.to_s
+      self.content_type = get_content_type_for_file self.file
 
       if master? and new_record?
         ix = 0

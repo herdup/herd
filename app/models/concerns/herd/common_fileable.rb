@@ -68,6 +68,10 @@ module Herd
       sub.save    
     end
 
+    def get_content_type_for_file(file)
+      FileMagic.new(FileMagic::MAGIC_MIME).file(file.path).split(';').first.to_s
+    end
+
     # define interface methods
 
     def did_identify_type

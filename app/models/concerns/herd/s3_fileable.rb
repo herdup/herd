@@ -98,10 +98,23 @@ module Herd
     def copy_file(input_file)
       case input_file
       when String
-        # download the file first if this is a remote path so we can do our asset type magic
-        self.meta[:content_url] = strip_query_string input_file
-        self.file = open input_file
-        self.file_name  = file_name_from_url input_file
+        if File.file? input_file
+          self.file = File.open input_file
+          self.file_name = File.basename input_file
+        elsif input_file =~ /\%d/ and first = sprintf(input_file, 1) and File.file? first
+          count = 1
+          while File.file? sprintf(input_file, count)
+            count += 1
+          end
+          self.file = File.open first
+          self.file_name = File.basename first
+          self.frame_count = count
+        else
+          # download the file first if this is a remote path so we can do our asset type magic
+          self.meta[:content_url] = strip_query_string input_file
+          self.file = open input_file
+          self.file_name  = file_name_from_url input_file
+        end
       when Pathname
         self.file = input_file.open
         self.file_name = input_file.basename.to_s 
@@ -111,7 +124,7 @@ module Herd
         self.file_name = File.basename(input_file.path)
       end
 
-      self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(self.file.path).split(';').first.to_s
+      self.content_type = get_content_type_for_file self.file
 
       # check if this file exists in s3 at this base_path, and change the path accordingly with an index suffix
       if master? and new_record?
