@@ -1,26 +1,22 @@
 module Herd
   class Asset < ActiveRecord::Base
-    include Fileable
+    if Rails.application.secrets.herd_s3_enabled
+      include S3Fileable
+    else
+      include Fileable
+    end
 
-    attr_accessor :file
-    file_field :file_name
-    # validates_presence_of :file_name
     attr_accessor :frame_count
-
-    attr_accessor :delete_original
-
     attr_accessor :jid
-    attr_accessor :generate_sync
 
     scope :master, -> {where(parent_asset_id: nil)}
     scope :child, -> {where.not(parent_asset_id: nil)}
 
     belongs_to :assetable, polymorphic: true
-
     belongs_to :transform
-    has_many :child_transforms, through: :child_assets, source: :transform
-
     belongs_to :parent_asset, class_name: 'Asset'
+
+    has_many :child_transforms, through: :child_assets, source: :transform
     has_many :child_assets, class_name: 'Asset',
                             dependent: :destroy,
                             foreign_key: :parent_asset_id
@@ -38,21 +34,16 @@ module Herd
       self.assetable_id ||= parent_asset.try :assetable_id
 
       if file.present? # reupload
-        cleanup_file if file_name.present?
-        prepare_file
+        delete_file if file_name.present?
+        prepare_file @file
+        copy_remote_file @file if @file.kind_of? URI::HTTPS
       end
     }
 
-    after_save -> {
-      save_file if @file.present?
-    }
     after_create -> {
       generate if child? and transform.present? and !@file.present?
-
       assetable.try :touch
     }
-
-    after_destroy :cleanup_file
 
     delegate :width, to: :meta_struct
     delegate :height, to: :meta_struct
@@ -63,38 +54,23 @@ module Herd
     end
 
     def generate(async=nil)
-      #puts "async #{async} herd: #{ENV['HERD_LIVE_ASSETS']} transform.async #{transform.try(:async)}"
       if async || ENV['HERD_LIVE_ASSETS'] == '1' || transform.try(:async)
-        self.jid = TransformWorker.perform_async(id, transform.options)
+        self.jid = TransformWorker.perform_async id, transform.options
       else
         generate!
       end
     end
 
     def generate!
-      TransformWorker.new.perform(id, transform.options)
+      TransformWorker.new.perform id, transform.options
       reload
-    end
-
-    def reset
-      cleanup_file
-
-      hash = {
-        file_name: nil,
-        file_size: nil,
-        content_type: nil,
-        meta: nil
-      }
-
-      update_attributes hash
     end
 
     def child_with_transform(transform)
       # first_or_create will generate a child_asset who's parent_asset is inaccessible
       # because it's tainted with the transform_id: transform.id scope for some reason
-      hash = {parent_asset:self, transform:transform}
+      hash = { parent_asset: self, transform: transform }
       child = Asset.where(hash).take || Asset.create(hash)
-
       child.becomes(type.constantize) rescue child
     end
 
@@ -107,125 +83,9 @@ module Herd
 
     def n(name, transform_string=nil, async=nil)
       return unless id
-      trans = computed_class.default_transform.find_by(name:name) unless name.nil?
+      trans = computed_class.default_transform.find_by(name: name) unless name.nil?
       child = child_with_transform(trans) if trans
       return child || t(transform_string, name, async)
-    end
-
-    def prepare_file
-      @file = @file.to_s if @file.kind_of? URI::HTTPS
-      puts @file
-
-      case @file
-      when String
-        if File.file? file
-          self.file_name = File.basename(@file)
-          self.file = File.open(@file)
-
-        #TODO: make this work with non-1 starting shnitzeldorfs
-        elsif file =~ /\%d/ and first = sprintf(file, 1) and File.file? first
-          self.file_name = File.basename(first)
-          count = 1
-          while File.file? sprintf(file,count)
-            count += 1
-          end
-          self.frame_count = count
-          self.file = File.open(first)
-        else
-          self.file_name = URI.unescape(File.basename(URI.parse(@file).path))
-          self.meta[:content_url] = @file
-
-          download_file = File.open unique_tmppath,'wb'
-          request = Typhoeus::Request.new(@file,followlocation: true)
-          request.on_headers do |response|
-
-            if response.effective_url != self.meta[:content_url]
-              self.meta[:effective_url] = response.effective_url
-            end
-
-            self.file_name = URI.unescape(File.basename(URI.parse(response.effective_url).path))
-
-            if len = response.headers['Content-Length'].try(:to_i)
-              @pbar = ProgressBar.new self.file_name, len
-              @pbar.file_transfer_mode
-            end
-          end
-          request.on_body do |chunk|
-            download_file.write(chunk)
-            @pbar.inc chunk.size if @pbar
-          end
-          request.on_complete do |response|
-            download_file.close
-          end
-          request.run
-
-          self.file = File.open download_file.path
-          # testme
-        end
-      when Pathname
-        # test me
-        raise "no file found #{self.file}" unless @file.exist?
-        self.file_name = @file.basename.to_s
-        self.file = @file.open
-      when ActionDispatch::Http::UploadedFile
-        self.file_name = @file.original_filename
-        self.content_type = @file.content_type.to_s
-      when File
-        self.file_name = File.basename(@file.path)
-      end
-
-      raise "no file, possibly bad url #{@file}" unless @file.try(:size)
-
-      # test me
-      self.file_size = @file.size
-      # tested png
-      self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(@file.path).split(';').first.to_s
-      # tested image / video
-
-      # should class itself try and figure this out?
-      mime_parts = content_type.split('/')
-      case mime_parts.first
-      when 'image'
-        self.type = 'Herd::Image'
-      when 'video'
-        self.type = 'Herd::Video'
-      when 'audio'
-        self.type = 'Herd::Audio'
-      end
-
-      if master? and new_record? # tested
-        o_file_name_wo_ext = file_name_wo_ext
-        ix = 0
-        while File.exist? file_path do
-          ix += 1
-          self.file_name = "#{o_file_name_wo_ext}-#{ix}.#{file_ext}"
-        end
-      end
-    end
-
-    def save_file
-      File.open(file_path(true), "wb") { |f| f.write(file.read) }
-
-      if self.frame_count
-        FileUtils.cp_r "#{File.dirname(file.path)}/.", File.dirname(file_path(true))
-        FileUtils.rm_rf File.dirname(file.path) if delete_original || file.path.match(Dir.tmpdir)
-      else
-        FileUtils.rm file.path if delete_original || file.path.match(Dir.tmpdir)
-      end
-
-
-      @file = nil
-      sub = becomes(type.constantize)
-
-      # ugly callback -- should ideally be automatically chained
-      # the problem is due to the type change that happened above
-      sub.did_identify_type
-      sub.meta[:frame_count] = self.frame_count
-      sub.save #if changed?
-    end
-
-    def did_identify_type
-      puts "subclass me bae"
     end
 
     def computed_class
@@ -235,9 +95,9 @@ module Herd
     def master?
       parent_asset_id.nil?
     end
+    
     def child?
       !master?
     end
   end
-
 end

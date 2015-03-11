@@ -14,37 +14,39 @@
 ActiveRecord::Schema.define(version: 20140820225744) do
 
   create_table "herd_assets", force: true do |t|
-    t.string   "file_name"
+    t.string   "file_name",       limit: nil
     t.integer  "file_size"
-    t.string   "content_type"
-    t.string   "type"
+    t.string   "content_type",    limit: nil
+    t.string   "type",            limit: nil
     t.text     "meta"
     t.integer  "parent_asset_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "transform_id"
     t.integer  "assetable_id"
-    t.string   "assetable_type"
+    t.string   "assetable_type",  limit: nil
     t.integer  "position"
   end
 
+  add_index "herd_assets", ["parent_asset_id"], name: "index_herd_assets_on_parent_asset_id"
+
   create_table "herd_pages", force: true do |t|
-    t.string   "path"
+    t.string   "path",       limit: nil
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "herd_transforms", force: true do |t|
-    t.string   "type"
+    t.string   "type",           limit: nil
     t.text     "options"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "assetable_type"
-    t.string   "name"
+    t.string   "assetable_type", limit: nil
+    t.string   "name",           limit: nil
   end
 
   create_table "posts", force: true do |t|
-    t.string   "title"
+    t.string   "title",      limit: nil
     t.text     "body"
     t.datetime "created_at"
     t.datetime "updated_at"
