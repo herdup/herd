@@ -5,7 +5,7 @@ module Herd
       def initialize(bucket, prefix='', output_assets=true, s3_key=ENV['AWS_ACCESS_KEY_ID'], s3_secret=ENV['AWS_SECRET_ACCESS_KEY'])
         @bucket = bucket
         @prefix = prefix
-        @output_assets = true
+        @output_assets = output_assets
         AWS.config access_key_id: s3_key, secret_access_key: s3_secret, http_open_timeout: 30, http_read_timeout: 120
       end
 
