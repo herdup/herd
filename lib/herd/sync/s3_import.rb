@@ -12,7 +12,7 @@ module Herd
         @s3 ||= AWS::S3.new
       end
 
-      def import_s3
+      def import_s3(namespace='')
         assets = []
 
         objects = s3.buckets[@bucket].objects
@@ -32,7 +32,7 @@ module Herd
           assetable_path = Rails.root.join 'tmp', 'import', *parts, assetable_slug
           asset_path = o.url_for :read
 
-          klass = class_from_path parts.join '/' rescue nil
+          klass = class_from_path parts.unshift(namespace).join '/' rescue nil
 
           next unless klass
 

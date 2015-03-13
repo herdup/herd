@@ -13,9 +13,9 @@ module Herd
         @s3 ||= AWS::S3.new
       end
 
-      def export_s3
+      def export_s3(namespace='')
         folder_map.each do |class_path, assetables|
-          klass = class_from_path class_path
+          klass = class_from_path class_path.split("/").unshift(namespace).join("/")
           if @output_assets and klass.missing.present?
             a = klass.missing
             asset_key = File.join @prefix, class_path, '_missing', File.basename(a.file_name)
