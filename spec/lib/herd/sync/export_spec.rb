@@ -53,23 +53,21 @@ describe Herd::Sync::Base do
 
     post = Post.create title: 'Test 2'
 
-    exporter = Herd::Sync::S3Export.new 'sweetgreen-seeds-development'
+    exporter = Herd::Sync::S3Export.new 'sweetgreen-seeds-development', 'herd_export_test'
     exporter.s3.buckets['sweetgreen-seeds-development'].objects.with_prefix('herd_export_test').delete_all
 
-    exporter.export_s3 'herd_export_test'
+    exporter.export_s3 
 
     expect(exporter.s3.buckets['sweetgreen-seeds-development'].objects.with_prefix('herd_export_test/').count).to be 5
 
     Herd::Asset.destroy_all
 
-
-    importer = Herd::Sync::S3Import.new 'sweetgreen-seeds-development'
-    importer.import_s3 'herd_export_test'
+    importer = Herd::Sync::S3Import.new 'sweetgreen-seeds-development', 'herd_export_test'
+    importer.import_s3
 
     expect(Post.missing_assets.count).to eq 1
     expect(Herd::Page.missing_assets.count).to eq 1
     expect(Herd::Asset.count).to eq 3
-
 
   end
 
