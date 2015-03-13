@@ -93,8 +93,14 @@ module Herd
       bucket[base_path].local_tmpfile.try(:path).presence || ""
     end
 
-    def file_url
-      self.meta[:read_url]
+    def file_url(cdn_host=ActionController::Base.asset_host.present?)
+      if cdn_host
+        # we have an asset host, which should be a cdn that is set up to read from the s3 bucket in pretty much any case
+        ActionController::Base.helpers.asset_url URI.parse(self.meta[:read_url]).path
+      else
+        # direct link to s3
+        self.meta[:read_url]
+      end
     end
 
     def prepare_remote_file(input_file)
