@@ -1,26 +1,22 @@
 module Herd
   module Sync
     class S3Import < Base
-      attr_accessor :bucket
 
-      def self.import(bucket, prefix=nil)
-        new(bucket).import_s3 prefix
-      end
-
-      def initialize(bucket)
+      def initialize(bucket, prefix='', s3_key=ENV['AWS_ACCESS_KEY_ID'], s3_secret=ENV['AWS_SECRET_ACCESS_KEY'])
         @bucket = bucket
-        accept_extensions
+        @prefix = prefix
+        AWS.config access_key_id: s3_key, secret_access_key: s3_secret, http_open_timeout: 30, http_read_timeout: 120
       end
 
-      def import_s3(prefix=nil, s3_key=ENV['AWS_ACCESS_KEY_ID'], s3_secret=ENV['AWS_SECRET_ACCESS_KEY'])
+      def s3
+        @s3 ||= AWS::S3.new
+      end
+
+      def import_s3(namespace='')
         assets = []
-        s3 = AWS::S3.new
 
-        # you can update the timeouts (with seconds)
-        AWS.config(:http_open_timeout => 25, :http_read_timeout => 120)
-
-        objects = s3.buckets[bucket].objects
-        objects = objects.with_prefix(prefix) if prefix
+        objects = s3.buckets[@bucket].objects
+        objects = objects.with_prefix(@prefix) unless @prefix.blank?
 
         objects.each do |o|
           remote_path = o.key
@@ -36,7 +32,7 @@ module Herd
           assetable_path = Rails.root.join 'tmp', 'import', *parts, assetable_slug
           asset_path = o.url_for :read
 
-          klass = class_from_path parts.join '/' rescue nil
+          klass = class_from_path parts.unshift(namespace).join '/' rescue nil
 
           next unless klass
 
@@ -73,8 +69,6 @@ module Herd
             assets << object.assets.create(file: asset_path)
           end
         end
-
-        # ap assets
       end
     end
   end

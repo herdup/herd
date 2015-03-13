@@ -11,9 +11,8 @@ describe Herd::Sync::Base do
 
   it "should import seeds from s3" do
     post = Post.create title: 'Test 1'
-
-    importer = Herd::Sync::S3Import.new 'sweetgreen-seeds-development'
-    importer.import_s3 'herd_import_test'
+    importer = Herd::Sync::S3Import.new 'sweetgreen-seeds-development', 'herd_import_test'
+    importer.import_s3
 
     expect(post.assets.count).to eq 1
   end
