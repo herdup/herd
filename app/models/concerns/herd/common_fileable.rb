@@ -78,7 +78,7 @@ module Herd
 
     def set_asset_type
       return if self.destroyed? # can't update attrs on destroyed/deleted objects
-      #raise ArgumentError, 'Asset content_type cannot be nil' if self.content_type.nil?
+      raise ArgumentError, 'Asset content_type cannot be nil' if self.content_type.nil?
       
       case self.content_type.split('/').first
       when 'image'
