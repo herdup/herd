@@ -5,5 +5,9 @@ transforms:
   name: test.hole
   options:
     resize: 350x
-    quality: 80
+- type: Herd::Transform::Magick
+  assetable_type: Post
+  name: test.rotated
+  options:
+    rotate: 90>
 defaults: []
