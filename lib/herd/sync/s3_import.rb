@@ -24,8 +24,7 @@ module Herd
           next if remote_path =~ /\.DS_Store|__MACOSX|(^|\/)\._/
           next unless accept_extensions.include? File.extname(remote_path).downcase
 
-          parts = remote_path.split '/'
-          parts.first.classify.constantize rescue parts.shift
+          parts = remote_path.split('/').drop 1 # get rid of client namespace
 
           asset_file = parts.pop
           assetable_slug = parts.pop
