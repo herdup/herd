@@ -20,7 +20,7 @@ module Herd
 
         objects = s3.buckets[bucket].objects
         objects = objects.with_prefix(prefix) if prefix
-
+        
         objects.each do |o|
           remote_path = o.key
 
@@ -42,7 +42,8 @@ module Herd
           asset_path = o.url_for(:read).to_s
 
           begin
-           klass = class_from_path parts.join '/'
+            parts -= %w(sweetgreen)
+            klass = class_from_path parts.unshift('SgApi').join '/'
           rescue Exception => e
           end
 
