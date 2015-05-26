@@ -49,7 +49,11 @@ module Herd
     after_create -> {
       generate if child? and transform.present? and !@file.present?
 
-      assetable.try :touch
+      if assetable
+        assetable.touch
+      elsif assetable_id == 0 and assetable_type.constantize
+        assetable_type.constantize.all.each(&:touch)
+      end
     }
 
     after_destroy :cleanup_file
