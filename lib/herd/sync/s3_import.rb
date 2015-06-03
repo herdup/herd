@@ -14,13 +14,12 @@ module Herd
 
       def import_s3(prefix=nil, s3_key=ENV['AWS_ACCESS_KEY_ID'], s3_secret=ENV['AWS_SECRET_ACCESS_KEY'])
         assets = []
-        # you can update the timeouts (with seconds)
-        AWS.config(:http_open_timeout => 25, :http_read_timeout => 120)
+        AWS.config(:http_open_timeout => 25, :http_read_timeout => 120, access_key_id: s3_key, secret_access_key: s3_secret)
         s3 = AWS::S3.new
 
         objects = s3.buckets[bucket].objects
         objects = objects.with_prefix(prefix) if prefix
-        
+
         objects.each do |o|
           remote_path = o.key
 
