@@ -70,7 +70,7 @@ module Herd
           puts "Uploaded to: #{key} with content type: #{content_type}"
           set_obj_cache key, value
         else
-          raise InvalidBucketValueException
+          raise InvalidBucketValueException.new value.to_s
         end
       end
     end
