@@ -64,7 +64,7 @@ module Herd
         if value.nil?
           self[key].delete
           @obj_cache.delete key
-        elsif value.class.in? [File, Tempfile, UploadedFile, ActionDispatch::Http::UploadedFile]
+        elsif value.class.in? [File, Tempfile, ActionDispatch::Http::UploadedFile]
           write_url = self[key].url_for(:write, content_type: content_type).to_s
           Typhoeus::Request.new(write_url, method: :put, body: value.read, headers: { 'content-type' => content_type }).run
           puts "Uploaded to: #{key} with content type: #{content_type}"
