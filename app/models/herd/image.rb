@@ -1,3 +1,6 @@
+require 'exifr'
+require 'mini_magick'
+
 module Herd
   class Image < Asset
 

@@ -1,3 +1,5 @@
+require 'zip'
+
 module Herd
   module Sync
     class ZipExport < Base

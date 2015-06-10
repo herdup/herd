@@ -1,3 +1,5 @@
+require 'aws-sdk-v1'
+
 module Herd
   module Sync
     class S3Export < Base

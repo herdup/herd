@@ -1,3 +1,5 @@
+require 'streamio-ffmpeg'
+
 module Herd
   class Video < Asset
     def self.default_transform

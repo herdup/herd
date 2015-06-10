@@ -140,6 +140,8 @@ module Herd
           self.meta[:content_url] = @file
 
           download_file = File.open unique_tmppath,'wb'
+          require 'typhoeus'
+
           request = Typhoeus::Request.new(@file,followlocation: true)
           request.on_headers do |response|
 
@@ -150,6 +152,7 @@ module Herd
             self.file_name = URI.unescape(File.basename(URI.parse(response.effective_url).path))
 
             if len = response.headers['Content-Length'].try(:to_i)
+              require 'progressbar'
               @pbar = ProgressBar.new self.file_name, len
               @pbar.file_transfer_mode
             end
@@ -185,7 +188,7 @@ module Herd
       # test me
       self.file_size = @file.size
       # tested png
-      self.content_type ||= `file --brief --mime-type` #FileMagic.new(FileMagic::MAGIC_MIME).file(@file.path).split(';').first.to_s if defined? FileMagic
+      self.content_type ||= `file --brief --mime-type #{@file.path}` #FileMagic.new(FileMagic::MAGIC_MIME).file(@file.path).split(';').first.to_s if defined? FileMagic
       # tested image / video
 
       # should class itself try and figure this out?

@@ -1,19 +1,10 @@
 require 'haml-rails'
 
 require 'active_model_serializers'
-require 'filemagic'
-require 'mini_magick'
-require 'exifr'
-require 'sidekiq'
-require 'streamio-ffmpeg'
-require 'progressbar'
 require 'open-uri'
-require 'zip'
+
 require 'sidekiq'
 require 'sidekiq-status'
-require 'rb-fsevent'
-require 'aws-sdk-v1'
-require 'typhoeus'
 
 module Herd
   class Engine < ::Rails::Engine
@@ -25,6 +16,7 @@ module Herd
     end
 
     initializer 'configure_minimagick' do |app|
+      require 'mini_magick'
       MiniMagick.configure do |config|
         config.cli = :graphicsmagick
         config.timeout = 5
@@ -45,7 +37,7 @@ module Herd
       app.config.autoload_paths << "#{config.root}/app/serializers/concerns"
       app.config.autoload_paths << "#{config.root}/lib"
     end
-    
+
     initializer :setup_sidekiq_middlewares do |app|
       Sidekiq.configure_client do |config|
         config.redis = { namespace: Rails.application.class.parent_name }

@@ -1,3 +1,5 @@
+require 'streamio-ffmpeg'
+
 module Herd
   class Transform::Ffmpeg < Transform
 

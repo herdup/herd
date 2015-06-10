@@ -13,7 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20140820225744) do
 
-  create_table "herd_assets", force: true do |t|
+  create_table "herd_assets", force: :cascade do |t|
     t.string   "file_name"
     t.integer  "file_size"
     t.string   "content_type"
@@ -28,13 +28,15 @@ ActiveRecord::Schema.define(version: 20140820225744) do
     t.integer  "position"
   end
 
-  create_table "herd_pages", force: true do |t|
+  add_index "herd_assets", ["parent_asset_id"], name: "index_herd_assets_on_parent_asset_id"
+
+  create_table "herd_pages", force: :cascade do |t|
     t.string   "path"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "herd_transforms", force: true do |t|
+  create_table "herd_transforms", force: :cascade do |t|
     t.string   "type"
     t.text     "options"
     t.datetime "created_at"
@@ -43,7 +45,7 @@ ActiveRecord::Schema.define(version: 20140820225744) do
     t.string   "name"
   end
 
-  create_table "posts", force: true do |t|
+  create_table "posts", force: :cascade do |t|
     t.string   "title"
     t.text     "body"
     t.datetime "created_at"

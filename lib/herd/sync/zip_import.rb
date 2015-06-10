@@ -1,3 +1,5 @@
+require 'zip'
+
 module Herd
   module Sync
     class ZipImport < Base
@@ -32,6 +34,7 @@ module Herd
         assets=[]
 
         ::Zip::File.open(zip_data) do |zip|
+          require 'progressbar'
           @pbar = ProgressBar.new(File.basename(zip_path), zip.count)
           zip.each do |entry|
             @pbar.inc if @pbar

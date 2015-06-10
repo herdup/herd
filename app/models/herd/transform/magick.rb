@@ -1,3 +1,5 @@
+require 'mini_magick'
+
 MiniMagick::Image.class_eval do
   attr_reader :tempfile
 end
