@@ -22,7 +22,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'active_model_serializers'
   s.add_dependency 'progressbar'
-  s.add_dependency 'ruby-filemagic'
   s.add_dependency 'mini_magick', '4.0.1'
   s.add_dependency 'exifr'
 
