@@ -174,16 +174,18 @@ module Herd
       when ActionDispatch::Http::UploadedFile
         self.file_name = @file.original_filename
         self.content_type = @file.content_type.to_s
+      when Tempfile
+        self.file_name = File.basename(@file.path)        
       when File
         self.file_name = File.basename(@file.path)
       end
 
       raise "no file, possibly bad url #{@file}" unless @file.try(:size)
-
+      
       # test me
       self.file_size = @file.size
       # tested png
-      self.content_type = FileMagic.new(FileMagic::MAGIC_MIME).file(@file.path).split(';').first.to_s
+      self.content_type ||= `file --brief --mime-type` #FileMagic.new(FileMagic::MAGIC_MIME).file(@file.path).split(';').first.to_s if defined? FileMagic
       # tested image / video
 
       # should class itself try and figure this out?

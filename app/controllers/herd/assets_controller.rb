@@ -87,13 +87,20 @@ module Herd
         end
         transform ||= klass.where_t(transform_params).first_or_create
 
-
         #TODO: check for / respond w errors here
         params[:asset][:transform_id] = transform.id
         @asset = parent.child_with_transform(transform)
       end
 
-      if asset_params[:file].kind_of? String
+      if request.content_type =~ /^image/
+        tmp = Tempfile.new(['unnamed', '.jpg'])
+        tmp.binmode
+        tmp.write request.body.read
+
+        file = File.open(tmp.path)
+        @asset = Asset.create file: file
+
+      elsif asset_params[:file].kind_of? String
         @asset = Asset.find_by("meta like ?", "%content_url: #{asset_params[:file]}%")
       end
 
@@ -111,6 +118,7 @@ module Herd
       else
         render json: @asset.errors, status: :unprocessable_entity
       end
+
     end
 
     # PATCH/PUT /assets/1
@@ -154,13 +162,13 @@ module Herd
 
       # Only allow a trusted parameter "white list" through.
       def asset_params
-        params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position, :created_at, :updated_at)
+        params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position, :created_at, :updated_at) if params[:asset]
       end
       def metadata_params
-        params.require(:asset).require(:metadata).permit!.symbolize_keys rescue nil
+        params.require(:asset).require(:metadata).permit!.symbolize_keys if asset_params.try(:metadata)
       end
       def transform_params
-        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at, :async) if params[:asset][:transform].present?
+        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at, :async) if asset_params
       end
   end
 end

@@ -28,9 +28,13 @@ module Herd
     end
 
     def self.where_t(params)
-      params[:options] = options_from_string(params[:options]).to_yaml if params[:options]
+      if params[:options]
+        options = options_from_string(params.delete(:options)).to_yaml 
+      end
       params.delete_if {|k,v|v.nil?}
-      where(params)
+
+      out = where(params)
+      out.where("options LIKE ?", options ) if options
     end
 
     def self.find_or_create_with_options_string(string,name=nil,assetable_type)
@@ -39,7 +43,8 @@ module Herd
         name: name,
         assetable_type: assetable_type
       }
-      where_t(params).first_or_create
+      found = where_t(params).first
+      found = params[:name]
     end
 
     def cascade
