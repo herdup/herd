@@ -1,3 +1,5 @@
+require 'aws-sdk-v1'
+
 module Herd
   module S3Fileable
     extend ActiveSupport::Concern
