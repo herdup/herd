@@ -1,53 +1,37 @@
-require 'aws-sdk-v1'
-
 module Herd
   module Sync
     class S3Import < Base
-      attr_accessor :bucket
 
-      def self.import(bucket, prefix=nil)
-        new(bucket).import_s3 prefix
-      end
-
-      def initialize(bucket)
+      def initialize(bucket, prefix='', s3_key=ENV['AWS_ACCESS_KEY_ID'], s3_secret=ENV['AWS_SECRET_ACCESS_KEY'])
         @bucket = bucket
-        accept_extensions
+        @prefix = prefix
+        AWS.config access_key_id: s3_key, secret_access_key: s3_secret, http_open_timeout: 30, http_read_timeout: 120
       end
 
-      def import_s3(prefix=nil, s3_key=ENV['AWS_ACCESS_KEY_ID'], s3_secret=ENV['AWS_SECRET_ACCESS_KEY'])
-        assets = []
-        # you can update the timeouts (with seconds)
-        AWS.config(:http_open_timeout => 25, :http_read_timeout => 120)
-        s3 = AWS::S3.new
+      def s3
+        @s3 ||= AWS::S3.new
+      end
 
-        objects = s3.buckets[bucket].objects
-        objects = objects.with_prefix(prefix) if prefix
-        
+      def import_s3(namespace='')
+        assets = []
+
+        objects = s3.buckets[@bucket].objects
+        objects = objects.with_prefix(@prefix) unless @prefix.blank?
+
         objects.each do |o|
           remote_path = o.key
 
           next if remote_path =~ /\.DS_Store|__MACOSX|(^|\/)\._/
           next unless accept_extensions.include? File.extname(remote_path).downcase
 
-          parts = remote_path.split '/'
-
-          begin
-           parts.first.classify.constantize
-          rescue NameError
-           parts.shift
-          end
+          parts = remote_path.split('/').drop 1 # get rid of client namespace
 
           asset_file = parts.pop
           assetable_slug = parts.pop
-
           assetable_path = Rails.root.join 'tmp', 'import', *parts, assetable_slug
-          asset_path = o.url_for(:read).to_s
+          asset_path = o.url_for :read
 
-          begin
-            parts -= %w(sweetgreen)
-            klass = class_from_path parts.unshift('SgApi').join '/'
-          rescue Exception => e
-          end
+          klass = class_from_path parts.unshift(namespace).join '/' rescue nil
 
           next unless klass
 
@@ -74,17 +58,16 @@ module Herd
 
           if found = object.assets.master.find_by("file_name like ?","%#{File.basename(remote_path,'.*')}%")
             if o.content_length == found.file_size
-              #puts "linked this file is #{asset_path} \n exist: #{found} and same size: #{found.file_size}"
+              puts "linked this file is #{asset_path} \n exist: #{found} and same size: #{found.file_size}"
             else
-              puts "updaing file with #{asset_path}"
+              puts "updating file with #{asset_path.to_s}"
               found.update file: asset_path
               assets << found
             end
           else
-            assets << object.assets.create(file: asset_path.to_s)
+            assets << object.assets.create(file: asset_path)
           end
         end
-        # ap assets
       end
     end
   end

@@ -1,4 +1,13 @@
+machine:
+  timezone:
+    America/New_York
+  ruby:
+    version: 2.1.2
 database:
   override:
-    - mv spec/dummy/config/database.ci.yml spec/dummy/config/database.yml
-    - bundle exec rake db:create db:schema:load --trace
+    - bundle exec rake db:create
+    - bundle exec rake db:migrate
+test:
+  override:
+    - bundle exec rspec
+    - HERD_S3_ENABLED=1 bundle exec rspec

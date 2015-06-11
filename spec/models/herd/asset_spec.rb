@@ -35,7 +35,7 @@ module Herd
     end
 
     it "should create image asset from url" do
-      asset = Herd::Asset.create file: 'http://files.ginlane.com/photo.JPG'
+      asset = Herd::Asset.create file: URI.parse('http://files.ginlane.com/photo.JPG')
 
       expect(File).to exist(asset.file_path)
       expect(asset.type).to eq('Herd::Image')
@@ -49,14 +49,14 @@ module Herd
     end
 
     it "should create video asset from url" do
-      asset = Herd::Asset.create file: 'http://files.ginlane.com/herd/IMG_6243.m4v'
+      asset = Herd::Asset.create file: URI.parse('http://files.ginlane.com/herd/IMG_6243.m4v')
       expect(File).to exist asset.file_path
       expect(asset.type).to eq 'Herd::Video'
       expect(asset.content_type).to eq 'video/mp4'
     end
 
     it "should replace original file if another is set" do
-      asset = Herd::Asset.create file: 'http://files.ginlane.com/photo.JPG'
+      asset = Herd::Asset.create file: URI.parse('http://files.ginlane.com/photo.JPG')
       file_path1 = asset.file_path
       expect(File).to exist file_path1
       asset.update file: img_path
