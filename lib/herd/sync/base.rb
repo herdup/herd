@@ -13,7 +13,7 @@ module Herd
           # convert module structure to path structure
           path = path_from_class model
           # populate hash with array of slugs; return hash
-          h[path] = model.group(model.assetable_slug_column).map(&:assetable_slug); h
+          h[path] = model.select("DISTINCT #{model.assetable_slug_column}").map(&:assetable_slug); h
         end
       end
 

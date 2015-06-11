@@ -20,3 +20,5 @@ gem 'pry'
 gem 'puma'
 gem 'quiet_assets'
 gem 'typhoeus'
+
+gem 'streamio-ffmpeg', github: 'streamio/streamio-ffmpeg'

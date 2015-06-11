@@ -12,9 +12,8 @@ module Herd
       expect(child.file_name).to be_nil
 
       expect(TransformWorker.jobs.size).to eq 1
-
+      
       TransformWorker.drain
-
       # still nil because needs reload
       expect(child.file_name).to be_nil
       expect(child.reload.file_name).not_to be_nil

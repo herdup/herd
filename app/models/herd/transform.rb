@@ -4,18 +4,10 @@ module Herd
     attr_accessor :async
     has_many :assets, dependent: :destroy
 
-    serialize :options, HashWithIndifferentAccess
+    # serialize :options, HashWithIndifferentAccess
     # validates_presence_of :name
     validates_uniqueness_of :name, scope: [:type, :assetable_type]
 
-    before_validation -> {
-      self.options = YAML::load(options) if options.kind_of? String
-      self.options = options.with_indifferent_access unless options.kind_of? HashWithIndifferentAccess
-    }
-
-    before_save -> {
-      self.options ||= self.class.defaults
-    }
 
     after_save -> {
       cascade if options_changed?
@@ -23,28 +15,27 @@ module Herd
 
     def self.options_from_string(string)
       string ||= ''
-      hash = YAML::load string.split('|').map(&:strip).join("\n")
-      hash ? hash.with_indifferent_access : {}
+      YAML::load string.split('|').map(&:strip).join("\n")
     end
 
     def self.where_t(params)
-      if params[:options]
-        options = options_from_string(params.delete(:options)).to_yaml 
-      end
       params.delete_if {|k,v|v.nil?}
-
-      out = where(params)
-      out.where("options LIKE ?", options ) if options
+      
+      where(params)
     end
 
     def self.find_or_create_with_options_string(string,name=nil,assetable_type)
-      params = {
-        options:string,
-        name: name,
-        assetable_type: assetable_type
-      }
-      found = where_t(params).first
-      found = params[:name]
+      where(name: name, assetable_type: assetable_type).first_or_create do |out|
+        out.options = options_from_string(string) || {}
+      end
+    end
+    # def options=(opt)
+    #   super.options=(opt)attributes[:options] = opt.with_indifferent_access 
+    # end
+
+    def options
+      opt = (read_attribute(:options) || {}).map { |k,v| {k => (v =~ /^\d*$/ ? v.to_i : v) } }.reduce(:merge)
+      (opt || {}).with_indifferent_access
     end
 
     def cascade

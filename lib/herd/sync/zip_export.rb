@@ -30,6 +30,7 @@ module Herd
 
       def generate_seeds_folder(pre_clean=true)
         FileUtils.rm_rf @seed_path if pre_clean
+
         # build folder structure into seed_path
         folder_map.each do |class_path,assetables|
 
@@ -51,7 +52,6 @@ module Herd
             if @output_assets
               object = klass.find_by_assetable_slug slug
               object.assets.master.each do |a|
-                a = a.n 'jpg' unless a.content_type == 'image/jpeg'
                 FileUtils.cp a.file_path, File.join(assetable_path, a.file_name)
               end
             end

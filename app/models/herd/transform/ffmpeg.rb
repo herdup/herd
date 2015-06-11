@@ -20,11 +20,8 @@ module Herd
 
     def perform(asset,options)
       parsed_options = parse_ffmpeg_options(options)
-
       out = asset.unique_tmppath(nil, parsed_options.delete(:format))
-
       asset.ffmpeg.transcode(out, parsed_options) #{ |progress| yield progress if block_given? }
-
       out
     end
   end

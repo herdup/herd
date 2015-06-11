@@ -188,7 +188,7 @@ module Herd
       # test me
       self.file_size = @file.size
       # tested png
-      self.content_type ||= `file --brief --mime-type #{@file.path}` #FileMagic.new(FileMagic::MAGIC_MIME).file(@file.path).split(';').first.to_s if defined? FileMagic
+      self.content_type ||= `file --brief --mime-type #{@file.path}`.strip #FileMagic.new(FileMagic::MAGIC_MIME).file(@file.path).split(';').first.to_s if defined? FileMagic
       # tested image / video
 
       # should class itself try and figure this out?

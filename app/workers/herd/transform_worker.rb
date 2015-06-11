@@ -11,6 +11,7 @@ module Herd
       end
 
       child.update file: file
+
       child.jid = nil
 
       if ENV['HERD_LIVE_ASSETS'] == '1'

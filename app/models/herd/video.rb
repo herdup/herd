@@ -17,7 +17,7 @@ module Herd
 
     def load_meta
       movie = ffmpeg
-
+      
       {
         resolution: movie.resolution,
         height: movie.height,
