@@ -70,6 +70,8 @@ module Herd
         self.file_name = input_file.original_filename
       when File
         self.file_name = File.basename(input_file.path)
+      when Tempfile
+        self.file_name = File.basename(@file.path)                
       end
 
       self.content_type = get_content_type_for_file self.file
@@ -99,11 +101,10 @@ module Herd
     end
 
     def get_content_type_for_file(file)
-      FileMagic.new(FileMagic::MAGIC_MIME).file(file.path).split(';').first.to_s
+      `file --brief --mime-type #{file.path}`.strip
     end
 
     # define interface methods
-
     def did_identify_type
       raise NotImplementedError, unimplemented_in_class_error_str
     end
