@@ -1,0 +1,4 @@
+database:
+  override:
+    - mv spec/dummy/config/database.ci.yml spec/dummy/config/database.yml
+    - bundle exec rake db:create db:schema:load --trace
