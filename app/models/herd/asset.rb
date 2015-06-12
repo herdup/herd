@@ -58,8 +58,6 @@ module Herd
       end
     }
 
-    after_destroy :cleanup_file
-
     delegate :width, to: :meta_struct
     delegate :height, to: :meta_struct
 
