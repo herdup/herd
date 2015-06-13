@@ -19,7 +19,9 @@ module Herd
     end
 
     def file_ext
-      File.extname(file_field).tr('.','') rescue ''
+      # if the file is coming from amazon it may have a query string as part of the extension due to the nature of AWS read urls
+      # so we strip the query string just in case
+      strip_query_string(File.extname(file_field).tr('.','')) rescue ''
     end
 
     def file_name_wo_ext

@@ -44,7 +44,6 @@ module Herd
       if file.present? # reupload
         delete_file if file_name.present?
         prepare_file @file
-        copy_remote_file @file if @file.kind_of? URI::HTTPS
       end
     }
 
