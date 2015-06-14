@@ -29,9 +29,6 @@ module Herd
         out.options = options_from_string(string) || {}
       end
     end
-    # def options=(opt)
-    #   super.options=(opt)attributes[:options] = opt.with_indifferent_access 
-    # end
 
     def options
       opt = (read_attribute(:options) || {}).map { |k,v| {k => (v =~ /^\d*$/ ? v.to_i : v) } }.reduce(:merge)
