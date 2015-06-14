@@ -14,7 +14,6 @@ module Herd
     attr_accessor :delete_original
 
     attr_accessor :jid
-    attr_accessor :generate_sync
 
     scope :master, -> {where(parent_asset_id: nil)}
     scope :child, -> {where.not(parent_asset_id: nil)}
