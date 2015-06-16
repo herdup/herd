@@ -70,6 +70,7 @@ module Herd
           write_url = self[key].url_for(:write, content_type: content_type).to_s
           require 'typhoeus'
           response = Typhoeus::Request.new(write_url, method: :put, body: value.read, headers: { 'content-type' => content_type }).run
+          raise response unless response.code == 200
           self[key].acl = :public_read
           puts "Uploaded to: #{key} with content type: #{content_type}"
           set_obj_cache key, value
