@@ -81,6 +81,10 @@ module Herd
     def bucket
       # singleton so when we call .becomes in asset, we keep this reference around
       @@bucket ||= Bucket.new
+      if @@bucket.acl != :public_read
+        @@bucket.acl = :public_read
+      end
+      @@bucket
     end
 
     def base_path
