@@ -15,7 +15,7 @@ module Herd
     end
 
     def file_name_from_url(url)
-      URI.unescape(File.basename(URI.parse(url).path))
+      URI.unescape(File.basename( URI.parse( url.gsub( /\?.*/, "" ) ).path ))
     end
 
     def file_ext
