@@ -76,7 +76,7 @@ module Herd
         self.file_name = File.basename(@file.path)                
       end
 
-      self.content_type = get_content_type_for_file self.file
+      self.content_type = get_content_type_for_file self.file.path
       finalize_file
     end
 
@@ -102,8 +102,8 @@ module Herd
       sub.save    
     end
 
-    def get_content_type_for_file(file)
-      `file --brief --mime-type #{file.path}`.strip
+    def get_content_type_for_file(path)
+      `file --brief --mime-type #{path}`.strip
     end
 
     # define interface methods
