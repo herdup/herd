@@ -43,6 +43,8 @@ module Herd
       def initialize
         if Rails.application.secrets.herd_s3_key and Rails.application.secrets.herd_s3_secret
           AWS.config access_key_id: Rails.application.secrets.herd_s3_key, secret_access_key: Rails.application.secrets.herd_s3_secret
+        else 
+          AWS.config access_key_id: ENV['AWS_ACCESS_KEY_ID'], secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
         end
         @s3 = AWS::S3.new
         @bucket_name = Rails.application.secrets.herd_s3_bucket
