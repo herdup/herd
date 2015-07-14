@@ -11,8 +11,8 @@ module Herd
       image = asset.mini_magick
 
       order = %w{resize background gravity extent}
-      opts = clean_options.keys.sort_by{ |el| order.index(el).to_i }.inject({}){|h,k|h[k]=options[k];h}
-
+      opts = options_with_defaults.keys.sort_by{ |el| order.index(el).to_i }.inject({}){|h,k|h[k]=options_with_defaults[k];h}
+      
       image.combine_options do |c|
         opts.each do |k,v|
           case k
@@ -33,7 +33,8 @@ module Herd
           end
         end
       end
-      out = asset.unique_tmppath clean_options[:format]
+      out = asset.unique_tmppath options_with_defaults[:format]
+      ap options_with_defaults
       puts "--about to write to #{out}"
       puts "--file at #{image.tempfile.path}"
       image.write out

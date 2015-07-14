@@ -24,7 +24,7 @@ module Herd
       # assets relation should be scoped to masters
       expect(page.master_assets.count).to be 1
       # all assets should give resize as well
-      expect(page.assets.count).to be 2 # with resize
+      expect(page.asset.child_assets.count).to be 1 # with resize
     end
 
     it "should allow missing asset to be set on page" do
@@ -38,8 +38,6 @@ module Herd
       child = Herd::Page.missing.t("resize: 320x", 'smallish')
 
       expect(Herd::Asset.count).to be 2
-
-      expect(Herd::Page.missing_assets.count).to be 2
       expect(Herd::Page.missing_assets.master.count).to be 1
     end
 

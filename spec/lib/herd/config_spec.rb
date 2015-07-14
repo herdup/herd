@@ -34,7 +34,9 @@ describe Herd::Config do
 
     Herd::Config.save_transforms yml_path, false
     yml = YAML::load_file yml_path
-    expect(yml['transforms'].count).to be 2
+    
+    expect(yml['transforms'].count).to be 1    
+    expect(yml['defaults'].count).to be 1
   end
 
   it "should re-read transforms saved to yml" do
@@ -52,7 +54,7 @@ describe Herd::Config do
     expect(tran_h['options']).to eq Herd::Transform.options_from_string('resize: 350x').to_h
 
     # change yml
-    tran_h['options']['quality'] = 80
+    tran_h['options']['quality'] = "80"
 
     # save it
     yml_path.write yml.to_yaml

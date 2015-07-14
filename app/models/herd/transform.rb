@@ -51,9 +51,9 @@ module Herd
     end
 
     def clean_options
-      if options
-        options.map { |k,v| {k => (v =~ /^\d*$/ ? v.to_i : v) } }.reduce(:merge).with_indifferent_access
-      end
+      if options and options.count
+        options.map { |k,v| {k => (v =~ /^\d*$/ ? v.to_i : v) } }.reduce(:merge)
+      end || {}.with_indifferent_access
     end
 
     def cascade
@@ -81,7 +81,7 @@ module Herd
     end
 
     def options_with_defaults
-      if options and self.class.defaults
+      if clean_options and self.class.defaults
         clean_options.reverse_merge self.class.defaults
       else
         clean_options
