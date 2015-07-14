@@ -18,10 +18,30 @@ module Herd
       YAML::load string.split('|').map(&:strip).join("\n")
     end
 
+    # Query all model instance sthat have a given
+    # key/value pair.
+    def self.by_hash_key_value(key, value)
+      kv = key + "=>" + value
+      where("options @> :kv", kv: kv) 
+    end
+
+    def self.by_options_hash(hash) 
+      scope = self
+      hash.each do |k,v|
+        scope = scope.by_hash_key_value(k,v)
+      end
+      scope
+    end
+
     def self.where_t(params)
-      params.delete_if {|k,v|v.nil?}
-      
-      where(params)
+      clean = params.dup.delete_if {|k,v|v.nil?}
+
+      scope = if clean[:options]
+        by_options_hash clean.delete(:options)
+      else
+        self
+      end
+      scope.where(clean)
     end
 
     def self.find_or_create_with_options_string(string,name=nil,assetable_type)
@@ -30,9 +50,10 @@ module Herd
       end
     end
 
-    def options
-      opt = (read_attribute(:options) || {}).map { |k,v| {k => (v =~ /^\d*$/ ? v.to_i : v) } }.reduce(:merge)
-      (opt || {}).with_indifferent_access
+    def clean_options
+      if options
+        options.map { |k,v| {k => (v =~ /^\d*$/ ? v.to_i : v) } }.reduce(:merge).with_indifferent_access
+      end
     end
 
     def cascade
@@ -51,7 +72,7 @@ module Herd
       end if default?
     end
 
-    def perform(parent_asset, options)
+    def perform(parent_asset)
       raise 'subclass this'
     end
 
@@ -60,7 +81,11 @@ module Herd
     end
 
     def options_with_defaults
-      options.reverse_merge self.class.defaults || {}
+      if options and self.class.defaults
+        clean_options.reverse_merge self.class.defaults
+      else
+        clean_options
+      end
     end
 
     def default?
@@ -74,7 +99,7 @@ module Herd
       end
 
       def defaults
-        default_transform.try :options
+        default_transform.try :clean_options
       end
 
       def defaults=(options)

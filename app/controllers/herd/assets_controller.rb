@@ -67,7 +67,7 @@ module Herd
 
     # POST /assets
     def create
-      if transform_params.present?
+      if params[:asset] and params[:asset][:transform]# transform_params.present?
         parent = Asset.find(params[:asset][:parent_asset_id])
 
         klass = params[:asset][:transform][:type].constantize rescue parent.class.default_transform
@@ -77,7 +77,11 @@ module Herd
         transform = unless transform_params[:name].empty?
           klass.find_by(name:transform_params[:name]).tap do |t|
             if t and transform_params[:options]
-              t_options = t.class.options_from_string(transform_params[:options])
+              t_options = if transform_params[:options].kind_of? String
+                t.class.options_from_string(transform_params[:options])
+              else
+                transform_params[:options]
+              end
               unless t_options == t.options
                 t.options = t_options
                 t.save
@@ -85,21 +89,35 @@ module Herd
             end
           end
         end
-        transform ||= klass.where_t(transform_params).first_or_create
-
+        transform ||= klass.where_t(transform_params).first_or_create do |t|
+          t_options = if transform_params[:options].kind_of? String
+            t.class.options_from_string(transform_params[:options])
+          else
+            transform_params[:options]
+          end          
+          t.options = t_options
+        end
+        
         #TODO: check for / respond w errors here
         params[:asset][:transform_id] = transform.id
         @asset = parent.child_with_transform(transform)
       end
 
-      if request.content_type =~ /^image/
-        tmp = Tempfile.new(['unnamed', '.jpg'])
+      if request.content_type =~ /^(image|video)/
+
+        tmp = if asset_params[:file_name].presence
+          tmp_path = Dir::Tmpname.tmpdir + "/" + asset_params[:file_name]
+          File.new(tmp_path, 'wb')
+        else
+          Tempfile.new(['unnamed', '.'+MIME::Types[request.content_type].first.try(:preferred_extension)])
+        end
+
         tmp.binmode
         tmp.write request.body.read
 
         file = File.open(tmp.path)
-        @asset = Asset.create file: file
-
+        @asset = Asset.create asset_params.merge(file: file)
+        
       elsif asset_params[:file].kind_of? String
         @asset = Asset.find_by("meta like ?", "%content_url: #{asset_params[:file]}%")
       end
@@ -137,7 +155,7 @@ module Herd
     # DELETE /assets/1
     def destroy
       @asset.destroy
-      render nothing: true, status: 204
+      render json: @asset.assetable
     end
 
     def scoped_assets
@@ -168,7 +186,7 @@ module Herd
         params.require(:asset).require(:metadata).permit!.symbolize_keys if asset_params.try(:metadata)
       end
       def transform_params
-        params.require(:asset).require(:transform).permit(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at, :async) if asset_params
+        params.require(:asset).require(:transform).permit! if asset_params#(:type, :options, :format, :name, :assetable_type, :created_at, :updated_at, :async) if asset_params
       end
   end
 end

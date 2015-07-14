@@ -6,7 +6,7 @@ module Herd
 
     def perform(child_asset_id, opts={})
       child = Asset.find child_asset_id
-      file = child.transform.perform child.parent_asset, child.transform.options_with_defaults do |p|
+      file = child.transform.perform child.parent_asset do |p|
         at p * 100.0, "transcoding"
       end
 

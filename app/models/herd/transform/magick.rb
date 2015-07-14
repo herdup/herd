@@ -6,12 +6,12 @@ end
 
 module Herd
   class Transform::Magick < Transform
-    def perform(asset_or_id, options)
+    def perform(asset_or_id)
       asset = computed_asset asset_or_id
       image = asset.mini_magick
 
       order = %w{resize background gravity extent}
-      opts = options.keys.sort_by{ |el| order.index(el).to_i }.inject({}){|h,k|h[k]=options[k];h}
+      opts = clean_options.keys.sort_by{ |el| order.index(el).to_i }.inject({}){|h,k|h[k]=options[k];h}
 
       image.combine_options do |c|
         opts.each do |k,v|
@@ -33,11 +33,12 @@ module Herd
           end
         end
       end
-      out = asset.unique_tmppath options[:format]
+      out = asset.unique_tmppath clean_options[:format]
       puts "--about to write to #{out}"
       puts "--file at #{image.tempfile.path}"
       image.write out
-
+      image.tempfile.close
+      image.tempfile.delete
       out
     end
   end

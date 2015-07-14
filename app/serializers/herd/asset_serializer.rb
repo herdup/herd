@@ -8,7 +8,7 @@ module Herd
     attributes :metadata
     attributes :assetable_type, :assetable_id
 
-    has_many :child_assets,  embed: :ids
+    has_many :child_assets,  embed: :ids, include: true, root: :assets, serializer: AssetSerializer
     has_one :parent_asset,  embed: :ids
 
     has_one :transform,  embed: :ids, include: true, serializer: TransformSerializer

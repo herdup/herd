@@ -8,11 +8,8 @@ module Herd
 
     attr_accessor :file
     file_field :file_name
-    # validates_presence_of :file_name
     attr_accessor :frame_count
-
     attr_accessor :delete_original
-
     attr_accessor :jid
 
     scope :master, -> {where(parent_asset_id: nil)}
@@ -37,8 +34,8 @@ module Herd
     }
 
     before_save -> {
-      self.assetable_type ||= parent_asset.try :assetable_type
-      self.assetable_id ||= parent_asset.try :assetable_id
+      # self.assetable_type ||= parent_asset.try :assetable_type
+      # self.assetable_id ||= parent_asset.try :assetable_id
 
       if file.present? # reupload
         delete_file if file_name.present?
@@ -87,7 +84,7 @@ module Herd
       }
       child = Asset.where(hash).take || Asset.create(hash)
 
-      child.becomes(type.constantize) rescue child
+      Asset.find child.id #becomes(type.constantize) 
     end
 
     def t(transform_string, name=nil, async=nil)

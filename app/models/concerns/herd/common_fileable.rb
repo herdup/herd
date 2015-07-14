@@ -42,7 +42,6 @@ module Herd
       # since this method is used to create paths in both s3/local file systems
       # to maintain consistency in paths between s3/local fs, we need to make sure the polymorphism is resolved
       # before we write to any paths, remote or otherwise 
-      set_asset_type 
       type_s = self.type
       type_s ||= self.class.to_s
       type_s.split("::").second.pluralize.downcase
@@ -77,6 +76,7 @@ module Herd
       end
 
       self.content_type = get_content_type_for_file self.file.path
+      set_asset_type
       finalize_file
     end
 
