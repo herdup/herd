@@ -34,7 +34,6 @@ module Herd
         end
       end
       out = asset.unique_tmppath options_with_defaults[:format]
-      ap options_with_defaults
       puts "--about to write to #{out}"
       puts "--file at #{image.tempfile.path}"
       image.write out
