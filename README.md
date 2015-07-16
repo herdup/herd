@@ -3,6 +3,8 @@
 
 Herds of Assets for your Rails 4 Apps.
 
+Dependent on PostgreSQL `gem 'pg'`
+
 ### Installation
 
 Just add Herd to your Gemfile:
@@ -15,6 +17,7 @@ And then bundle it up and run a migration:
 
 ```ruby
 bundle install
+bundle exec rake herd:install:migrations
 bundle exec rake db:migrate
 ```
 
@@ -26,8 +29,65 @@ class Post < ActiveRecord::Base
 end
 ```
 
+Mount Herd API in your routes
+
+```ruby
+Rails.application.routes.draw do
+  mount Herd::Engine, at: '/'
+  ...
+end
+```
+
+Mount the helpers (if you're using rails templates)
+
+```ruby
+class ApplicationController < ActionController::Base
+  helper Herd::Engine.helpers
+  helper Herd::Engine.routes.url_helpers
+  ...
+end
+```
+
 ### Using the Uploader
-We're in the process of building a standard uploader component in React.  Coming soon!
+
+Drop in an uploader for your assetable model (@pano is mines)
+
+
+```erb
+<%= assetable_uploader @pano %>
+
+```
+
+### Release the Herd!
+
+Display your attached assets! a.t *transform string*, *name*
+
+```erb
+<% @pano.assets.each do |a| %>
+  <%= herd_tag a.t 'resize: x420', 'edit' %>
+<% end %>
+```
+
+
+### Enable S3
+
+Currently S3 can be enabled using your Rails secrets.yml file. 
+
+```yml
+production:
+  herd_s3_key: abc123
+  herd_s3_secret: zyxlmnop123
+  herd_s3_enabled: true
+  herd_s3_bucket: dev-herd
+```
+
+Note: If you already have `ENV["AWS_ACCESS_KEY_ID"]` / `ENV["AWS_SECRET_ACCESS_KEY"]`, herd will use those instead.
+
+Note: Changing this setting will break existing assets. See import/export process to move assets between s3/filesystem
+
+### Transform Defaults
+
+
 
 ### Versioning
 
