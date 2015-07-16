@@ -25,10 +25,13 @@ module Herd
     end
 
     def perform(asset)
-      parsed_options = parse_ffmpeg_options(options_with_defaults)
-      ap parsed_options
+      parsed_options = parse_ffmpeg_options(options_with_defaults.symbolize_keys)
       out = asset.unique_tmppath parsed_options.delete(:format)
-      asset.ffmpeg.transcode(out, parsed_options) #{ |progress| yield progress if block_given? }
+
+      puts parsed_options.inspect
+      puts "out file: #{out}"
+
+      asset.ffmpeg.transcode(out, parsed_options) { |progress| puts progress; yield progress if block_given? }
       out
     end
   end

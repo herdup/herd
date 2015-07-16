@@ -1,5 +1,7 @@
 require 'haml-rails'
 
+require 'responders'
+
 require 'active_model_serializers'
 require 'open-uri'
 

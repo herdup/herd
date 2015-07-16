@@ -45,9 +45,12 @@ module Herd
     end
 
     def self.find_or_create_with_options_string(string,name=nil,assetable_type)
-      where(name: name, assetable_type: assetable_type).first_or_create do |out|
+      out = where(name: name, assetable_type: assetable_type).first_or_create
+      if out.options != options_from_string(string)
         out.options = options_from_string(string) || {}
+        out.save
       end
+      out
     end
 
     def clean_options
