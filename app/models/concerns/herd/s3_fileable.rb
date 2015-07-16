@@ -32,6 +32,7 @@ module Herd
           return @local_tmpfile unless @local_tmpfile.nil?
           @local_tmpfile = Tempfile.open('tmp', Dir::Tmpname.tmpdir) do |file|
             file.binmode
+
             self.read do |chunk|
               file.write(chunk)
             end
@@ -71,10 +72,12 @@ module Herd
           self[key].delete
           @obj_cache.delete key
         elsif value.class.in? [File, Tempfile, ActionDispatch::Http::UploadedFile]
-          write_url = self[key].url_for(:write, content_type: content_type).to_s
+          write_url = self[key].url_for(:write, content_type: content_type , secure: true).to_s
           require 'typhoeus'
           response = Typhoeus::Request.new(write_url, method: :put, body: value.read, headers: { 'content-type' => content_type }).run
-          raise response unless response.code == 200
+          unless response.code == 200
+            raise response 
+          end
           self[key].acl = :public_read
           puts "Uploaded to: #{key} with content type: #{content_type}"
           set_obj_cache key, value
@@ -132,11 +135,12 @@ module Herd
         end
       end
 
+      # bucket[base_path] = nil if bucket[base_path]
       # now write to the bucket since we have all the prerequisite information (content/asset type mainly)
       bucket[base_path] = self.file, self.content_type
 
       # final bits of meta once we've successfully copied to s3
-      self.file_size = bucket[base_path].local_tmpfile.size
+      self.file_size = self.file.size
 
       # read url is the newly uploaded bucket url -- used in file_url for cdn origin downloading purposes
       self.meta[:read_url] = strip_query_string bucket[base_path].url_for(:read).to_s

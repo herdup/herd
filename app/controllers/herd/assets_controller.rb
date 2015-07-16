@@ -2,7 +2,7 @@ module Herd
   class AssetsController < ApplicationController
     include ActionController::Live
 
-    respond_to :json
+    respond_to :json, :html
     before_action :set_asset, only: [:show, :edit, :update, :destroy]
 
     def transform
@@ -132,7 +132,11 @@ module Herd
           @asset.save unless pre == @asset.meta
         end
 
-        render json: @asset, serializer: AssetSerializer
+        respond_to do |format|
+          format.html { redirect_to :back }
+          format.json { render json: @asset, serializer: AssetSerializer          }
+        end
+        
       else
         render json: @asset.errors, status: :unprocessable_entity
       end

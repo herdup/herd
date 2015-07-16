@@ -35,7 +35,7 @@ module Herd
     end
 
     def unique_tmppath(ext=nil)
-      Dir::Tmpname.tmpdir + "/" + "#{file_name_wo_ext}.#{file_ext}"
+      Dir::Tmpname.tmpdir + "/" + "#{file_name_wo_ext}.#{ext || file_ext}"
     end
 
     def sanitized_classname
@@ -103,7 +103,7 @@ module Herd
     end
 
     def get_content_type_for_file(path)
-      `file --brief --mime-type #{path}`.strip
+      `file --brief --mime-type #{Shellwords.escape(path)}`.strip
     end
 
     # define interface methods
