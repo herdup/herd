@@ -19,8 +19,16 @@ RSpec.configure do |config|
   config.before(:each) do
     Sidekiq::Worker.clear_all
     if Rails.application.secrets.herd_s3_enabled
-      # clear out our tests
-      AWS::S3.new.buckets[Rails.application.secrets.herd_s3_bucket].clear!
+      
+      AWS.config({
+        access_key_id:     ENV['HERD_TESTING_AWS_ACCESS_KEY_ID'],
+        secret_access_key: ENV['HERD_TESTING_AWS_SECRET_ACCESS_KEY'],
+        http_open_timeout: 30, 
+        http_read_timeout: 120
+      })
+
+      bucket = AWS::S3.new.buckets[Rails.application.secrets.herd_s3_bucket]
+      bucket.objects.with_prefix(Rails.application.secrets.herd_s3_path_prefix).delete_all
     else
       FileUtils.rm_rf File.join(Rails.root, 'public', 'uploads')
     end
