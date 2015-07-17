@@ -8,8 +8,8 @@ require 'open-uri'
 OpenURI::Buffer.send :remove_const, 'StringMax' if OpenURI::Buffer.const_defined?('StringMax')
 OpenURI::Buffer.const_set 'StringMax', 0
 
-require 'sidekiq'
-require 'sidekiq-status'
+# require 'sidekiq'
+# require 'sidekiq-status'
 
 module Herd
   class Engine < ::Rails::Engine
@@ -43,24 +43,24 @@ module Herd
       app.config.autoload_paths << "#{config.root}/lib"
     end
 
-    initializer :setup_sidekiq_middlewares do |app|
-      Sidekiq.configure_client do |config|
-        config.redis = { namespace: Rails.application.class.parent_name }
-        config.client_middleware do |chain|
-          chain.add Sidekiq::Status::ClientMiddleware
-        end
-      end
+    # initializer :setup_sidekiq_middlewares do |app|
+    #   Sidekiq.configure_client do |config|
+    #     config.redis = { namespace: Rails.application.class.parent_name }
+    #     config.client_middleware do |chain|
+    #       chain.add Sidekiq::Status::ClientMiddleware
+    #     end
+    #   end
 
-      Sidekiq.configure_server do |config|
-        config.redis = { namespace: Rails.application.class.parent_name }
-        config.server_middleware do |chain|
-          chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.minutes # default
-        end
-        config.client_middleware do |chain|
-          chain.add Sidekiq::Status::ClientMiddleware
-        end
-      end
-    end
+    #   Sidekiq.configure_server do |config|
+    #     config.redis = { namespace: Rails.application.class.parent_name }
+    #     config.server_middleware do |chain|
+    #       chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.minutes # default
+    #     end
+    #     config.client_middleware do |chain|
+    #       chain.add Sidekiq::Status::ClientMiddleware
+    #     end
+    #   end
+    # end
 
   end
 end

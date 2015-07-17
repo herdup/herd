@@ -29,10 +29,10 @@ Gem::Specification.new do |s|
   s.add_dependency 'streamio-ffmpeg'
   s.add_dependency 'rubyzip'
 
-  s.add_dependency 'sidekiq'
-  s.add_dependency 'sidekiq-status'
-  s.add_dependency 'sidekiq-unique-jobs'
-  s.add_dependency 'sinatra'
+  # s.add_dependency 'sidekiq'
+  # s.add_dependency 'sidekiq-status'
+  # s.add_dependency 'sidekiq-unique-jobs'
+  # s.add_dependency 'sinatra'
 
   s.add_dependency 'aws-sdk-v1'
   s.add_dependency 'typhoeus'
