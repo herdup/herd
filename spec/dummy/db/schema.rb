@@ -11,13 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150611185413) do
+ActiveRecord::Schema.define(version: 20150611013901) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "hstore"
 
-  create_table "herd_assets", force: :cascade do |t|
+  create_table "herd_assets", force: true do |t|
     t.string   "file_name"
     t.integer  "file_size"
     t.string   "content_type"
@@ -32,15 +32,13 @@ ActiveRecord::Schema.define(version: 20150611185413) do
     t.integer  "position"
   end
 
-  add_index "herd_assets", ["parent_asset_id"], name: "index_herd_assets_on_parent_asset_id", using: :btree
-
-  create_table "herd_pages", force: :cascade do |t|
+  create_table "herd_pages", force: true do |t|
     t.string   "path"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "herd_transforms", force: :cascade do |t|
+  create_table "herd_transforms", force: true do |t|
     t.string   "type"
     t.hstore   "options"
     t.datetime "created_at"
@@ -49,7 +47,7 @@ ActiveRecord::Schema.define(version: 20150611185413) do
     t.string   "name"
   end
 
-  create_table "posts", force: :cascade do |t|
+  create_table "posts", force: true do |t|
     t.string   "title"
     t.text     "body"
     t.datetime "created_at"

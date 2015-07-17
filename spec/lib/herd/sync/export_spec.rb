@@ -53,16 +53,18 @@ describe Herd::Sync::Base do
 
     post = Post.create title: 'Test 2'
 
-    exporter = Herd::Sync::S3Export.new 'sweetgreen-seeds-development', 'herd_export_test'
-    exporter.s3.buckets['sweetgreen-seeds-development'].objects.with_prefix('herd_export_test').delete_all
+    exporter = Herd::Sync::S3Export.new 'herd-testing', 'herd_export_test', true, ENV['HERD_TESTING_AWS_ACCESS_KEY_ID'], ENV['HERD_TESTING_AWS_SECRET_ACCESS_KEY']
+
+    exporter.s3.buckets['herd-testing'].objects.with_prefix('herd_export_test').delete_all
 
     exporter.export_s3 
 
-    expect(exporter.s3.buckets['sweetgreen-seeds-development'].objects.with_prefix('herd_export_test/').count).to be 5
+    expect(exporter.s3.buckets['herd-testing'].objects.with_prefix('herd_export_test/').count).to be 5
 
     Herd::Asset.destroy_all
 
-    importer = Herd::Sync::S3Import.new 'sweetgreen-seeds-development', 'herd_export_test'
+    importer = Herd::Sync::S3Import.new 'herd-testing', 'herd_export_test', ENV['HERD_TESTING_AWS_ACCESS_KEY_ID'], ENV['HERD_TESTING_AWS_SECRET_ACCESS_KEY']
+
     importer.import_s3
 
     expect(Post.missing_assets.count).to eq 1
@@ -70,5 +72,4 @@ describe Herd::Sync::Base do
     expect(Herd::Asset.count).to eq 3
 
   end
-
 end
