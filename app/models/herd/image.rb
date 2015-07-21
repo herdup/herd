@@ -31,12 +31,9 @@ module Herd
         hash[:make]   = exif.make
         hash[:model]  = exif.model
         hash[:gps]    = exif.gps.try(:to_h)
-
-        begin
-          image.auto_orient
-        rescue NoMethodError
-          print "This verison of magic does not support `auto_orient` command"
-        end
+       
+        # Auto Orient if Available
+        image.try :auto_orient
       end
 
       hash[:height] = image.height
