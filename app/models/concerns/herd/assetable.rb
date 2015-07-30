@@ -33,6 +33,10 @@ module Herd
       assets.empty? ? self.class.missing_assets : assets
     end
 
+    def missing_assets
+      self.class.missing_assets
+    end
+
     module ClassMethods
 
       def transforms
