@@ -1,6 +1,6 @@
 module Herd
-class ImageCombineWorker
-  include Sidekiq::Worker
+  class ImageCombineWorker
+  # include Sidekiq::Worker
 
   def perform(asset_id, transform_id)
     asset = Asset.find_by(id:asset_id)#.t("crop: '34%x100%+52+0'")
