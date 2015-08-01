@@ -6,17 +6,21 @@ module Herd
       include Fileable
     end
 
+    attr_accessor :file
+    file_field :file_name
     attr_accessor :frame_count
+    attr_accessor :delete_original
     attr_accessor :jid
 
     scope :master, -> {where(parent_asset_id: nil)}
     scope :child, -> {where.not(parent_asset_id: nil)}
 
     belongs_to :assetable, polymorphic: true
-    belongs_to :transform
-    belongs_to :parent_asset, class_name: 'Asset'
 
+    belongs_to :transform
     has_many :child_transforms, through: :child_assets, source: :transform
+
+    belongs_to :parent_asset, class_name: 'Asset'
     has_many :child_assets, class_name: 'Asset',
                             dependent: :destroy,
                             foreign_key: :parent_asset_id
@@ -30,19 +34,23 @@ module Herd
     }
 
     before_save -> {
-      self.assetable_type ||= parent_asset.try :assetable_type
-      self.assetable_id ||= parent_asset.try :assetable_id
+      # self.assetable_type ||= parent_asset.try :assetable_type
+      # self.assetable_id ||= parent_asset.try :assetable_id
 
       if file.present? # reupload
         delete_file if file_name.present?
         prepare_file @file
-        copy_remote_file @file if @file.kind_of? URI::HTTPS
       end
     }
 
     after_create -> {
       generate if child? and transform.present? and !@file.present?
-      assetable.try :touch
+
+      if assetable
+        assetable.touch
+      elsif assetable_id == 0 and assetable_type.try :constantize
+        assetable_type.constantize.all.each(&:touch)
+      end
     }
 
     delegate :width, to: :meta_struct
@@ -54,7 +62,8 @@ module Herd
     end
 
     def generate(async=nil)
-      if async || ENV['HERD_LIVE_ASSETS'] == '1' || transform.try(:async)
+      #puts "async #{async} herd: #{ENV['HERD_LIVE_ASSETS']} transform.async #{transform.try(:async)}"
+      if defined?(Sidekiq) and (async || ENV['HERD_LIVE_ASSETS'] == '1' || transform.try(:async))
         self.jid = TransformWorker.perform_async id, transform.options
       else
         generate!
@@ -69,9 +78,13 @@ module Herd
     def child_with_transform(transform)
       # first_or_create will generate a child_asset who's parent_asset is inaccessible
       # because it's tainted with the transform_id: transform.id scope for some reason
-      hash = { parent_asset: self, transform: transform }
+      hash = {
+        parent_asset:self, 
+        transform:transform
+      }
       child = Asset.where(hash).take || Asset.create(hash)
-      child.becomes(type.constantize) rescue child
+
+      Asset.find child.id #becomes(type.constantize) 
     end
 
     def t(transform_string, name=nil, async=nil)
@@ -83,7 +96,7 @@ module Herd
 
     def n(name, transform_string=nil, async=nil)
       return unless id
-      trans = computed_class.default_transform.find_by(name: name) unless name.nil?
+      trans = computed_class.default_transform.find_by(name:name) unless name.nil?
       child = child_with_transform(trans) if trans
       return child || t(transform_string, name, async)
     end
@@ -95,9 +108,9 @@ module Herd
     def master?
       parent_asset_id.nil?
     end
-    
     def child?
       !master?
     end
   end
+
 end

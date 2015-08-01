@@ -17,12 +17,12 @@ module Herd
     end
 
     def file_url(absolute=ActionController::Base.asset_host.present?)
-      relative = File.join base_path(false), file_field
-      if absolute
+      url = if absolute
         ActionController::Base.helpers.asset_url relative
       else
-        relative
+        File.join base_path(false), file_field
       end
+      URI.encode url
     end
 
     def prepare_remote_file(input_file)
@@ -30,7 +30,7 @@ module Herd
       self.meta[:content_url] = strip_query_string input_file
       
       download_file = File.open(unique_tmppath, 'wb')
-
+      require 'typhoeus'
       request = Typhoeus::Request.new input_file, followlocation: true
 
       request.on_headers do |response|
@@ -38,6 +38,7 @@ module Herd
         self.meta[:effective_url] = effective_url if effective_url != self.meta[:content_url]
         self.file_name = file_name_from_url response.effective_url
         if len = response.headers['Content-Length'].try(:to_i)
+          require 'progressbar'
           @pbar = ProgressBar.new self.file_name, len
           @pbar.file_transfer_mode
         end

@@ -34,7 +34,9 @@ describe Herd::Config do
 
     Herd::Config.save_transforms yml_path, false
     yml = YAML::load_file yml_path
-    expect(yml['transforms'].count).to be 2
+    
+    expect(yml['transforms'].count).to be 1    
+    expect(yml['defaults'].count).to be 1
   end
 
   it "should re-read transforms saved to yml" do
@@ -52,7 +54,7 @@ describe Herd::Config do
     expect(tran_h['options']).to eq Herd::Transform.options_from_string('resize: 350x').to_h
 
     # change yml
-    tran_h['options']['quality'] = 80
+    tran_h['options']['quality'] = "80"
 
     # save it
     yml_path.write yml.to_yaml
@@ -128,13 +130,13 @@ describe Herd::Config do
     expect(child3.transform.options['crop']).to eq '200x200+150+0'
 
     expect(child3.width).to eq 400
-    expect(child3.reload.width).to eq 400
+    # expect(child3.reload.width).to eq 400
 
-    expect(Herd::TransformWorker.jobs.size).to eq 1
+    # expect(Herd::TransformWorker.jobs.size).to eq 1
 
-    Herd::TransformWorker.drain
+    # Herd::TransformWorker.drain
 
-    expect(child3.width).to eq 400
+    # expect(child3.width).to eq 400
     expect(child3.reload.width).to eq 200
   end
 

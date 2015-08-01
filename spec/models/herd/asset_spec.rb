@@ -35,7 +35,7 @@ module Herd
     end
 
     it "should create image asset from url" do
-      asset = Herd::Asset.create file: URI.parse('http://files.ginlane.com/photo.JPG')
+      asset = Herd::Asset.create file: URI.parse('https://s3.amazonaws.com/herd-testing/resources/photo.jpg')
 
       expect(File).to exist(asset.file_path)
       expect(asset.type).to eq('Herd::Image')
@@ -44,19 +44,19 @@ module Herd
     end
 
     it "should fail if bad path" do
-      asset = Herd::Asset.new file: Rails.root.join('/etc/poop.png')
+      asset = Herd::Asset.new file: Rails.root.join('/etc/no_file_here.png')
       expect{ asset.save }.to raise_error
     end
 
     it "should create video asset from url" do
-      asset = Herd::Asset.create file: URI.parse('http://files.ginlane.com/herd/IMG_6243.m4v')
+      asset = Herd::Asset.create file: URI.parse('https://s3.amazonaws.com/herd-testing/resources/video.m4v')
       expect(File).to exist asset.file_path
       expect(asset.type).to eq 'Herd::Video'
       expect(asset.content_type).to eq 'video/mp4'
     end
 
     it "should replace original file if another is set" do
-      asset = Herd::Asset.create file: URI.parse('http://files.ginlane.com/photo.JPG')
+      asset = Herd::Asset.create file: URI.parse('https://s3.amazonaws.com/herd-testing/resources/photo.jpg')
       file_path1 = asset.file_path
       expect(File).to exist file_path1
       asset.update file: img_path
@@ -80,7 +80,7 @@ module Herd
       expect(child2.height).to eq 30
     end
 
-    it "should created empty child if async flag true" do
+    xit "should created empty child if async flag true" do
       asset = Herd::Asset.create file: img_path
       asset = Herd::Asset.find asset.id
 

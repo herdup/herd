@@ -35,7 +35,7 @@ module Herd
       expect(child.reload.width).to eq 40 # reload reveals updated asset
     end
 
-    it "should recreat using queue if async" do
+    xit "should recreat using queue if async" do
       asset = Herd::Asset.create file: jpg_path
       asset = Herd::Asset.find asset.id # hack cuz need type
       child = asset.t "resize: 30x", 'test'
@@ -65,10 +65,6 @@ module Herd
       large_size = child.file_size
       Transform::Magick.defaults = { quality: 50 }
 
-      # no longer async
-      #expect(TransformWorker.jobs.size).to eq 1
-
-      TransformWorker.drain
       small_size = child.reload.file_size
 
       expect(large_size).to be > small_size

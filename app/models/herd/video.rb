@@ -1,3 +1,5 @@
+require 'streamio-ffmpeg'
+
 module Herd
   class Video < Asset
     def self.default_transform
@@ -15,7 +17,7 @@ module Herd
 
     def load_meta
       movie = ffmpeg
-
+      
       {
         resolution: movie.resolution,
         height: movie.height,

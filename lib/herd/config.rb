@@ -140,6 +140,7 @@ module Herd
 
     def watch
       begin
+        require 'rb-fsevent'
         @fsevent = FSEvent.new
 
         # Watch the above directories

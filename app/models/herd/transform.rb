@@ -4,18 +4,10 @@ module Herd
     attr_accessor :async
     has_many :assets, dependent: :destroy
 
-    serialize :options, HashWithIndifferentAccess
+    # serialize :options, HashWithIndifferentAccess
     # validates_presence_of :name
     validates_uniqueness_of :name, scope: [:type, :assetable_type]
 
-    before_validation -> {
-      self.options = YAML::load(options) if options.kind_of? String
-      self.options = options.with_indifferent_access unless options.kind_of? HashWithIndifferentAccess
-    }
-
-    before_save -> {
-      self.options ||= self.class.defaults
-    }
 
     after_save -> {
       cascade if options_changed?
@@ -23,23 +15,48 @@ module Herd
 
     def self.options_from_string(string)
       string ||= ''
-      hash = YAML::load string.split('|').map(&:strip).join("\n")
-      hash ? hash.with_indifferent_access : {}
+      YAML::load string.split('|').map(&:strip).join("\n")
+    end
+
+    # Query all model instance sthat have a given
+    # key/value pair.
+    def self.by_hash_key_value(key, value)
+      kv = key + "=>" + value
+      where("options @> :kv", kv: kv) 
+    end
+
+    def self.by_options_hash(hash) 
+      scope = self
+      hash.each do |k,v|
+        scope = scope.by_hash_key_value(k,v)
+      end
+      scope
     end
 
     def self.where_t(params)
-      params[:options] = options_from_string(params[:options]).to_yaml if params[:options]
-      params.delete_if {|k,v|v.nil?}
-      where(params)
+      clean = params.dup.delete_if {|k,v|v.nil?}
+
+      scope = if clean[:options]
+        by_options_hash clean.delete(:options)
+      else
+        self
+      end
+      scope.where(clean)
     end
 
     def self.find_or_create_with_options_string(string,name=nil,assetable_type)
-      params = {
-        options:string,
-        name: name,
-        assetable_type: assetable_type
-      }
-      where_t(params).first_or_create
+      out = where(name: name, assetable_type: assetable_type).first_or_create
+      if out.options != options_from_string(string)
+        out.options = options_from_string(string) || {}
+        out.save
+      end
+      out
+    end
+
+    def clean_options
+      if options and options.count
+        options.map { |k,v| {k => (v =~ /^\d*$/ ? v.to_i : v) } }.reduce(:merge)
+      end || {}.with_indifferent_access
     end
 
     def cascade
@@ -58,7 +75,7 @@ module Herd
       end if default?
     end
 
-    def perform(parent_asset, options)
+    def perform(parent_asset)
       raise 'subclass this'
     end
 
@@ -67,7 +84,11 @@ module Herd
     end
 
     def options_with_defaults
-      options.reverse_merge self.class.defaults || {}
+      if clean_options and self.class.defaults
+        clean_options.reverse_merge self.class.defaults
+      else
+        clean_options
+      end
     end
 
     def default?
@@ -81,7 +102,7 @@ module Herd
       end
 
       def defaults
-        default_transform.try :options
+        default_transform.try :clean_options
       end
 
       def defaults=(options)

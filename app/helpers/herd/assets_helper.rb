@@ -1,5 +1,15 @@
 module Herd
   module AssetsHelper
+
+    def assetable_uploader(assetable) 
+      form_for [:herd, assetable.assets.new] do |f|
+        concat f.hidden_field :assetable_type
+        concat f.hidden_field :assetable_id
+        concat f.file_field :file
+        concat f.submit
+      end
+    end
+
     def herd_tag(asset, options={})
       return unless asset
       asset.generate unless asset.file_name
@@ -12,8 +22,7 @@ module Herd
         end
       when Video
         options[:size] ||= "#{asset.width}x#{asset.height}"
-
-        video_tag(asset.file_url, options)
+        video_tag([asset.file_url], options) 
       end
     end
   end

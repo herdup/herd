@@ -15,11 +15,13 @@ module Herd
     end
 
     def file_name_from_url(url)
-      URI.unescape(File.basename(URI.parse(url).path))
+      URI.unescape(File.basename( URI.parse( url.gsub( /\?.*/, "" ) ).path ))
     end
 
     def file_ext
-      File.extname(file_field).tr('.','') rescue ''
+      # if the file is coming from amazon it may have a query string as part of the extension due to the nature of AWS read urls
+      # so we strip the query string just in case
+      strip_query_string(File.extname(file_field).tr('.','')) rescue ''
     end
 
     def file_name_wo_ext
@@ -33,14 +35,13 @@ module Herd
     end
 
     def unique_tmppath(ext=nil)
-      Dir::Tmpname.tmpdir + "/" + "#{file_name_wo_ext}.#{file_ext}"
+      Dir::Tmpname.tmpdir + "/" + "#{file_name_wo_ext}.#{ext || file_ext}"
     end
 
     def sanitized_classname
       # since this method is used to create paths in both s3/local file systems
       # to maintain consistency in paths between s3/local fs, we need to make sure the polymorphism is resolved
       # before we write to any paths, remote or otherwise 
-      set_asset_type 
       type_s = self.type
       type_s ||= self.class.to_s
       type_s.split("::").second.pluralize.downcase
@@ -70,9 +71,12 @@ module Herd
         self.file_name = input_file.original_filename
       when File
         self.file_name = File.basename(input_file.path)
+      when Tempfile
+        self.file_name = File.basename(@file.path)                
       end
 
-      self.content_type = get_content_type_for_file self.file
+      self.content_type = get_content_type_for_file self.file.path
+      set_asset_type
       finalize_file
     end
 
@@ -98,12 +102,11 @@ module Herd
       sub.save    
     end
 
-    def get_content_type_for_file(file)
-      FileMagic.new(FileMagic::MAGIC_MIME).file(file.path).split(';').first.to_s
+    def get_content_type_for_file(path)
+      `file --brief --mime-type #{Shellwords.escape(path)}`.strip
     end
 
     # define interface methods
-
     def did_identify_type
       raise NotImplementedError, unimplemented_in_class_error_str
     end
@@ -156,7 +159,7 @@ module Herd
 
     private 
     def unimplemented_in_class_error_str
-      "This method must be implemented in a subclass of Herd:Asset"
+      "This method must be implemented in a subclass of Herd::Asset"
     end
 
     def unimplemented_in_module_error_str

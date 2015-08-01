@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.name        = "herd"
   s.version     = Herd::VERSION
   s.authors     = ["Sebastian Bean"]
-  s.email       = ["sebastian@ginlanemedia.com"]
+  s.email       = ["sebbean@gmail.com"]
   s.homepage    = "http://herdup.io"
   s.summary     = "Herds of Assets for your Rails 4 App"
   s.description = "Herd is Rails Engine that provides a simple interface for managing assets."
@@ -16,22 +16,23 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency "rails", "~> 4.1.0"
-  s.add_dependency "rspec-rails"#, "~> 2.14.1"
-  s.add_dependency "haml-rails"
+  s.add_dependency 'rails', '> 4'
+  s.add_dependency 'responders'
+  s.add_dependency 'rspec-rails'#, "~> 2.14.1"
+  s.add_dependency 'haml-rails'
+  s.add_dependency 'pg'
   s.add_dependency 'active_model_serializers'
   s.add_dependency 'progressbar'
-  s.add_dependency 'ruby-filemagic'
-  s.add_dependency 'mini_magick', '4.0.1'
+  s.add_dependency 'mini_magick', '4.2.7'
   s.add_dependency 'exifr'
 
   s.add_dependency 'streamio-ffmpeg'
   s.add_dependency 'rubyzip'
 
-  s.add_dependency 'sidekiq'
-  s.add_dependency 'sidekiq-status'
-  s.add_dependency 'sidekiq-unique-jobs'
-  s.add_dependency 'sinatra'
+  # s.add_dependency 'sidekiq'
+  # s.add_dependency 'sidekiq-status'
+  # s.add_dependency 'sidekiq-unique-jobs'
+  # s.add_dependency 'sinatra'
 
   s.add_dependency 'aws-sdk-v1'
   s.add_dependency 'typhoeus'

@@ -1,19 +1,15 @@
 require 'haml-rails'
 
+require 'responders'
+
 require 'active_model_serializers'
-require 'filemagic'
-require 'mini_magick'
-require 'exifr'
-require 'sidekiq'
-require 'streamio-ffmpeg'
-require 'progressbar'
 require 'open-uri'
-require 'zip'
-require 'sidekiq'
-require 'sidekiq-status'
-require 'rb-fsevent'
-require 'aws-sdk-v1'
-require 'typhoeus'
+
+OpenURI::Buffer.send :remove_const, 'StringMax' if OpenURI::Buffer.const_defined?('StringMax')
+OpenURI::Buffer.const_set 'StringMax', 0
+
+# require 'sidekiq'
+# require 'sidekiq-status'
 
 module Herd
   class Engine < ::Rails::Engine
@@ -25,6 +21,7 @@ module Herd
     end
 
     initializer 'configure_minimagick' do |app|
+      require 'mini_magick'
       MiniMagick.configure do |config|
         config.cli = :graphicsmagick
         config.timeout = 5
@@ -46,34 +43,24 @@ module Herd
       app.config.autoload_paths << "#{config.root}/lib"
     end
 
-    if Rails.env.test?
-      initializer :append_herd_migrations do |app|
-        unless app.root.to_s.match root.to_s
-          config.paths["db/migrate"].expanded.each do |expanded_path|
-            app.config.paths["db/migrate"] << expanded_path
-          end
-        end
-      end
-    end
+    # initializer :setup_sidekiq_middlewares do |app|
+    #   Sidekiq.configure_client do |config|
+    #     config.redis = { namespace: Rails.application.class.parent_name }
+    #     config.client_middleware do |chain|
+    #       chain.add Sidekiq::Status::ClientMiddleware
+    #     end
+    #   end
 
-    initializer :setup_sidekiq_middlewares do |app|
-      Sidekiq.configure_client do |config|
-        config.redis = { namespace: Rails.application.class.parent_name }
-        config.client_middleware do |chain|
-          chain.add Sidekiq::Status::ClientMiddleware
-        end
-      end
-
-      Sidekiq.configure_server do |config|
-        config.redis = { namespace: Rails.application.class.parent_name }
-        config.server_middleware do |chain|
-          chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.minutes # default
-        end
-        config.client_middleware do |chain|
-          chain.add Sidekiq::Status::ClientMiddleware
-        end
-      end
-    end
+    #   Sidekiq.configure_server do |config|
+    #     config.redis = { namespace: Rails.application.class.parent_name }
+    #     config.server_middleware do |chain|
+    #       chain.add Sidekiq::Status::ServerMiddleware, expiration: 30.minutes # default
+    #     end
+    #     config.client_middleware do |chain|
+    #       chain.add Sidekiq::Status::ClientMiddleware
+    #     end
+    #   end
+    # end
 
   end
 end
