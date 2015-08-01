@@ -3,7 +3,7 @@
 
 Herds of Assets for your Rails 4 Apps.
 
-Dependent on PostgreSQL `gem 'pg'`
+**Note:** Herd is dependent on PostgreSQL `gem 'pg'`
 
 ### Installation
 
@@ -52,11 +52,12 @@ end
 
 Drop in an uploader for your assetable model (@pano is mines)
 
-
 ```erb
 <%= assetable_uploader @pano %>
 
 ```
+
+**Note:** Using Ember CLI?  Checkout the [Herd Ember](https://github.com/herdup/herd-ember) addon.
 
 ### Release the Herd!
 
@@ -68,22 +69,60 @@ Display your attached assets! a.t *transform string*, *name*
 <% end %>
 ```
 
-
 ### Enable S3
+
+Herd is designed to be used with S3.  To enable S3:
+
+#### Setup your Host Application
 
 Currently S3 can be enabled using your Rails secrets.yml file. 
 
 ```yml
 production:
-  herd_s3_key: abc123
-  herd_s3_secret: zyxlmnop123
+  herd_s3_key: your_s3_key_here
+  herd_s3_secret: your_s3_secret_key_here
   herd_s3_enabled: true
-  herd_s3_bucket: dev-herd
+  herd_s3_bucket: myapp-production-bucket
+  herd_s3_path_prefix: assets 
 ```
 
-Note: If you already have `ENV["AWS_ACCESS_KEY_ID"]` / `ENV["AWS_SECRET_ACCESS_KEY"]`, herd will use those instead.
+**Note**: If you already have `ENV["AWS_ACCESS_KEY_ID"]` / `ENV["AWS_SECRET_ACCESS_KEY"]`, Herd will use those instead.
 
-Note: Changing this setting will break existing assets. See import/export process to move assets between s3/filesystem
+**Note**: Changing this setting will break existing assets. See import/export process to move assets between s3/filesystem
+
+#### S3 Bucket Configuration
+
+You'll also need to setup a S3 bucket, and allow it to be accessed publicly. Add a policy such as:
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadForGetBucketObjects",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::MY-BUCKET-NAME/*"
+        }
+    ]
+}
+```
+
+If you're requesting images from the bucket via JS, you'll want to Edit the Buckets CORS configuration too:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+    <CORSRule>
+        <AllowedOrigin>http://*</AllowedOrigin>
+        <AllowedOrigin>https://*</AllowedOrigin>
+        <AllowedMethod>GET</AllowedMethod>
+        <MaxAgeSeconds>3000</MaxAgeSeconds>
+        <AllowedHeader>Authorization</AllowedHeader>
+    </CORSRule>
+</CORSConfiguration>
+```
 
 ### Transform Defaults
 
