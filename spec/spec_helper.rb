@@ -2,7 +2,7 @@
 ENV["RAILS_ENV"] ||= 'test'
 require File.expand_path("../dummy/config/environment",  __FILE__)
 require 'rspec/rails'
-require 'sidekiq/testing'
+# require 'sidekiq/testing'
 #
 # Sidekiq::Testing.fake!
 
@@ -17,7 +17,7 @@ ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
   config.before(:each) do
-    Sidekiq::Worker.clear_all
+    # Sidekiq::Worker.clear_all
     if Rails.application.secrets.herd_s3_enabled
       
       AWS.config({

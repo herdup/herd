@@ -63,7 +63,7 @@ module Herd
 
     def generate(async=nil)
       #puts "async #{async} herd: #{ENV['HERD_LIVE_ASSETS']} transform.async #{transform.try(:async)}"
-      if async || ENV['HERD_LIVE_ASSETS'] == '1' || transform.try(:async)
+      if defined?(Sidekiq) and (async || ENV['HERD_LIVE_ASSETS'] == '1' || transform.try(:async))
         self.jid = TransformWorker.perform_async id, transform.options
       else
         generate!

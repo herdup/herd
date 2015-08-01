@@ -1,6 +1,6 @@
 module Herd
   class TransformExportWorker
-    include Sidekiq::Worker
+    # include Sidekiq::Worker
 
     def perform(path=nil)
       path ||= Rails.root.join 'config/herd.yml'

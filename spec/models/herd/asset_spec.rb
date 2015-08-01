@@ -80,7 +80,7 @@ module Herd
       expect(child2.height).to eq 30
     end
 
-    it "should created empty child if async flag true" do
+    xit "should created empty child if async flag true" do
       asset = Herd::Asset.create file: img_path
       asset = Herd::Asset.find asset.id
 

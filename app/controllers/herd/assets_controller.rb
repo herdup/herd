@@ -159,7 +159,7 @@ module Herd
     # DELETE /assets/1
     def destroy
       @asset.destroy
-      render json: @asset.assetable
+      head :no_content
     end
 
     def scoped_assets
