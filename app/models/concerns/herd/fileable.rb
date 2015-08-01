@@ -17,12 +17,12 @@ module Herd
     end
 
     def file_url(absolute=ActionController::Base.asset_host.present?)
-      relative = File.join base_path(false), file_field
-      if absolute
+      url = if absolute
         ActionController::Base.helpers.asset_url relative
       else
-        relative
+        File.join base_path(false), file_field
       end
+      URI.encode url
     end
 
     def prepare_remote_file(input_file)

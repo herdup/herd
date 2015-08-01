@@ -134,7 +134,7 @@ module Herd
 
         respond_to do |format|
           format.html { redirect_to :back }
-          format.json { render json: @asset, serializer: AssetSerializer          }
+          format.json { render json: @asset, serializer: AssetSerializer }
         end
         
       else

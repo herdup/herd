@@ -159,7 +159,7 @@ module Herd
 
     private 
     def unimplemented_in_class_error_str
-      "This method must be implemented in a subclass of Herd:Asset"
+      "This method must be implemented in a subclass of Herd::Asset"
     end
 
     def unimplemented_in_module_error_str
