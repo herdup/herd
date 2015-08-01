@@ -1,5 +1,6 @@
 # Herd
-[![Build Status](https://travis-ci.org/herdupio/herd.svg)](https://travis-ci.org/herdupio/herd)
+
+[![Build Status](https://circleci.com/gh/herdup/herd.svg?&style=shield)](https://circleci.com/gh/herdup/herd)
 
 Herds of Assets for your Rails 4 Apps.
 
@@ -50,11 +51,10 @@ end
 
 ### Using the Uploader
 
-Drop in an uploader for your assetable model (@pano is mines)
+Drop in an uploader for your assetable model like so:
 
 ```erb
-<%= assetable_uploader @pano %>
-
+<%= assetable_uploader @post %>
 ```
 
 **Note:** Using Ember CLI?  Checkout the [Herd Ember](https://github.com/herdup/herd-ember) addon.
@@ -64,7 +64,7 @@ Drop in an uploader for your assetable model (@pano is mines)
 Display your attached assets! a.t *transform string*, *name*
 
 ```erb
-<% @pano.assets.each do |a| %>
+<% @post.assets.each do |a| %>
   <%= herd_tag a.t 'resize: x420', 'edit' %>
 <% end %>
 ```
@@ -126,11 +126,11 @@ If you're requesting images from the bucket via JS, you'll want to Edit the Buck
 
 ### Transform Defaults
 
+TODO
 
+### Import / Export Assets
 
-### Versioning
-
-When this library is released, it will follow the [Semantic Versioning](http://semver.org/) spec.
+TODO
 
 ### Testing
 Run tests with Rspec!
