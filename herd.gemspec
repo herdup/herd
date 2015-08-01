@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'pg'
   s.add_dependency 'active_model_serializers'
   s.add_dependency 'progressbar'
-  s.add_dependency 'mini_magick', '4.0.1'
+  s.add_dependency 'mini_magick', '4.2.7'
   s.add_dependency 'exifr'
 
   s.add_dependency 'streamio-ffmpeg'

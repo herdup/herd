@@ -130,13 +130,13 @@ describe Herd::Config do
     expect(child3.transform.options['crop']).to eq '200x200+150+0'
 
     expect(child3.width).to eq 400
-    expect(child3.reload.width).to eq 400
+    # expect(child3.reload.width).to eq 400
 
-    expect(Herd::TransformWorker.jobs.size).to eq 1
+    # expect(Herd::TransformWorker.jobs.size).to eq 1
 
-    Herd::TransformWorker.drain
+    # Herd::TransformWorker.drain
 
-    expect(child3.width).to eq 400
+    # expect(child3.width).to eq 400
     expect(child3.reload.width).to eq 200
   end
 
