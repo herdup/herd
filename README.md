@@ -1,6 +1,6 @@
 # Herd
 
-[![Build Status](https://circleci.com/gh/herdup/herd.svg?&style=shield)](https://circleci.com/gh/herdup/herd)
+[![Build Status](https://circleci.com/gh/herdup/herd.svg?style=shield&circle-token=9b150d27bd4c1ed7dc84e57623f021ef2edf2e99)](https://circleci.com/gh/herdup/herd)
 
 Herds of Assets for your Rails 4 Apps.
 
