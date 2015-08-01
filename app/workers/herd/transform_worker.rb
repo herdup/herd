@@ -7,7 +7,7 @@ module Herd
     def perform(child_asset_id, opts={})
       child = Asset.find child_asset_id
       file = child.transform.perform child.parent_asset do |p|
-        at p * 100.0, "transcoding"
+        # at p * 100.0, "transcoding"
       end
 
       child.update file: file
