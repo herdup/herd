@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Herd::Sync::Base do
+  fixtures :posts
+
   it "should make file map with assetable model structure" do
 
     ap Herd::Asset.all
@@ -48,10 +50,8 @@ describe Herd::Sync::Base do
     Herd::Page.missing_assets.create file: Rails.root.join('../../spec/fixtures/guac.png')
     Post.missing_assets.create file: Rails.root.join('../../spec/fixtures/shutter.jpg')
 
-    post = Post.create title: 'Test 1'
+    post = Post.find_by_assetable_slug 'Test 1'
     post.assets.create file: Rails.root.join('../../spec/fixtures/test.mov')
-
-    post = Post.create title: 'Test 2'
 
     exporter = Herd::Sync::S3Export.new 'herd-testing', 'herd_export_test', true, ENV['HERD_TESTING_AWS_ACCESS_KEY_ID'], ENV['HERD_TESTING_AWS_SECRET_ACCESS_KEY']
 
