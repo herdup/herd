@@ -132,10 +132,11 @@ module Herd
           @asset.save unless pre == @asset.meta
         end
 
-        respond_to do |format|
-          # format.html { redirect_to :back }
-          format.json { render json: @asset, serializer: AssetSerializer }
-        end
+        render json: @asset, serializer: AssetSerializer
+        # respond_to do |format|
+        #   # format.html { redirect_to :back }
+        #   format.any { }
+        # end
         
       else
         render json: @asset.errors, status: :unprocessable_entity
