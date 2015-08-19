@@ -70,7 +70,7 @@ module Herd
       if params[:asset] and params[:asset][:transform]# transform_params.present?
         parent = Asset.find(params[:asset][:parent_asset_id])
 
-        klass = params[:asset][:transform][:type].constantize rescue parent.class.default_transform
+        klass = klass_for_type(params[:asset][:transform][:type]) rescue parent.class.default_transform
         params[:asset][:transform].delete(:type)
 
         #TODO: dont use default_transform here
@@ -177,6 +177,9 @@ module Herd
 
     private
 
+      def klass_for_type(type)
+        type.constantize
+      end
 
       # Use callbacks to share common setup or constraints between actions.
       def set_asset
@@ -185,7 +188,21 @@ module Herd
 
       # Only allow a trusted parameter "white list" through.
       def asset_params
-        params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position, :created_at, :updated_at) if params[:asset]
+        if params[:asset]
+          sanitized = params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position, :created_at, :updated_at)
+          assetable_slug = params[:asset][:assetable_slug]
+           
+          # If the uploader passes :assetable_slug instead, prepare the asset_params appropriately
+          if sanitized[:assetable_id].nil? && assetable_slug
+            klass     = klass_for_type sanitized[:assetable_type]
+            assetable = klass.find_by_assetable_slug assetable_slug
+
+            sanitized[:assetable_id] = assetable.id if assetable
+          end
+          sanitized 
+        else
+          []
+        end
       end
       def metadata_params
         params.require(:asset).require(:metadata).permit!.symbolize_keys if asset_params.try(:metadata)
