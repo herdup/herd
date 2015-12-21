@@ -170,7 +170,7 @@ module Herd
       elsif params[:parent_id].present?
         assets = assets.where parent_asset_id:params.require(:parent_id)
       elsif params[:ids].present?
-        assets = assets.where id:params.require(:id)
+        assets = assets.where id:params.require(:ids)
       end
       assets
     end
