@@ -8,7 +8,7 @@ module Herd
     attributes :metadata
     attributes :assetable_type, :assetable_id
 
-    has_many :child_assets,  embed: :ids, serializer: AssetSerializer
+    has_many :child_assets,  embed: :ids, include: true, serializer: AssetSerializer
     has_one :parent_asset,  embed: :ids
 
     has_one :transform,  embed: :ids, include: true, serializer: TransformSerializer
@@ -30,5 +30,6 @@ module Herd
     def metadata
       object.meta
     end
+
   end
 end
