@@ -9,20 +9,18 @@ module Herd
       has_many :assets, -> {order(:position)},
         as:         :assetable,
         class_name: 'Herd::Asset',
-        dependent:  :destroy,
-        touch:      true
+        dependent:  :destroy#, touch:      true
 
       has_many :master_assets, -> {master.order(:position)},
         as:         :assetable,
         class_name: 'Herd::Asset',
-        dependent:  :destroy,
-        touch:      true
+        dependent:  :destroy#, touch:      true
 
       assetable_slug
     end
 
     def asset
-      assets.master.take || self.class.missing_assets.take || Asset.new
+      assets.master.take || self.class.missing_assets.take || assets.new
     end
 
     def transforms

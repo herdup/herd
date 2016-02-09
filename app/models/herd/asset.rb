@@ -56,9 +56,9 @@ module Herd
     delegate :width, to: :meta_struct
     delegate :height, to: :meta_struct
 
-    serialize :meta, Hash
+    # serialize :meta, Hash
     def meta_struct
-      OpenStruct.new meta
+      OpenStruct.new Transform.clean_options(meta)
     end
 
     def generate(async=nil)

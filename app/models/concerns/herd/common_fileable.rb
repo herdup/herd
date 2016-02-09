@@ -96,6 +96,7 @@ module Herd
 
     def become_asset_type
       file = nil
+      return if self.type.nil?
       sub = becomes(self.type.constantize)
       sub.did_identify_type
       sub.meta[:frame_count] = self.frame_count unless self.frame_count.nil?

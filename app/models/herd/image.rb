@@ -20,6 +20,7 @@ module Herd
     end
 
     def did_identify_type
+      self.meta ||= {}
       self.meta.merge! load_meta
     end
 
@@ -28,16 +29,16 @@ module Herd
       image = mini_magick(true)
 
       if exif.present?
-        hash[:make]   = exif.make
-        hash[:model]  = exif.model
-        hash[:gps]    = exif.gps.try(:to_h)
+        hash["make"]   = exif.make
+        hash["model"]  = exif.model
+        hash["gps"]    = exif.gps.try(:to_h)
        
         # Auto Orient if Available
         image.try :auto_orient
       end
 
-      hash[:height] = image.height
-      hash[:width]  = image.width
+      hash["height"] = image.height
+      hash["width"]  = image.width
 
       hash.delete_if {|k,v|v.nil?} # make sense er na? cleaner db
       hash

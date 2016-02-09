@@ -74,8 +74,8 @@ module Herd
         params[:asset][:transform].delete(:type)
 
         #TODO: dont use default_transform here
-        transform = unless transform_params[:name].empty?
-          klass.find_by(name:transform_params[:name]).tap do |t|
+        transform = if name = transform_params[:name].presence
+          klass.find_by(name:name).tap do |t|
             if t and transform_params[:options]
               t_options = if transform_params[:options].kind_of? String
                 t.class.options_from_string(transform_params[:options])
@@ -83,12 +83,14 @@ module Herd
                 transform_params[:options]
               end
               unless t_options == t.options
+                
                 t.options = t_options
                 t.save
               end
             end
           end
         end
+        
         transform ||= klass.where_t(transform_params).first_or_create do |t|
           t_options = if transform_params[:options].kind_of? String
             t.class.options_from_string(transform_params[:options])
@@ -132,7 +134,7 @@ module Herd
           @asset.save unless pre == @asset.meta
         end
 
-        render json: @asset, serializer: AssetSerializer
+        render json: @asset.reload, serializer: AssetSerializer
         # respond_to do |format|
         #   # format.html { redirect_to :back }
         #   format.any { }
@@ -146,11 +148,18 @@ module Herd
 
     # PATCH/PUT /assets/1
     def update
+      if params[:trigger].present?
+        @asset.send params[:trigger]
+        @asset.save #if @asset.meta_changed?
+        return respond_with(@asset, serializer: AssetSerializer)
+      end      
+
       if @asset.update(asset_params)
         if metadata_params.present?
           @asset.meta.merge! metadata_params
           @asset.save if @asset.meta_changed?
         end
+
         respond_with(@asset, serializer: AssetSerializer)
       else
         render :edit

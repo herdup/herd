@@ -10,13 +10,21 @@ module Herd
       end
     end
 
-    def herd_tag(asset, options={})
+    def herd_tag(asset, options={}, &block)
       return unless asset
       asset.generate unless asset.file_name
+
+      options[:data] = { asset_id: asset.id }
       case asset
       when Image
         if options[:bg]
-          content_tag(:div,raw("&nbsp;"),options.merge(style:"background-image: url('#{asset.file_url}');"))
+          options[:style] ||= ""
+          options[:style] += ";background-image: url('#{asset.file_url}');"
+          options[:style] += "width: #{asset.width}px; height: #{asset.height}px;"
+
+          content_tag options.delete(:bg), raw("&nbsp;"), options  do
+            capture(&block) if block_given?
+          end
         else
           tag(:img,options.merge(src:asset.file_url))
         end

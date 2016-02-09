@@ -27,6 +27,7 @@ module Herd
 
     def prepare_remote_file(input_file)
       input_file = input_file.to_s
+      self.meta ||= {}
       self.meta[:content_url] = strip_query_string input_file
       
       download_file = File.open(unique_tmppath, 'wb')

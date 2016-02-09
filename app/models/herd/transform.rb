@@ -53,10 +53,14 @@ module Herd
       out
     end
 
-    def clean_options
+    def self.clean_options(options)
       if options and options.count
         options.map { |k,v| {k => (v =~ /^\d*$/ ? v.to_i : v) } }.reduce(:merge)
       end || {}.with_indifferent_access
+    end
+
+    def clean_options
+      self.class.clean_options(options)
     end
 
     def cascade

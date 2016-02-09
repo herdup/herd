@@ -101,6 +101,10 @@ module Herd
       paths.join "/"
     end
 
+    def s3_object
+      bucket[base_path]
+    end
+
     def file_path
       # check if local file exists and return that otherwise download the file 
       bucket[base_path].local_tmpfile.try(:path).presence || ""
@@ -109,17 +113,18 @@ module Herd
     def file_url(cdn_host=ActionController::Base.asset_host.present?)
       if cdn_host
         # we have an asset host, which should be a cdn that is set up to read from the s3 bucket in pretty much any case
-        ActionController::Base.helpers.asset_url URI.parse(self.meta[:read_url]).path
+        ActionController::Base.helpers.asset_url URI.parse(self.meta["read_url"]).path
       else
         # direct link to s3
-        self.meta[:read_url]
+        self.meta["read_url"]
       end
     end
 
     def prepare_remote_file(input_file)
       # download the file first if this is a remote path so we can do our asset type magic
       input_file = input_file.to_s
-      self.meta[:content_url] = strip_query_string input_file
+      self.meta ||= {}
+      self.meta["content_url"] = strip_query_string input_file
       self.file = open input_file
       self.file_name  = file_name_from_url input_file
     end
@@ -134,7 +139,6 @@ module Herd
           self.file_name = "#{o_file_name_wo_ext}-#{ix}.#{file_ext}"
         end
       end
-
       # bucket[base_path] = nil if bucket[base_path]
       # now write to the bucket since we have all the prerequisite information (content/asset type mainly)
       bucket[base_path] = self.file, self.content_type
@@ -142,8 +146,9 @@ module Herd
       # final bits of meta once we've successfully copied to s3
       self.file_size = self.file.size
 
+      self.meta ||= {}
       # read url is the newly uploaded bucket url -- used in file_url for cdn origin downloading purposes
-      self.meta[:read_url] = strip_query_string bucket[base_path].url_for(:read).to_s
+      self.meta["read_url"] = strip_query_string bucket[base_path].url_for(:read).to_s
     end
 
     def save_file
