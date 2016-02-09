@@ -5,7 +5,7 @@ module Herd
 
     def base_path(abs=true, fields = nil)
       fields ||= fileable_directory_fields
-      parts = ["/uploads",((Rails.application.secrets.herd_env || Rails.env), sanitized_classname]
+      parts = ["/uploads", (Rails.application.secrets.herd_env || Rails.env), sanitized_classname]
       parts.concat fields
       parts.unshift *[Rails.root,'public'] if abs
       File.join(*parts)
