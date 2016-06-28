@@ -5,7 +5,12 @@ module Herd
 
     def base_path(abs=true, fields = nil)
       fields ||= fileable_directory_fields
-      parts = ["/uploads", Rails.env, sanitized_classname]
+      
+      parts = if (Rails.application.secrets.herd_env || Rails.env) == "production"
+        [(Rails.application.secrets.herd_env || Rails.env), sanitized_classname]
+      else
+        ["/uploads", Rails.env, sanitized_classname]
+      end
       parts.concat fields
       parts.unshift *[Rails.root,'public'] if abs
       File.join(*parts)
@@ -18,7 +23,7 @@ module Herd
 
     def file_url(absolute=ActionController::Base.asset_host.present?)
       url = if absolute
-        ActionController::Base.helpers.asset_url relative
+        ActionController::Base.helpers.asset_url File.join base_path(false), file_field
       else
         File.join base_path(false), file_field
       end
