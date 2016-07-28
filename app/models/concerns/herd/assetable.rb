@@ -6,7 +6,7 @@ module Herd
     included do
       ASSETABLE_MODELS.push(self)
 
-      has_many :assets, -> { order(:position).includes(child_assets: :transform) },
+      has_many :assets, -> { order(:position).preload(child_assets: :transform) },
         as:         :assetable,
         class_name: 'Herd::Asset',
         dependent:  :destroy,
