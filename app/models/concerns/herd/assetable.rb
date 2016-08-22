@@ -10,15 +10,12 @@ module Herd
         as:         :assetable,
         class_name: 'Herd::Asset',
         dependent:  :destroy,
-        touch:      true,
         inverse_of: :assetable
 
       has_many :master_assets, -> { master.order(:position) },
         as:         :assetable,
         class_name: 'Herd::Asset',
-        dependent:  :destroy,
-        touch:      true
-
+        dependent:  :destroy
 
       assetable_slug
     end
