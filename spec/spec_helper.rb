@@ -26,6 +26,8 @@ RSpec.configure do |config|
         http_open_timeout: 30, 
         http_read_timeout: 120
       })
+      puts "aws_key_id: " + ENV['HERD_TESTING_AWS_ACCESS_KEY_ID']
+      puts "aws_secret: " + ENV['HERD_TESTING_AWS_SECRET_ACCESS_KEY']
 
       bucket = AWS::S3.new.buckets[Rails.application.secrets.herd_s3_bucket]
       bucket.objects.with_prefix(Rails.application.secrets.herd_s3_path_prefix).delete_all
