@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'mini_magick', '4.2.7'
   s.add_dependency 'exifr'
 
-  s.add_dependency 'streamio-ffmpeg', '0.9.0'
+  s.add_dependency 'streamio-ffmpeg'
   s.add_dependency 'rubyzip'
 
   # s.add_dependency 'sidekiq'
