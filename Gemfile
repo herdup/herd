@@ -20,4 +20,4 @@ gem 'pry'
 gem 'puma'
 gem 'typhoeus'
 
-gem 'streamio-ffmpeg', github: 'streamio/streamio-ffmpeg'
+gem 'streamio-ffmpeg', github: 'streamio/streamio-ffmpeg', tag: 'v0.9.0'
