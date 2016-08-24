@@ -15,15 +15,23 @@ module Herd
     scope :master, -> {where(parent_asset_id: nil)}
     scope :child, -> {where.not(parent_asset_id: nil)}
 
-    belongs_to :assetable, polymorphic: true
+    belongs_to :assetable, polymorphic: true, inverse_of: :assets
 
-    belongs_to :transform
+    belongs_to :transform, inverse_of: :assets
     has_many :child_transforms, through: :child_assets, source: :transform
 
-    belongs_to :parent_asset, class_name: 'Asset'
-    has_many :child_assets, class_name: 'Asset',
-                            dependent: :destroy,
-                            foreign_key: :parent_asset_id
+    belongs_to :parent_asset,
+      inverse_of:   :child_assets,
+      class_name:   'Asset'
+      
+
+    has_many :child_assets, 
+      inverse_of:   :parent_asset,
+      class_name:   'Asset', 
+      dependent:    :destroy, 
+      foreign_key:  :parent_asset_id
+      
+
 
     fileable_directory_fields -> (a) {
       if a.master?

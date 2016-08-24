@@ -2,7 +2,7 @@ machine:
   timezone:
     America/New_York
   ruby:
-    version: 2.1.2
+    version: 2.2.2
 database:
   override:
     - bundle exec rake db:create

@@ -11,13 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150611013901) do
+ActiveRecord::Schema.define(version: 20160722234053) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "hstore"
 
-  create_table "herd_assets", force: true do |t|
+  create_table "herd_assets", force: :cascade do |t|
     t.string   "file_name"
     t.integer  "file_size"
     t.string   "content_type"
@@ -32,13 +32,17 @@ ActiveRecord::Schema.define(version: 20150611013901) do
     t.integer  "position"
   end
 
-  create_table "herd_pages", force: true do |t|
+  add_index "herd_assets", ["assetable_id"], name: "index_herd_assets_on_assetable_id", using: :btree
+  add_index "herd_assets", ["assetable_type"], name: "index_herd_assets_on_assetable_type", using: :btree
+  add_index "herd_assets", ["transform_id"], name: "index_herd_assets_on_transform_id", using: :btree
+
+  create_table "herd_pages", force: :cascade do |t|
     t.string   "path"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "herd_transforms", force: true do |t|
+  create_table "herd_transforms", force: :cascade do |t|
     t.string   "type"
     t.hstore   "options"
     t.datetime "created_at"
@@ -47,7 +51,10 @@ ActiveRecord::Schema.define(version: 20150611013901) do
     t.string   "name"
   end
 
-  create_table "posts", force: true do |t|
+  add_index "herd_transforms", ["assetable_type"], name: "index_herd_transforms_on_assetable_type", using: :btree
+  add_index "herd_transforms", ["name"], name: "index_herd_transforms_on_name", using: :btree
+
+  create_table "posts", force: :cascade do |t|
     t.string   "title"
     t.text     "body"
     t.datetime "created_at"
