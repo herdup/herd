@@ -6,17 +6,16 @@ module Herd
     included do
       ASSETABLE_MODELS.push(self)
 
-      has_many :assets, -> {order(:position)},
+      has_many :assets, -> { order(:position).preload(child_assets: :transform) },
         as:         :assetable,
         class_name: 'Herd::Asset',
         dependent:  :destroy,
-        touch:      true
+        inverse_of: :assetable
 
-      has_many :master_assets, -> {master.order(:position)},
+      has_many :master_assets, -> { master.order(:position) },
         as:         :assetable,
         class_name: 'Herd::Asset',
-        dependent:  :destroy,
-        touch:      true
+        dependent:  :destroy
 
       assetable_slug
     end

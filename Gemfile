@@ -1,5 +1,5 @@
 source "https://rubygems.org"
-ruby '2.1.2'
+ruby '2.2.2'
 # Declare your gem's dependencies in herd.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
@@ -20,4 +20,4 @@ gem 'pry'
 gem 'puma'
 gem 'typhoeus'
 
-gem 'streamio-ffmpeg', github: 'streamio/streamio-ffmpeg'
+gem 'streamio-ffmpeg', github: 'streamio/streamio-ffmpeg', tag: 'v0.9.0'

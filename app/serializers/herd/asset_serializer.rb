@@ -19,12 +19,22 @@ module Herd
 
     attributes :transform_name
 
+    def include_child_assets?
+      object.association(:child_assets).loaded?
+    end
+    def include_parent_asset?
+      object.association(:parent_asset).loaded?
+    end
+    def include_transform?
+      object.association(:transform).loaded?
+    end
+
     def asset_class
       object.class.name.demodulize.downcase
     end
 
     def transform_name
-      object.try(:transform).try(:name)
+      object.try(:transform).try(:name) unless object.master? 
     end
 
     def url
