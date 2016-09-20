@@ -54,7 +54,7 @@ module Herd
     end
 
     def clean_options
-      if options and options.count
+      unless options.nil? or options.empty?
         options.map { |k,v| {k => (v =~ /^\d*$/ ? v.to_i : v) } }.reduce(:merge)
       end || {}.with_indifferent_access
     end
