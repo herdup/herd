@@ -39,7 +39,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'flip'
   s.add_dependency 'rb-fsevent'
-
+  s.add_dependency 'cocaine'
 
   s.add_development_dependency "sqlite3"
 
