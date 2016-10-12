@@ -105,7 +105,7 @@ module Herd
     def get_content_type_for_file(path)
       require 'cocaine'
       line = Cocaine::CommandLine.new("file --brief --mime-type", Shellwords.escape(path))
-      line.run
+      line.run.strip
     end
 
     # define interface methods
