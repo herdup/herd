@@ -18,9 +18,9 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rails', '> 4'
   s.add_dependency 'responders'
-  s.add_dependency 'rspec-rails'#, "~> 2.14.1"
+  # s.add_dependency ''#, "~> 2.14.1"
   s.add_dependency 'haml-rails'
-  s.add_dependency 'pg'
+  # s.add_dependency 'pg'
   s.add_dependency 'active_model_serializers'
   s.add_dependency 'progressbar'
   s.add_dependency 'mini_magick', '4.2.7'
@@ -40,9 +40,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'flip'
   s.add_dependency 'rb-fsevent'
 
-
+  s.add_development_dependency "pg"
   s.add_development_dependency "sqlite3"
-
+  s.add_development_dependency "rspec-rails"
 end
 
 
