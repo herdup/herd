@@ -96,13 +96,13 @@ module Herd
       # we need the asset type before we can write to s3
       # this is different from regular fileable because here we write the file first
       path_prefix = Rails.application.secrets.herd_s3_path_prefix.to_s
-      paths = [Rails.env, sanitized_classname, fileable_directory_fields.join("/"), self.file_name]
+      paths = [(Rails.application.secrets.herd_env || Rails.env), sanitized_classname, fileable_directory_fields.join("/"), self.file_name]
       paths.unshift path_prefix unless path_prefix.blank?
       paths.join "/"
     end
 
     def file_path
-      # check if local file exists and return that otherwise download the file 
+      # check if local file exists and return that otherwise download the file
       bucket[base_path].local_tmpfile.try(:path).presence || ""
     end
 
