@@ -5,8 +5,8 @@ module Herd
 
     def base_path(abs=true, fields = nil)
       fields ||= fileable_directory_fields
-      
-      parts = if (Rails.application.secrets.herd_env || Rails.env) == "production"
+
+      parts = if (Rails.application.secrets.herd_env || Rails.env) == "production" || (Rails.application.secrets.herd_env || Rails.env) == "staging"
         [(Rails.application.secrets.herd_env || Rails.env), sanitized_classname]
       else
         ["/uploads", Rails.env, sanitized_classname]
