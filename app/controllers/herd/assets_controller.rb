@@ -94,10 +94,10 @@ module Herd
             t.class.options_from_string(transform_params[:options])
           else
             transform_params[:options]
-          end          
+          end
           t.options = t_options
         end
-        
+
         #TODO: check for / respond w errors here
         params[:asset][:transform_id] = transform.id
         @asset = parent.child_with_transform(transform)
@@ -117,7 +117,7 @@ module Herd
 
         file = File.open(tmp.path)
         @asset = Asset.create asset_params.merge(file: file)
-        
+
       elsif asset_params[:file].kind_of? String
         @asset = Asset.find_by("meta like ?", "%content_url: #{asset_params[:file]}%")
       end
@@ -132,12 +132,16 @@ module Herd
           @asset.save unless pre == @asset.meta
         end
 
-        render json: @asset, serializer: AssetSerializer
+        if params[:response_action] == "back"
+          redirect_to :back
+        else
+          render json: @asset, serializer: AssetSerializer
+        end
         # respond_to do |format|
         #   # format.html { redirect_to :back }
         #   format.any { }
         # end
-        
+
       else
         render json: @asset.errors, status: :unprocessable_entity
       end
@@ -160,7 +164,12 @@ module Herd
     # DELETE /assets/1
     def destroy
       @asset.destroy
-      head :no_content
+
+      if params[:response_action] == "back"
+        redirect_to :back
+      else
+        head :no_content
+      end
     end
 
     def scoped_assets
@@ -191,7 +200,7 @@ module Herd
         if params[:asset]
           sanitized = params.require(:asset).permit(:file, :file_name, :parent_asset_id, :transform_id, :assetable_type, :assetable_id, :position, :created_at, :updated_at)
           assetable_slug = params[:asset][:assetable_slug]
-           
+
           # If the uploader passes :assetable_slug instead, prepare the asset_params appropriately
           if sanitized[:assetable_id].nil? && assetable_slug
             klass     = klass_for_type sanitized[:assetable_type]
@@ -199,7 +208,7 @@ module Herd
 
             sanitized[:assetable_id] = assetable.id if assetable
           end
-          sanitized 
+          sanitized
         else
           []
         end
